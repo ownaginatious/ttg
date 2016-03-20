@@ -1,0 +1,5 @@
+clone-workspace-scm:latest
+git:latest
+git-client:latest
+greenballs:latest
+scm-api:latest
