@@ -31,6 +31,8 @@ fi
 
 printf " -> Starting a new docker registry container (${container})... "
 
+# Update to the latest image.
+docker pull registry:2
 docker run -d --name "${container}" \
            -p ${DOCKER_REGISTRY_PORT}:5000 \
            -v $1/registry:/var/lib/registry registry:2 > /dev/null

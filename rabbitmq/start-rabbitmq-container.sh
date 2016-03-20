@@ -42,6 +42,8 @@ printf " -> Starting a new RabbitMQ container (${container})... "
 
 work_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+# Update to the latest RabbitMQ image.
+docker pull rabbitmq:3-management
 docker run -d --name "${container}" \
            -p ${RABBITMQ_MANAGEMENT_PORT}:15672 \
            -p ${RABBITMQ_AMQP_TLS_PORT}:5671 \

@@ -31,6 +31,9 @@ then
 fi
 
 printf " -> Starting a new gogs container (${container})... "
+
+# Update to the latest gogs image first.
+docker pull gogs/gogs
 # Communication with this docker server will be integrated into the Jenkins container
 docker run -d --name "${container}" \
            -p ${GOGS_SSH_PORT}:22 \
