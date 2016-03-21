@@ -23,8 +23,9 @@ public enum McMasterDepartmentScraper implements SupportingScraper {
 
     public synchronized Collection<Department> getDepartments() throws IOException {
 
-        if (this.cachedDepartments == null)
+        if (this.cachedDepartments == null) {
             this.cachedDepartments = retrieveDepartments();
+        }
 
         return this.cachedDepartments;
     }
