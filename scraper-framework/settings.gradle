@@ -1,0 +1,2 @@
+include ':ttg-java-api'
+project(':ttg-java-api').projectDir = new File(settingsDir, '../../../api/java/')
