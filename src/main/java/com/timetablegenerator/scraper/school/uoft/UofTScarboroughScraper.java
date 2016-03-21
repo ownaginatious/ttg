@@ -129,8 +129,9 @@ public class UofTScarboroughScraper extends Scraper {
         Elements courseTable = doc.getElementById("timetable_section").select("tr");
 
         // A single row implies no course information.
-        if (courseTable.size() <= 1)
+        if (courseTable.size() <= 1) {
             return courses;
+        }
 
         Course course = null;
 
