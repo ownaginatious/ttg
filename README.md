@@ -1,7 +1,8 @@
 ## Steps:
 1. Run npm install
 2. Run mongod
-3. Start app: node app.js
+3. Start app: node app.js [options]
+###### Options: --debug, --server_port, --service, --id_length, --max_size, --db_host, --db_url (note that these are double dashes)
 
 ## michuservice API
 #### GET /michuservice/:id

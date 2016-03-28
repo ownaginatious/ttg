@@ -1,5 +1,3 @@
-var DEBUG = true;
-
 // Other libraries
 var http = require('http');
 var url = require('url');
@@ -9,26 +7,77 @@ var crypto = require('crypto');
 var MongoClient = require('mongodb').MongoClient;
 var express = require('express');
 var stringify = require('json-stable-stringify');
+var parseArgs = require('minimist');
+
+// Parse command line options
+var opts = {
+    'boolean': ['debug', 'DEBUG'],
+    'default': {
+        'server_port': 8080,
+        'service': 'michuservice',
+        'id_length': 7,
+        'max_size': 5000,
+        'db_host': 'localhost',
+        'db_port': 27017,
+        'debug': false
+    },
+    'alias': {
+        'server_port': 'SERVER_PORT',
+        'service': 'SERVICE',
+        'id_length': 'ID_LENGTH',
+        'max_size': 'MAX_SIZE',
+        'db_host': 'DB_HOST',
+        'db_port': 'DB_PORT',
+        'debug': 'DEBUG'
+    },
+    'unknown': function (param) {
+        console.log('Sorry, ' + param + ' is not supported.');
+        process.exit(1);
+    }
+};
+var argv = parseArgs(process.argv.slice(2), opts);
 
 // Constants
-const HOST = 'localhost';
-const SERVER_PORT = 8080;
-const SERVICE = 'michuservice';
-const ID_LENGTH = 7;
-const MAX_SIZE = 5000;
+const DEBUG = argv.debug;
+const SERVER_PORT = Number(argv.server_port);
+const SERVICE = argv.service;
+const ID_LENGTH = Number(argv.id_length);
+const MAX_SIZE = Number(argv.max_size);
 
 // Database related constants
 const DATABASE = 'timetable_generator';
 const COLLECTION = 'user_schedules';
-const DB_PORT = 27017;
-const DB_URL = 'mongodb://' + HOST + ':' + DB_PORT + '/' + DATABASE;
+const DB_HOST = argv.db_host;
+const DB_PORT = Number(argv.db_port);
+const DB_URL = 'mongodb://' + DB_HOST + ':' + DB_PORT + '/' + DATABASE;
 
 // Global variables
 var db;
 
+// Log if DEBUG
+if (DEBUG) {
+    console.log('DEBUG INFO:');
+    console.log('  DEBUG=' + DEBUG);
+    console.log('  SERVER_PORT=' + SERVER_PORT);
+    console.log('  SERVICE=' + SERVICE);
+    console.log('  ID_LENGTH=' + ID_LENGTH);
+    console.log('  MAX_SIZE=' + MAX_SIZE);
+    console.log('  DATABASE=' + DATABASE);
+    console.log('  COLLECTION=' + COLLECTION);
+    console.log('  DB_HOST=' + DB_HOST);
+    console.log('  DB_PORT=' + DB_PORT);
+    console.log('  DB_URL=' + DB_URL + '\n');
+}
+
 // Connect to MongoDB and start server
 MongoClient.connect(DB_URL, function(err, database) {
-    if (err) throw err;
+    if (err) {
+        console.error('Unable to connect to MongoDB.');
+        console.info('Maybe there is no mongod instance running.');
+        console.info('Check to make sure you have the correct port '
+                + 'set for DB_PORT');
+        throw err;
+    }
     db = database;
     app.listen(SERVER_PORT);
 });
