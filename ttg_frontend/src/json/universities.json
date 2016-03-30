@@ -1,0 +1,82 @@
+{
+    "utsc": {
+        "visual_settings": {
+            "show_term": false,
+            "uses_serials": false,
+            "eow_word": "",
+            "uses_depheaders": false,
+            "school_unit_names": {
+                "t": "Tutorial",
+                "c": "Lecture",
+                "l": "Practical"
+            },
+            "school_unit_prefixes": {
+                "t": "TUT",
+                "c": "LEC",
+                "l": "PRA"
+            },
+            "show_tod": false
+        },
+        "name": "University of Toronto Scarborough Campus 2015/2016"
+    },
+    "western": {
+        "visual_settings": {
+            "show_term": false,
+            "uses_serials": true,
+            "eow_word": "",
+            "uses_depheaders": true,
+            "school_unit_names": {
+                "t": "Tutorial",
+                "c": "Lecture",
+                "l": "Lab"
+            },
+            "school_unit_prefixes": {
+                "t": "TUT",
+                "c": "LEC",
+                "l": "LAB"
+            },
+            "show_tod": false
+        },
+        "name": "University of Western Ontario 2015/2016"
+    },
+    "mcmaster": {
+        "visual_settings": {
+            "show_term": true,
+            "uses_serials": false,
+            "eow_word": "EOW",
+            "uses_depheaders": true,
+            "school_unit_names": {
+                "t": "Tutorial",
+                "c": "Core",
+                "l": "Lab"
+            },
+            "school_unit_prefixes": {
+                "t": "T",
+                "c": "C",
+                "l": "L"
+            },
+            "show_tod": false
+        },
+        "name": "McMaster University 2015/2016"
+    },
+    "mcmaster_summer": {
+        "visual_settings": {
+            "show_term": true,
+            "uses_serials": false,
+            "eow_word": "EOW",
+            "uses_depheaders": true,
+            "school_unit_names": {
+                "t": "Tutorial",
+                "c": "Core",
+                "l": "Lab"
+            },
+            "school_unit_prefixes": {
+                "t": "T",
+                "c": "C",
+                "l": "L"
+            },
+            "show_tod": false
+        },
+        "name": "McMaster University Summer 2016"
+    }
+}

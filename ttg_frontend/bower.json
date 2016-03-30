@@ -1,0 +1,8 @@
+{
+  "name": "ttg",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "jquery": "1.7.2"
+  }
+}
