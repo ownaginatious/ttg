@@ -33,10 +33,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': ()
 }
 
-ROOT_URLCONF = 'ttg_backend.urls'
+ROOT_URLCONF = 'urls'
 
-WSGI_APPLICATION = 'ttg_backend.wsgi.application'
-
+WSGI_APPLICATION = 'wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
