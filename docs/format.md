@@ -252,7 +252,7 @@ The unique identifying codes of any courses that cannot have already been comple
 
 Any relevant notes as to this course. Courses may or may not have these depending on the school they come from.
 
-#### term <Term>
+#### term `Term`
 
 The `Term` that this course occurs in. This key will always be set to a term that is covered by the timetable's overall term. For example, if the timetable's term value is set to `6` (full school year), the the only possible values for the term variable within this structure are the those that are within fall, spring or are unscheduled, cancelled or not offered. Refer to the [`Term`](#term-head) section for more information.
 
