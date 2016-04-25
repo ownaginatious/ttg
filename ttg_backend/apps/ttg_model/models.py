@@ -4,13 +4,14 @@ from django.utils.translation import ugettext as _
 from model_utils import Choices
 from model_utils.fields import MonitorField
 
+
 class Note(models.Model):
     text = models.TextField(max_length=1000)
 
     class Meta:
         abstract = True
 
-    def __unicode__ (self):
+    def __unicode__(self):
         return unicode(self.text)
 
 
@@ -29,14 +30,14 @@ class Term(models.Model):
                                     related_name='subterms',
                                     related_query_name='subterm',
                                     null=True)
-    short_name = models.CharField(max_length=50, null=True) 
+    short_name = models.CharField(max_length=50, null=True)
     long_name = models.CharField(max_length=100, null=True)
 
     class Meta:
         unique_together = (('code', 'school'),)
 
-    def __unicode__ (self):
-        return  unicode("%s %s" % (self.school.key, str(self.term)))
+    def __unicode__(self):
+        return unicode("%s %s" % (self.school.key, str(self.term)))
 
 
 class TermInstance(models.Model):
@@ -51,8 +52,8 @@ class TermInstance(models.Model):
     class Meta:
         unique_together = (('year', 'term'),)
 
-    def __unicode__ (self):
-        return  unicode("[%d] %s" % (self.year, str(self.term)))
+    def __unicode__(self):
+        return unicode("[%d] %s" % (self.year, str(self.term)))
 
 
 class TimeTable(models.Model):
@@ -63,9 +64,9 @@ class TimeTable(models.Model):
                              related_query_name='timetable')
     departments = models.ManyToManyField('Department')
 
-    def __unicode__ (self):
-        return unicode("[%s] last update: %s" % \
-            (str(self.term), str(self.name)))
+    def __unicode__(self):
+        return unicode("[%s] last update: %s" %
+                       (str(self.term), str(self.name)))
 
 
 class Department (models.Model):
@@ -79,7 +80,7 @@ class Department (models.Model):
     class Meta:
         unique_together = (('school', 'name', 'code'),)
 
-    def __unicode__ (self):
+    def __unicode__(self):
         return unicode("[%s] %s" % (self.code, self.name))
 
 
@@ -99,9 +100,9 @@ class Course(models.Model):
     co_requisites = models.ManyToManyField('self')
     cross_listings = models.ManyToManyField('self')
 
-    def __unicode__ (self):
-        return unicode("[%s] %s (%s)" % \
-            (self.code, self.name, self.department.code))
+    def __unicode__(self):
+        return unicode("[%s] %s (%s)" %
+                       (self.code, self.name, self.department.code))
 
 
 class CourseNote(Note):
@@ -110,8 +111,8 @@ class CourseNote(Note):
 
 class SectionType(models.Model):
     school = models.ForeignKey(School, on_delete=models.CASCADE,
-                              related_name='section_types',
-                              related_query_name='section_type')
+                               related_name='section_types',
+                               related_query_name='section_type')
     name = models.CharField(max_length=100)
     code = models.CharField(max_length=20)
 
@@ -119,10 +120,10 @@ class SectionType(models.Model):
 class Section(models.Model):
 
     course = models.ForeignKey(Course, on_delete=models.CASCADE,
-                              related_name='courses',
-                              related_query_name='course')
+                               related_name='courses',
+                               related_query_name='course')
     section_type = models.ForeignKey(SectionType,
-                                    on_delete=models.CASCADE)
+                                     on_delete=models.CASCADE)
     serial = models.CharField(max_length=20)
     online = models.BooleanField(default=False)
     max_enrolled = models.IntegerField(null=True)
@@ -141,7 +142,7 @@ class SectionNote(Note):
 
 class Period(models.Model):
 
-    DAY = Choices (
+    DAY = Choices(
             ('MO', 'monday', _('monday')),
             ('TU', 'tuesday', _('tuesday')),
             ('WE', 'wednesday', _('wednesday')),

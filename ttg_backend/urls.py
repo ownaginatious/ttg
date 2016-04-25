@@ -1,3 +1,5 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
 
-urlpatterns = []
+urlpatterns = [
+    url(r'', include('ttg_legacy.urls'))
+]
