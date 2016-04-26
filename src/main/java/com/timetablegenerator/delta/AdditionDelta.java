@@ -19,6 +19,6 @@ public class AdditionDelta extends Delta {
     public String toString(int tabAmount) {
 
         return "ADDED [" + this.propertyType.name() + "] : "
-                + fixPrinting(Delta.TAB + Delta.generateTabs(tabAmount), this.newValue);
+                + fixPrinting(TAB + generateTabs(tabAmount), this.newValue);
     }
 }

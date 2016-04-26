@@ -4,8 +4,7 @@ import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
 import com.timetablegenerator.model.TermClassifier;
-import com.timetablegenerator.delta.PropertyType;
-import com.timetablegenerator.delta.StructureChangeDelta;
+import lombok.Getter;
 
 import javax.annotation.Nonnull;
 import java.time.DayOfWeek;
@@ -14,13 +13,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Collections;
 
-public class RepeatingPeriod extends Period implements Comparable<RepeatingPeriod>, Diffable<RepeatingPeriod>{
+public class RepeatingPeriod extends Period implements Comparable<RepeatingPeriod>, Diffable<RepeatingPeriod> {
 
     public static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm");
 
-    private DayOfWeek dow;
-    private LocalTime startTime;
-    private LocalTime endTime;
+    @Getter private DayOfWeek dayOfWeek;
+    @Getter private LocalTime startTime;
+    @Getter private LocalTime endTime;
 
     public RepeatingPeriod(TermClassifier term) {
         super(term);
@@ -36,7 +35,7 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
                 throw new IllegalStateException("The start time \"" + startTime
                         + "\" is after the end time '" + endTime + "'");
 
-        this.dow = dow;
+        this.dayOfWeek = dow;
         this.startTime = startTime;
         this.endTime = endTime;
 
@@ -45,19 +44,7 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
 
     @Override
     public boolean isScheduled(){
-        return this.dow != null;
-    }
-
-    public DayOfWeek getDayOfWeek(){
-        return this.dow;
-    }
-
-    public LocalTime getStartTime(){
-        return this.startTime;
-    }
-
-    public LocalTime getEndTime(){
-        return this.endTime;
+        return this.dayOfWeek != null;
     }
 
     public RepeatingPeriod addSupervisors(String... supervisors){
@@ -76,10 +63,10 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
 
         StringBuilder sb = new StringBuilder();
 
-        if (this.dow == null)
+        if (this.dayOfWeek == null)
             sb.append("TBA");
         else
-            sb.append(this.dow.toString());
+            sb.append(this.dayOfWeek.toString());
 
         sb.append(" ");
 
@@ -129,7 +116,7 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
 
         RepeatingPeriod rp = (RepeatingPeriod) o;
 
-        return this.dow == rp.dow
+        return this.dayOfWeek == rp.dayOfWeek
                 && this.endTime.equals(rp.endTime)
                 && this.startTime.equals(rp.startTime)
                 && this.term.equals(rp.term);
@@ -140,7 +127,7 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
 
         int result = super.hashCode();
 
-        result = 31 * result + dow.hashCode();
+        result = 31 * result + dayOfWeek.hashCode();
         result = 31 * result + startTime.hashCode();
         result = 31 * result + endTime.hashCode();
 
@@ -157,11 +144,11 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
 
         int dayOfWeekComparison = 0;
 
-        if (this.dow != null && rp.dow != null)
-            dayOfWeekComparison = this.dow.compareTo(rp.dow);
-        else if(this.dow == null && rp.dow != null)
+        if (this.dayOfWeek != null && rp.dayOfWeek != null)
+            dayOfWeekComparison = this.dayOfWeek.compareTo(rp.dayOfWeek);
+        else if(this.dayOfWeek == null && rp.dayOfWeek != null)
             dayOfWeekComparison = -1;
-        else if(this.dow != null)
+        else if(this.dayOfWeek != null)
             dayOfWeekComparison = 1;
 
         if (dayOfWeekComparison != 0)
@@ -183,12 +170,12 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
                 && this.endTime.equals(that.endTime))) {
             throw new IllegalStateException(
                     String.format("Cannot compare temporally unequal repeating periods: (%s, %s, %s) and (%s, %s, %s)",
-                            this.dow.toString(), this.startTime.format(TIME_FORMAT), this.endTime.format(TIME_FORMAT),
-                            that.dow.toString(), that.startTime.format(TIME_FORMAT), that.endTime.format(TIME_FORMAT))
+                            this.dayOfWeek.toString(), this.startTime.format(TIME_FORMAT), this.endTime.format(TIME_FORMAT),
+                            that.dayOfWeek.toString(), that.startTime.format(TIME_FORMAT), that.endTime.format(TIME_FORMAT))
             );
         }
 
-        String id = this.dow.getValue() + "/" + this.startTime.format(TIME_FORMAT) + "/"
+        String id = this.dayOfWeek.getValue() + "/" + this.startTime.format(TIME_FORMAT) + "/"
                 + this.endTime.format(TIME_FORMAT);
 
         StructureChangeDelta delta = StructureChangeDelta.of(PropertyType.REPEATING_PERIOD, id);

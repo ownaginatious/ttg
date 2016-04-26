@@ -21,10 +21,10 @@ public class ValueChangeDelta extends Delta {
 
     public String toString(int tabAmount) {
 
-        final String tabs = Delta.generateTabs(tabAmount);
+        final String tabs = generateTabs(tabAmount);
 
         return tabs + "MODIFIED [" + this.propertyType.name() + "]\n"
-                  + tabs + Delta.TAB + "Old value : \"" + oldValue + "\"\n"
-                  + tabs + Delta.TAB + "New value : \"" + newValue + "\"";
+                  + tabs + TAB + "Old value : \"" + oldValue + "\"\n"
+                  + tabs + TAB + "New value : \"" + newValue + "\"";
     }
 }

@@ -1,12 +1,14 @@
 package com.timetablegenerator.model;
 
+import lombok.Getter;
+
 import javax.annotation.Nonnull;
 import java.util.*;
 
 public class School {
 
-    private final String schoolName;
-    private final String schoolId;
+    @Getter  private final String schoolName;
+    @Getter private final String schoolId;
 
     private final boolean useDepartmentPrefixes;
 
@@ -62,14 +64,6 @@ public class School {
 
     public static Builder builder(@Nonnull String name, @Nonnull String id){
         return new Builder(name, id);
-    }
-
-    public String getSchoolName() {
-        return this.schoolName;
-    }
-
-    public String getSchoolId() {
-        return this.schoolId;
     }
 
     public boolean usesDepartmentPrefixes() {

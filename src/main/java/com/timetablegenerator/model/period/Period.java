@@ -3,21 +3,23 @@ package com.timetablegenerator.model.period;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
 import com.timetablegenerator.model.TermClassifier;
-import com.timetablegenerator.delta.PropertyType;
-import com.timetablegenerator.delta.StructureChangeDelta;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.util.*;
 
+@Accessors(chain = true)
 public abstract class Period {
 
-    protected final TermClassifier term;
-    protected final Set<String> supervisors = new TreeSet<>();
-    protected String room;
-    protected String campus;
+    @Getter protected final TermClassifier term;
+    @Getter protected final Set<String> supervisors = new TreeSet<>();
+    @Setter protected String room;
+    @Setter protected String campus;
 
-    protected final List<String> notes = new ArrayList<>();
+    @Getter protected final List<String> notes = new ArrayList<>();
 
-    protected Boolean online;
+    @Setter protected Boolean online;
 
     public Period(TermClassifier term) {
 
@@ -27,25 +29,8 @@ public abstract class Period {
         this.term = term;
     }
 
-    public Period setOnline(boolean online){
-        this.online = online;
-        return this;
-    }
-
     public Optional<Boolean> isOnline(){
         return this.online == null ? Optional.empty() : Optional.of(this.online);
-    }
-
-    public Period setRoom(String room) {
-
-        this.room = room;
-        return this;
-    }
-
-    public Period setCampus(String campus) {
-
-        this.campus = campus;
-        return this;
     }
 
     public Period addSupervisors(String... supervisors){
@@ -72,24 +57,12 @@ public abstract class Period {
         return this;
     }
 
-    public Collection<String> getNotes(){
-        return this.notes;
-    }
-
-    public Collection<String> getSupervisors(){
-        return this.supervisors;
-    }
-
     public Optional<String> getRoom(){
         return this.room == null ? Optional.empty(): Optional.of(this.room);
     }
 
     public Optional<String> getCampus(){
         return this.campus == null ? Optional.empty() : Optional.of(this.campus);
-    }
-
-    public TermClassifier getTerm(){
-        return this.term;
     }
 
     public abstract boolean isScheduled();

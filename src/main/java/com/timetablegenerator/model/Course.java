@@ -3,23 +3,29 @@ package com.timetablegenerator.model;
 import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
+@Accessors(chain = true)
 public class Course implements Comparable<Course>, Diffable<Course> {
 
     // Required data.
     private final School school;
-    private final String courseCode, courseName, uniqueId;
-    private final Department department;
-    private final TermClassifier term;
-    private final double credits;
+    @Getter private final String courseCode;
+    @Getter private final String courseName;
+    @Getter private final String uniqueId;
+    @Getter private final Department department;
+    @Getter private final TermClassifier term;
+    @Getter private final double credits;
 
     // Optional data.
-    private String description = null;
+    @Getter @Setter private String description = null;
     private final List<String> notes = new ArrayList<>();
 
     private final Set<Course> crossListings = new HashSet<>();
@@ -32,7 +38,7 @@ public class Course implements Comparable<Course>, Diffable<Course> {
      * Creates a new course object representing a single course within a timetable.
      *
      * @param school The school for the school's terms.
-     * @param term          The term this course is part fromName.
+     * @param term          The term this course is part fromSectionId.
      * @param department    The department to which this course belongs.
      * @param courseCode    The code of this course.
      * @param courseName    The name of this course.
@@ -52,11 +58,6 @@ public class Course implements Comparable<Course>, Diffable<Course> {
 
         // Generate the unique identifier for this course.
         this.uniqueId = this.department.getCode() + this.courseCode + this.term.getId();
-    }
-
-    public Course setDescription(String description) {
-        this.description = description;
-        return this;
     }
 
     public Course addPrerequisite(Course c) {
@@ -83,22 +84,6 @@ public class Course implements Comparable<Course>, Diffable<Course> {
         return new ArrayList<>(this.notes);
     }
 
-    public String getCode() {
-        return this.courseCode;
-    }
-
-    public String getName() {
-        return this.courseName;
-    }
-
-    public double getCredits() {
-        return this.credits;
-    }
-
-    public Department getDepartment() {
-        return this.department;
-    }
-
     public Collection<Course> getCrossListings() {
         return new HashSet<>(this.crossListings);
     }
@@ -109,14 +94,6 @@ public class Course implements Comparable<Course>, Diffable<Course> {
 
     public Collection<Course> getAntirequisites() {
         return new HashSet<>(this.antirequisites);
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
-    public TermClassifier getTerm() {
-        return this.term;
     }
 
     public SectionType getSectionType(String sectionTypeId) {
@@ -183,10 +160,6 @@ public class Course implements Comparable<Course>, Diffable<Course> {
         }
 
         return sb.toString();
-    }
-
-    public String getUniqueId() {
-        return this.uniqueId;
     }
 
     @Override
@@ -298,7 +271,7 @@ public class Course implements Comparable<Course>, Diffable<Course> {
     }
 
     private Set<String> shallowCourseSet(Set<Course> courses) {
-        return courses.stream().map(x -> x.getUniqueId()).collect(Collectors.toSet());
+        return courses.stream().map(Course::getUniqueId).collect(Collectors.toSet());
     }
 
     private static void recordCourseRelationDiff(StructureChangeDelta delta, PropertyType propertyType,

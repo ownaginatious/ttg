@@ -3,6 +3,7 @@ package com.timetablegenerator.model;
 import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
+import lombok.Getter;
 
 import javax.annotation.Nonnull;
 import java.util.HashSet;
@@ -14,8 +15,8 @@ import java.util.stream.IntStream;
 
 public class SectionType implements Comparable<SectionType>, Diffable<SectionType> {
 
-    private final School school;
-    private final String type;
+    @Getter private final School school;
+    @Getter private final String type;
     private final Map<String, Section> sections = new TreeMap<>();
 
     public SectionType(@Nonnull School school, @Nonnull String type) {
@@ -37,9 +38,9 @@ public class SectionType implements Comparable<SectionType>, Diffable<SectionTyp
 
     public void addSection(@Nonnull Section s) {
 
-        if (this.sections.putIfAbsent(s.getId(), s) != null)
+        if (this.sections.putIfAbsent(s.getSectionId(), s) != null)
             throw new IllegalStateException("Attempted to add the section of type \""
-                    + this.type + "\" with ID \"" + s.getId() + "\" twice");
+                    + this.type + "\" with ID \"" + s.getSectionId() + "\" twice");
     }
 
     @Override

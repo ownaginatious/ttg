@@ -1,4 +1,4 @@
-package com.timetablegenerator;
+package com.timetablegenerator.tests.api.diff;
 
 import junit.framework.TestCase;
 

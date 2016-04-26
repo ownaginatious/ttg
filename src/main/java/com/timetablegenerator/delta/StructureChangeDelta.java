@@ -1,5 +1,7 @@
 package com.timetablegenerator.delta;
 
+import lombok.Getter;
+
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,7 +12,7 @@ public class StructureChangeDelta extends Delta {
     private final Collection<Delta> propertyChangeDeltas = new ArrayList<>();
     private final Collection<StructureChangeDelta> structureChangeDeltas = new ArrayList<>();
 
-    private final String identifier;
+    @Getter private final String identifier;
 
     public static StructureChangeDelta of(@Nonnull PropertyType propertyType) {
         return new StructureChangeDelta(propertyType, null);
@@ -24,10 +26,6 @@ public class StructureChangeDelta extends Delta {
 
         super(propertyType);
         this.identifier = identifier;
-    }
-
-    public String getIdentifier() {
-        return this.identifier;
     }
 
     public void addAdded(PropertyType propertyType, @Nonnull Object value) {

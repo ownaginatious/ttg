@@ -1,21 +1,27 @@
 package com.timetablegenerator.model;
 
-import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
-import com.timetablegenerator.delta.StructureChangeDelta;
 import com.timetablegenerator.model.period.Period;
+import com.timetablegenerator.delta.Diffable;
+import com.timetablegenerator.delta.StructureChangeDelta;
 import com.timetablegenerator.model.period.RepeatingPeriod;
 import com.timetablegenerator.model.period.OneTimePeriod;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
-import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+@EqualsAndHashCode()
+@Accessors(chain = true)
 public class Section implements Diffable<Section> {
 
-    private String serialNumber;
-    private final String sectionId;
+    @Setter private String serialNumber;
+    @Getter private final String sectionId;
 
     private Boolean waitingList;
 
@@ -34,27 +40,28 @@ public class Section implements Diffable<Section> {
 
     private final List<String> notes = new ArrayList<>();
 
-    private Boolean online = null;
-    private Boolean alternating = null;
+    @Setter private Boolean online = null;
+    @Setter private Boolean alternating = null;
 
-    private Section(@Nonnull String sectionId) {
+    private Section(@NonNull String sectionId) {
         this.sectionId = sectionId;
     }
 
-    public static Section fromName(String sectionId) {
+    public static Section fromSectionId(String sectionId) {
         return new Section(sectionId);
-    }
-
-    public String getId() {
-        return this.sectionId;
     }
 
     public Optional<String> getSerialNumber() {
         return this.serialNumber == null ? Optional.empty() : Optional.of(this.serialNumber);
     }
 
-    public Section addNotes(@Nonnull String note) {
-        this.notes.add(note);
+    public Section addNotes(@NonNull Collection<String> notes) {
+        this.notes.addAll(notes);
+        return this;
+    }
+
+    public Section addNotes(@NonNull String... notes) {
+        Collections.addAll(this.notes, notes);
         return this;
     }
 
@@ -62,17 +69,11 @@ public class Section implements Diffable<Section> {
         return new ArrayList<>(this.notes);
     }
 
-    public Section setOnline(Boolean online) {
-
-        this.online = online;
-        return this;
-    }
-
     public Optional<Boolean> isOnline() {
         return this.online == null ? Optional.empty() : Optional.of(this.online);
     }
 
-    public Section setCancelled(Boolean cancelled) {
+    public Section setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
         return this;
     }
@@ -81,27 +82,15 @@ public class Section implements Diffable<Section> {
         return this.cancelled == null ? Optional.empty() : Optional.of(this.cancelled);
     }
 
-    public Section setAlternating(Boolean alternating) {
-
-        this.alternating = alternating;
-        return this;
-    }
-
     public Optional<Boolean> isAlternating() {
         return this.alternating == null ? Optional.empty() : Optional.of(this.alternating);
     }
 
-    public Section setSerialNumber(@Nonnull String serialNumber) {
-
-        this.serialNumber = serialNumber;
-        return this;
-    }
-
-    public Section setWaitingList(Boolean waitingList) {
+    public Section setWaitingList(boolean waitingList) {
 
         this.waitingList = waitingList;
 
-        if (this.waitingList == null || !this.waitingList)
+        if (!this.waitingList)
             this.waiting = -1;
 
         return this;
@@ -145,12 +134,18 @@ public class Section implements Diffable<Section> {
         return this;
     }
 
-    public Section setFull(Boolean full) {
+    public Section setFull(boolean full) {
 
         this.full = full;
 
-        if (this.full == null || !this.full)
+        if (!this.full) {
             this.enrollment = -1;
+        } else {
+            if (this.maxEnrollment != -1)
+                this.enrollment = this.maxEnrollment;
+            if (this.maxEnrollment == -1 && this.enrollment != -1)
+                this.maxEnrollment = this.enrollment;
+        }
 
         return this;
     }
@@ -188,9 +183,9 @@ public class Section implements Diffable<Section> {
         if (maxEnrollment < 0)
             throw new IllegalStateException("Maximum number of people enrolled must be greater than or equal to 0 ("
                     + maxWaiting + ")");
-        else if (this.waiting >= 0 && this.waiting > maxWaiting)
-            throw new IllegalStateException("Number of people waiting must be less than the maximum ("
-                    + waiting + "/" + maxWaiting + ")");
+        else if (this.enrollment >= 0 && this.enrollment > maxEnrollment)
+            throw new IllegalStateException("Number of people enrolled must be less than the maximum ("
+                    + this.enrollment + "/" + maxEnrollment + ")");
 
         this.maxEnrollment = maxEnrollment;
 
@@ -216,20 +211,6 @@ public class Section implements Diffable<Section> {
 
     public Collection<OneTimePeriod> getOneTimePeriods() {
         return new TreeSet<>(this.oneTimePeriods);
-    }
-
-    @Override
-    public boolean equals(Object e) {
-
-        if (!(e instanceof Section))
-            return false;
-
-        Section that = (Section) e;
-
-        return Objects.equals(this.sectionId, that.sectionId)
-                && Objects.equals(this.repeatingPeriods, that.repeatingPeriods)
-                && Objects.equals(this.oneTimePeriods, that.oneTimePeriods)
-                && this.alternating == that.alternating;
     }
 
     @Override

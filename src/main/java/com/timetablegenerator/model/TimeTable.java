@@ -3,21 +3,22 @@ package com.timetablegenerator.model;
 import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import javax.annotation.Nonnull;
 import java.time.ZonedDateTime;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import java.util.concurrent.ConcurrentSkipListMap;
 
+@EqualsAndHashCode(exclude={"lastUpdate"})
 public class TimeTable implements Comparable<TimeTable>, Diffable<TimeTable> {
 
-    private final School school;
-    private final Term term;
-    private final ZonedDateTime lastUpdate;
+    @Getter private final School school;
+    @Getter private final Term term;
+    @Getter private final ZonedDateTime lastUpdate;
 
     private final Map<String, Course> courses = new ConcurrentSkipListMap<>();
 
@@ -36,20 +37,12 @@ public class TimeTable implements Comparable<TimeTable>, Diffable<TimeTable> {
         this.lastUpdate = parseDate;
     }
 
-    public Term getTerm() {
-        return term;
-    }
-
     public void addCourse(Course c) {
 
         String id = c.getUniqueId();
 
         if (this.courses.putIfAbsent(id, c) != null)
             throw new IllegalStateException("Attempted to insert multiple courses with the ID \"" + id + "\".");
-    }
-
-    public ZonedDateTime getLastUpdate() {
-        return this.lastUpdate;
     }
 
     public void removeCourse(Course c) {
@@ -66,47 +59,8 @@ public class TimeTable implements Comparable<TimeTable>, Diffable<TimeTable> {
 
     @Override
     public String toString() {
-        return "TERM: " + this.term + ", COURSE #: " + courses.size()
-                + ", LAST_UPDATE: " + lastUpdate.toString();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-
-        if (!(obj instanceof TimeTable))
-            return false;
-
-        TimeTable tt = (TimeTable) obj;
-
-        if (!term.equals(tt.getTerm()))
-            return false;
-
-        Set<String> diffA = new HashSet<>(this.courses.keySet());
-        Set<String> diffB = new HashSet<>(tt.courses.keySet());
-
-        diffA.removeAll(tt.courses.keySet());
-        diffB.removeAll(this.courses.keySet());
-
-        if (diffA.size() > 0 || diffB.size() > 0)
-            return false;
-
-        for (String k : this.courses.keySet())
-            if (!this.courses.get(k).equals(tt.courses.get(k)))
-                return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-
-        final int prime = 31;
-        int result = 1;
-
-        result = prime * result + (this.courses.hashCode());
-        result = prime * result + term.hashCode();
-
-        return result;
+        return "TERM: " + this.term + ", COURSE #: " + courses.size() +
+                ", LAST_UPDATE: " + lastUpdate.toString();
     }
 
     @Override

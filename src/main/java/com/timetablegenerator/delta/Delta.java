@@ -1,5 +1,7 @@
 package com.timetablegenerator.delta;
 
+import lombok.Getter;
+
 import javax.annotation.Nonnull;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -13,14 +15,10 @@ public abstract class Delta {
 
     protected static final String TAB = "    ";
 
-    protected final PropertyType propertyType;
+    @Getter protected final PropertyType propertyType;
 
     public Delta(@Nonnull PropertyType propertyType) {
         this.propertyType = propertyType;
-    }
-
-    public final PropertyType getPropertyType() {
-        return this.propertyType;
     }
 
     protected static String generateTabs(int tabAmount) {

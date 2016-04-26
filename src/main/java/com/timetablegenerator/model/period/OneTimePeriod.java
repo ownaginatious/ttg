@@ -4,20 +4,20 @@ import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
 import com.timetablegenerator.model.TermClassifier;
-import com.timetablegenerator.delta.Diffable;
-import com.timetablegenerator.delta.PropertyType;
-import com.timetablegenerator.delta.StructureChangeDelta;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import javax.annotation.Nonnull;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+@EqualsAndHashCode(callSuper = true)
 public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, Diffable<OneTimePeriod> {
 
     public static final DateTimeFormatter DATETIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'hh:mm");
 
-    private LocalDateTime startDateTime;
-    private LocalDateTime endDateTime;
+    @Getter private LocalDateTime startDateTime;
+    @Getter private LocalDateTime endDateTime;
 
     public OneTimePeriod(TermClassifier term) {
         super(term);
@@ -37,40 +37,9 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
         return this;
     }
 
-    public LocalDateTime getStartDateTime(){
-        return this.startDateTime;
-    }
-
-    public LocalDateTime getEndDateTime(){
-        return this.endDateTime;
-    }
-
     @Override
     public boolean isScheduled(){
         return this.startDateTime != null;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-
-        if (!super.equals(o) || !(o instanceof OneTimePeriod))
-            return false;
-
-        OneTimePeriod sp = (OneTimePeriod) o;
-
-        return this.endDateTime.equals(sp.endDateTime)
-                && this.startDateTime.equals(sp.startDateTime);
-    }
-
-    @Override
-    public int hashCode() {
-
-        int result = super.hashCode();
-
-        result = 31 * result + startDateTime.hashCode();
-        result = 31 * result + endDateTime.hashCode();
-
-        return result;
     }
 
     @Override
