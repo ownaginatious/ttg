@@ -19,8 +19,12 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
     @Getter private LocalDateTime startDateTime;
     @Getter private LocalDateTime endDateTime;
 
-    public OneTimePeriod(TermClassifier term) {
+    private OneTimePeriod(TermClassifier term) {
         super(term);
+    }
+
+    public static OneTimePeriod of(TermClassifier term) {
+        return new OneTimePeriod(term);
     }
 
     public OneTimePeriod setDateTimes(LocalDateTime startDateTime, LocalDateTime endDateTime) {

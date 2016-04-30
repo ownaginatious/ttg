@@ -15,14 +15,18 @@ import java.util.Collections;
 
 public class RepeatingPeriod extends Period implements Comparable<RepeatingPeriod>, Diffable<RepeatingPeriod> {
 
-    public static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm");
 
     @Getter private DayOfWeek dayOfWeek;
     @Getter private LocalTime startTime;
     @Getter private LocalTime endTime;
 
-    public RepeatingPeriod(TermClassifier term) {
+    private RepeatingPeriod(TermClassifier term) {
         super(term);
+    }
+
+    public static RepeatingPeriod of(TermClassifier term){
+        return new RepeatingPeriod(term);
     }
 
     public RepeatingPeriod setTime(DayOfWeek dow, LocalTime startTime, LocalTime endTime) {

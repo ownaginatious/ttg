@@ -21,7 +21,7 @@ public abstract class Period {
 
     @Setter protected Boolean online;
 
-    public Period(TermClassifier term) {
+    Period(TermClassifier term) {
 
         if (term == null)
             throw new IllegalStateException("Attempted to set null term into repeating time period.");
