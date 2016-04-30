@@ -336,10 +336,6 @@ public class McMasterScraper extends Scraper {
 
             String courseTitleString = ParsingTools.sanitize(courseTitle.text());
 
-            //TODO: Remove this when the retards at McMaster finally fix it.
-            if (courseTitleString.equals("GENTECH   10 - Lean Thinking"))
-                return courses;
-
             // Parse the standard course information.
             Matcher courseData = COURSE_INFO_PATTERN.matcher(courseTitleString);
 
