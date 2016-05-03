@@ -1,56 +1,75 @@
 package com.timetablegenerator.delta;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Objects;
+import java.util.*;
 
+@EqualsAndHashCode(callSuper = true)
 public class StructureChangeDelta extends Delta {
 
-    private final Collection<Delta> propertyChangeDeltas = new ArrayList<>();
-    private final Collection<StructureChangeDelta> structureChangeDeltas = new ArrayList<>();
+    private static class DeltaSort implements Comparator<Delta>{
+        @Override
+        public int compare(Delta d1, Delta d2) {
+            return d1.getPropertyType().compareTo(d2.getPropertyType());
+        }
+    }
+
+    private static DeltaSort sorter = new DeltaSort();
+
+    private final Collection<Delta> propertyChangeDeltas = new HashSet<>();
+    private final Map<String, StructureChangeDelta> structureChangeDeltas = new HashMap<>();
 
     @Getter private final String identifier;
 
-    public static StructureChangeDelta of(@Nonnull PropertyType propertyType) {
-        return new StructureChangeDelta(propertyType, null);
+    public static StructureChangeDelta of(@NonNull PropertyType propertyType, @NonNull Diffable<?> diffable) {
+        return new StructureChangeDelta(propertyType, diffable.getDeltaId());
     }
 
-    public static StructureChangeDelta of(@Nonnull PropertyType propertyType, @Nonnull String identifier) {
-        return new StructureChangeDelta(propertyType, identifier);
-    }
-
-    private StructureChangeDelta(@Nonnull PropertyType propertyType, String identifier) {
+    private StructureChangeDelta(@NonNull PropertyType propertyType, String identifier) {
 
         super(propertyType);
         this.identifier = identifier;
     }
 
-    public void addAdded(PropertyType propertyType, @Nonnull Object value) {
+    public StructureChangeDelta addAdded(PropertyType propertyType, @NonNull Object value) {
         this.propertyChangeDeltas.add(new AdditionDelta(propertyType, value));
+        return this;
     }
 
-    public void addRemoved(PropertyType propertyType, @Nonnull Object value) {
+    public StructureChangeDelta addRemoved(PropertyType propertyType, @NonNull Object value) {
         this.propertyChangeDeltas.add(new RemovalDelta(propertyType, value));
+        return this;
     }
 
-    public <T> void addIfChanged(PropertyType propertyType, T oldValue, T newValue) {
+    public <T> StructureChangeDelta addIfChanged(PropertyType propertyType, T oldValue, T newValue) {
 
-        if (Objects.equals(newValue, oldValue))
-            return;
+        if (Objects.equals(newValue, oldValue)) {
+            return this;
+        }
 
-        if (newValue == null)
+        if (newValue == null) {
             this.propertyChangeDeltas.add(new RemovalDelta(propertyType, oldValue));
-        else if (oldValue == null)
+        } else if (oldValue == null) {
             this.propertyChangeDeltas.add(new AdditionDelta(propertyType, newValue));
-        else
+        } else {
             this.propertyChangeDeltas.add(new ValueChangeDelta(propertyType, newValue, oldValue));
+        }
+
+        return this;
     }
 
-    public void addChange(StructureChangeDelta delta) {
-        this.structureChangeDeltas.add(delta);
+    public StructureChangeDelta addChange(StructureChangeDelta delta) {
+
+        String identifier = delta.getIdentifier();
+
+        if (this.structureChangeDeltas.containsKey(identifier)){
+            throw new IllegalArgumentException("Change delta already recorded for identifier \'" + identifier + "\'");
+        }
+
+        this.structureChangeDeltas.put(identifier, delta);
+        return this;
     }
 
     public boolean hasValueChanges() {
@@ -70,7 +89,7 @@ public class StructureChangeDelta extends Delta {
     }
 
     public Collection<StructureChangeDelta> getChildChanges() {
-        return this.structureChangeDeltas;
+        return this.structureChangeDeltas.values();
     }
 
     public String toString() {
@@ -83,33 +102,29 @@ public class StructureChangeDelta extends Delta {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append(tabs).append("MODIFIED [").append(this.propertyType.name()).append("] (id = ")
-                .append(this.identifier).append(")\n\n");
+        sb.append("MODIFIED [").append(this.getPropertyType().name()).append(']');
+        sb.append(" (id = ").append(this.identifier).append(")");
+
+        int[] i = {0};
 
         if (this.hasValueChanges()) {
 
-            sb.append(tabs).append(tabs).append("Property changes:\n\n");
+            sb.append("\n\n").append(tabs).append(tabs).append("Property changes:\n");
 
-            int i = 0;
-
-            for (Delta pd : this.propertyChangeDeltas) {
-
-                sb.append(tabs).append(tabs).append(tabs)
-                        .append('[').append(++i).append("] ").append(pd).append('\n');
-            }
+            this.propertyChangeDeltas.stream().sorted(sorter)
+                    .forEach(d -> sb.append('\n').append(tabs).append(tabs).append(tabs)
+                            .append('[').append(++i[0]).append("] ").append(d));
         }
+
+        i[0] = 0;
 
         if (this.hasChildStructureChanges()) {
 
-            sb.append(tabs).append(tabs).append("Child property changes:\n\n");
+            sb.append("\n\n").append(tabs).append(tabs).append("Child property changes:");
 
-            int i = 0;
-
-            for (StructureChangeDelta pd : this.structureChangeDeltas) {
-
-                sb.append(tabs).append(tabs).append(tabs)
-                        .append('[').append(++i).append("] \n").append(pd.toString(tabAmount + 4)).append('\n');
-            }
+            this.structureChangeDeltas.values().stream().sorted(sorter)
+                    .forEach(d -> sb.append("\n\n").append(tabs).append(tabs).append(tabs)
+                        .append('[').append(++i[0]).append("] ").append(d.toString(tabAmount + 1)));
         }
 
         return sb.toString();

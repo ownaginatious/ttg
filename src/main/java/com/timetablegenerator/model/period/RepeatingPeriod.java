@@ -4,40 +4,41 @@ import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
 import com.timetablegenerator.model.TermClassifier;
-import lombok.Getter;
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 
 import javax.annotation.Nonnull;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
+@EqualsAndHashCode(callSuper = true)
 public class RepeatingPeriod extends Period implements Comparable<RepeatingPeriod>, Diffable<RepeatingPeriod> {
 
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm");
 
-    @Getter private DayOfWeek dayOfWeek;
-    @Getter private LocalTime startTime;
-    @Getter private LocalTime endTime;
+    private DayOfWeek dayOfWeek;
+    private LocalTime startTime;
+    private LocalTime endTime;
 
     private RepeatingPeriod(TermClassifier term) {
         super(term);
     }
 
-    public static RepeatingPeriod of(TermClassifier term){
+    public static RepeatingPeriod of(TermClassifier term) {
         return new RepeatingPeriod(term);
     }
 
-    public RepeatingPeriod setTime(DayOfWeek dow, LocalTime startTime, LocalTime endTime) {
+    public RepeatingPeriod setTime(@NonNull DayOfWeek dow, @NonNull LocalTime startTime, @NonNull LocalTime endTime) {
 
-        if (dow == null)
-            throw new IllegalStateException("Attempted to set null day of the week into repeating time period.");
-        if (startTime == null || endTime == null)
-            throw new IllegalStateException("Attempted to set null start and/or end times.");
-        else if (endTime.isBefore(startTime)) // Catch unaccounted AM/PM crossings.
-                throw new IllegalStateException("The start time \"" + startTime
-                        + "\" is after the end time '" + endTime + "'");
+        if (endTime.isBefore(startTime)) { // Catch unconverted AM/PM crossings.
+            throw new IllegalStateException("The start time \"" + startTime
+                    + "\" is after the end time '" + endTime + "'");
+        }
 
         this.dayOfWeek = dow;
         this.startTime = startTime;
@@ -46,19 +47,31 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
         return this;
     }
 
+    public Optional<DayOfWeek> getDayOfWeek(){
+        return this.dayOfWeek == null ? Optional.empty() : Optional.of(this.dayOfWeek);
+    }
+
+    public Optional<LocalTime> getStartTime(){
+        return this.startTime == null ? Optional.empty() : Optional.of(this.startTime);
+    }
+
+    public Optional<LocalTime> getEndTime(){
+        return this.endTime == null ? Optional.empty() : Optional.of(this.endTime);
+    }
+
     @Override
-    public boolean isScheduled(){
+    public boolean isScheduled() {
         return this.dayOfWeek != null;
     }
 
-    public RepeatingPeriod addSupervisors(String... supervisors){
+    public RepeatingPeriod addSupervisors(String... supervisors) {
 
-        Collections.addAll(this.supervisors, supervisors);
+        super.addSupervisors(supervisors);
         return this;
     }
 
-    public RepeatingPeriod addSupervisors(Collection<String> supervisors){
-        this.supervisors.addAll(supervisors);
+    public RepeatingPeriod addSupervisors(Collection<String> supervisors) {
+        super.addSupervisors(supervisors);
         return this;
     }
 
@@ -67,122 +80,89 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
 
         StringBuilder sb = new StringBuilder();
 
-        if (this.dayOfWeek == null)
+        if (this.dayOfWeek == null) {
             sb.append("TBA");
-        else
+        } else {
             sb.append(this.dayOfWeek.toString());
+        }
 
         sb.append(" ");
 
-        if (this.startTime != null && this.endTime != null)
+        if (this.startTime != null && this.endTime != null) {
             sb.append(this.startTime.format(TIME_FORMAT))
                     .append(" -> ")
                     .append(this.endTime.format(TIME_FORMAT));
-        else
+        } else {
             sb.append("TBA -> TBA");
+        }
 
-        sb.append(" [Term: ").append(term.toString()).append(']');
+        sb.append(" [Term: ").append(this.getTerm().toString()).append(']');
 
-        if (this.campus != null || this.room != null) {
+        if (this.getCampus().isPresent() || this.getRoom().isPresent()) {
 
             sb.append(" (");
 
-            if (this.campus != null)
-                sb.append("campus: ").append(this.room);
-
-            if (this.room != null) {
-                if (this.campus != null)
-                    sb.append(", ");
-
-                sb.append("room: ").append(this.room);
-            }
+            this.getCampus().ifPresent(x -> sb.append("campus: ").append(x));
+            this.getRoom().ifPresent(x -> sb.append(this.getCampus().isPresent() ? ", " : "")
+                                            .append("room: ").append(x));
 
             sb.append(")");
         }
 
-        if (this.online != null)
-            sb.append(" (online: ").append(this.online).append(')');
+        this.isOnline().ifPresent(x -> sb.append(x ? " (" : " (not ").append("online)"));
 
-        if (supervisors.size() > 0)
-            sb.append(" [Instructors: ").append(this.supervisors).append(']');
-
+        if (!this.getSupervisors().isEmpty()) {
+            sb.append(" [Instructors: ").append(this.getSupervisors().stream()
+                    .map(x -> "'" + x + "'")
+                    .collect(Collectors.joining(", "))).append(']');
+        }
         return sb.toString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-
-        if (this == o)
-            return true;
-
-        if (o == null || !(o instanceof RepeatingPeriod))
-            return false;
-
-        RepeatingPeriod rp = (RepeatingPeriod) o;
-
-        return this.dayOfWeek == rp.dayOfWeek
-                && this.endTime.equals(rp.endTime)
-                && this.startTime.equals(rp.startTime)
-                && this.term.equals(rp.term);
-    }
-
-    @Override
-    public int hashCode() {
-
-        int result = super.hashCode();
-
-        result = 31 * result + dayOfWeek.hashCode();
-        result = 31 * result + startTime.hashCode();
-        result = 31 * result + endTime.hashCode();
-
-        return result;
     }
 
     @Override
     public int compareTo(@Nonnull RepeatingPeriod rp) {
 
-        int termCompare = this.term.compareTo(rp.term);
+        int termCompare = this.getTerm().compareTo(rp.getTerm());
 
-        if (termCompare != 0)
-            return  termCompare;
+        if (termCompare != 0) {
+            return termCompare;
+        }
 
-        int dayOfWeekComparison = 0;
-
-        if (this.dayOfWeek != null && rp.dayOfWeek != null)
-            dayOfWeekComparison = this.dayOfWeek.compareTo(rp.dayOfWeek);
-        else if(this.dayOfWeek == null && rp.dayOfWeek != null)
-            dayOfWeekComparison = -1;
-        else if(this.dayOfWeek != null)
-            dayOfWeekComparison = 1;
-
-        if (dayOfWeekComparison != 0)
-            return dayOfWeekComparison;
-
-        if (this.startTime != null && rp.startTime != null)
-            return this.startTime.compareTo(rp.startTime);
-        else if(this.startTime == null && rp.startTime != null)
+        if (this.dayOfWeek == null && rp.dayOfWeek != null) {
             return -1;
-        else if (this.startTime != null)
+        } else if (this.dayOfWeek != null && rp.dayOfWeek == null) {
             return 1;
+        } else if (this.dayOfWeek == null){
+            return 0;
+        } else if (this.dayOfWeek != rp.dayOfWeek) {
+            return this.dayOfWeek.compareTo(rp.dayOfWeek);
+        }
 
-        return 0;
+        return this.startTime.compareTo(rp.startTime);
+    }
+
+    @Override
+    public String getDeltaId(){
+        String id = this.getTerm().getId() + "/TBA/TBA/TBA";
+        if (this.dayOfWeek != null) {
+            id = this.getTerm().getId() + "/"
+                    + this.dayOfWeek.name() + "/"
+                    + this.startTime.format(TIME_FORMAT) + "/"
+                    + this.endTime.format(TIME_FORMAT);
+        }
+        return id;
     }
 
     public StructureChangeDelta findDifferences(RepeatingPeriod that) {
 
-        if (!(this.startTime.equals(that.startTime)
-                && this.endTime.equals(that.endTime))) {
-            throw new IllegalStateException(
-                    String.format("Cannot compare temporally unequal repeating periods: (%s, %s, %s) and (%s, %s, %s)",
-                            this.dayOfWeek.toString(), this.startTime.format(TIME_FORMAT), this.endTime.format(TIME_FORMAT),
-                            that.dayOfWeek.toString(), that.startTime.format(TIME_FORMAT), that.endTime.format(TIME_FORMAT))
-            );
+        if (this.getTerm() != that.getTerm() || !Objects.equals(this.startTime, that.startTime)
+                || !Objects.equals(this.endTime, that.endTime)) {
+            throw new IllegalArgumentException(
+                    String.format("Cannot compare temporally unequal repeating periods: (%s) and (%s)",
+                            this.getDeltaId(), that.getDeltaId()));
         }
 
-        String id = this.dayOfWeek.getValue() + "/" + this.startTime.format(TIME_FORMAT) + "/"
-                + this.endTime.format(TIME_FORMAT);
-
-        StructureChangeDelta delta = StructureChangeDelta.of(PropertyType.REPEATING_PERIOD, id);
+        StructureChangeDelta delta = StructureChangeDelta.of(PropertyType.REPEATING_PERIOD, this);
         this.savePeriodDifferences(delta, that);
 
         return delta;

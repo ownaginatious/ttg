@@ -3,29 +3,28 @@ package com.timetablegenerator.model.period;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
 import com.timetablegenerator.model.TermClassifier;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.util.*;
 
 @Accessors(chain = true)
+@EqualsAndHashCode()
 public abstract class Period {
 
-    @Getter protected final TermClassifier term;
-    @Getter protected final Set<String> supervisors = new TreeSet<>();
-    @Setter protected String room;
-    @Setter protected String campus;
+    @Getter private final TermClassifier term;
+    @Getter private final Set<String> supervisors = new TreeSet<>();
+    @Setter private String room;
+    @Setter private String campus;
 
-    @Getter protected final List<String> notes = new ArrayList<>();
+    @Getter private final List<String> notes = new ArrayList<>();
 
-    @Setter protected Boolean online;
+    @Setter private Boolean online;
 
-    Period(TermClassifier term) {
-
-        if (term == null)
-            throw new IllegalStateException("Attempted to set null term into repeating time period.");
-
+    Period(@NonNull TermClassifier term) {
         this.term = term;
     }
 
@@ -67,29 +66,8 @@ public abstract class Period {
 
     public abstract boolean isScheduled();
 
-    @Override
-    public boolean equals(Object o) {
-
-        if (this == o)
-            return true;
-
-        if (o == null || this.getClass() != o.getClass())
-            return false;
-
-        Period that = (Period) o;
-
-        return Objects.equals(this.room, that.room)
-                && this.term.equals(that.term);
-    }
-
-    @Override
-    public int hashCode() {
-        return 31 * term.hashCode() + (room != null ? room.hashCode() : 0);
-    }
-
     protected void savePeriodDifferences(StructureChangeDelta delta, Period that) {
 
-        delta.addIfChanged(PropertyType.TERM, this.term, that.term);
         delta.addIfChanged(PropertyType.ROOM, this.room, that.room);
         delta.addIfChanged(PropertyType.CAMPUS, this.campus, that.campus);
         delta.addIfChanged(PropertyType.IS_ONLINE, this.online, that.online);
@@ -104,12 +82,13 @@ public abstract class Period {
                 .filter(x -> !that.notes.contains(x))
                 .forEach(x -> delta.addRemoved(PropertyType.NOTE, x));
 
-        // Add added notes.
+
+        // Add added supervisors.
         that.supervisors.stream()
                 .filter(x -> !this.supervisors.contains(x))
                 .forEach(x -> delta.addAdded(PropertyType.SUPERVISOR, x));
 
-        // Add removed notes.
+        // Add removed supervisors.
         this.supervisors.stream()
                 .filter(x -> !that.supervisors.contains(x))
                 .forEach(x -> delta.addRemoved(PropertyType.SUPERVISOR, x));

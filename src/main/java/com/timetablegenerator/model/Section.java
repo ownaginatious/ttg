@@ -160,17 +160,17 @@ public class Section implements Diffable<Section> {
 
     public Section setEnrollment(int enrollment) {
 
-        if (enrollment < 0)
+        if (enrollment < 0) {
             throw new IllegalStateException("Enrollment must be greater than or equal to 0 (" + enrollment + ")");
-        else if (this.maxEnrollment >= 0 && enrollment > this.maxEnrollment)
+        } else if (this.maxEnrollment >= 0 && enrollment > this.maxEnrollment) {
             throw new IllegalStateException("Number of people enrolled must be less than the maximum ("
                     + enrollment + "/" + this.maxEnrollment + ")");
-
+        }
         this.enrollment = enrollment;
 
-        if (this.maxEnrollment >= 0)
+        if (this.maxEnrollment >= 0) {
             this.full = this.enrollment == this.maxEnrollment;
-
+        }
         return this;
     }
 
@@ -180,28 +180,30 @@ public class Section implements Diffable<Section> {
 
     public Section setMaximumEnrollment(int maxEnrollment) {
 
-        if (maxEnrollment < 0)
+        if (maxEnrollment < 0) {
             throw new IllegalStateException("Maximum number of people enrolled must be greater than or equal to 0 ("
                     + maxWaiting + ")");
-        else if (this.enrollment >= 0 && this.enrollment > maxEnrollment)
+        } else if (this.enrollment >= 0 && this.enrollment > maxEnrollment) {
             throw new IllegalStateException("Number of people enrolled must be less than the maximum ("
                     + this.enrollment + "/" + maxEnrollment + ")");
+        }
 
         this.maxEnrollment = maxEnrollment;
 
-        if (this.enrollment >= 0)
+        if (this.enrollment >= 0) {
             this.full = this.enrollment == this.maxEnrollment;
+        }
 
         return this;
     }
 
-    public Section addPeriod(Period dayTime) {
+    public Section addPeriod(Period period) {
 
-        if (dayTime instanceof OneTimePeriod)
-            this.oneTimePeriods.add((OneTimePeriod) dayTime);
-        else
-            this.repeatingPeriods.add((RepeatingPeriod) dayTime);
-
+        if (period instanceof OneTimePeriod) {
+            this.oneTimePeriods.add((OneTimePeriod) period);
+        } else {
+            this.repeatingPeriods.add((RepeatingPeriod) period);
+        }
         return this;
     }
 
@@ -226,18 +228,21 @@ public class Section implements Diffable<Section> {
 
         sb.append(preTabs).append(this.sectionId);
 
-        if (this.serialNumber != null)
+        if (this.serialNumber != null) {
             sb.append(" {").append(this.serialNumber).append('}');
+        }
 
-        if (this.cancelled != null && this.cancelled)
+        if (this.cancelled != null && this.cancelled) {
             return sb.append(" [CANCELLED]\n").toString();
+        }
 
         if (this.full != null) {
 
-            if (this.full)
+            if (this.full) {
                 sb.append(" [FULL]");
-            else
+            } else {
                 sb.append(" [AVAILABLE]");
+            }
         }
 
         if (this.enrollment > -1 || this.maxEnrollment > -1) {
@@ -264,19 +269,26 @@ public class Section implements Diffable<Section> {
 
             sb.append("\n").append(preTabs).append("\tRepeating periods:\n").append(preTabs).append('\n');
 
-            for (RepeatingPeriod rp : this.repeatingPeriods)
+            for (RepeatingPeriod rp : this.repeatingPeriods) {
                 sb.append(preTabs).append("\t\t").append(rp).append('\n');
+            }
         }
 
         if (!this.oneTimePeriods.isEmpty()) {
 
             sb.append("\n").append(preTabs).append("\tOne time periods:\n").append(preTabs).append('\n');
 
-            for (OneTimePeriod sp : this.oneTimePeriods)
+            for (OneTimePeriod sp : this.oneTimePeriods) {
                 sb.append(preTabs).append("\t\t").append(sp).append('\n');
+            }
         }
 
         return sb.toString();
+    }
+
+    @Override
+    public String getDeltaId(){
+        return this.getSectionId();
     }
 
     @Override
@@ -287,17 +299,21 @@ public class Section implements Diffable<Section> {
                     + "\" and \"" + that.sectionId + "\"");
         }
 
-        final StructureChangeDelta delta = StructureChangeDelta.of(PropertyType.SECTION, this.sectionId);
+        final StructureChangeDelta delta = StructureChangeDelta.of(PropertyType.SECTION, this);
 
-        delta.addIfChanged(PropertyType.SERIAL, this.serialNumber, that.serialNumber);
+        delta.addIfChanged(PropertyType.SERIAL_NUMBER, this.serialNumber, that.serialNumber);
 
         delta.addIfChanged(PropertyType.WAITING_LIST, this.waitingList, that.waitingList);
-        delta.addIfChanged(PropertyType.NUM_WAITING, this.waiting, that.waiting);
-        delta.addIfChanged(PropertyType.MAX_WAITING, this.maxWaiting, that.maxWaiting);
+        delta.addIfChanged(PropertyType.NUM_WAITING,
+                this.getWaiting().orElse(null), that.getWaiting().orElse(null));
+        delta.addIfChanged(PropertyType.MAX_WAITING,
+                this.getMaxWaiting().orElse(null), that.getMaxWaiting().orElse(null));
 
         delta.addIfChanged(PropertyType.IS_FULL, this.full, that.full);
-        delta.addIfChanged(PropertyType.NUM_ENROLLED, this.enrollment, that.enrollment);
-        delta.addIfChanged(PropertyType.MAX_ENROLLED, this.maxEnrollment, that.maxEnrollment);
+        delta.addIfChanged(PropertyType.NUM_ENROLLED,
+                this.getEnrollment().orElse(null), that.getEnrollment().orElse(null));
+        delta.addIfChanged(PropertyType.MAX_ENROLLED,
+                this.getMaxEnrollment().orElse(null), that.getMaxEnrollment().orElse(null));
 
         delta.addIfChanged(PropertyType.IS_CANCELLED, this.cancelled, that.cancelled);
 
@@ -321,7 +337,7 @@ public class Section implements Diffable<Section> {
                                 y -> Objects.equals(x.getStartDateTime(), y.getStartDateTime())
                                         && Objects.equals(x.getEndDateTime(), y.getEndDateTime())
                         ))
-                .forEach(x -> delta.addRemoved(PropertyType.SINGLE_PERIOD, x));
+                .forEach(x -> delta.addRemoved(PropertyType.ONE_TIME_PERIOD, x));
 
         // Find added one-time periods.
         that.oneTimePeriods.stream()
@@ -330,10 +346,10 @@ public class Section implements Diffable<Section> {
                                 y -> x.getStartDateTime().equals(y.getStartDateTime())
                                         && x.getEndDateTime().equals(y.getEndDateTime())
                         ))
-                .forEach(x -> delta.addAdded(PropertyType.SINGLE_PERIOD, x));
+                .forEach(x -> delta.addAdded(PropertyType.ONE_TIME_PERIOD, x));
 
         // Find changed one-time periods.
-        for (OneTimePeriod thisOtp : this.oneTimePeriods)
+        for (OneTimePeriod thisOtp : this.oneTimePeriods) {
             for (OneTimePeriod thatOtp : that.oneTimePeriods) {
                 boolean cond = thisOtp.getStartDateTime().equals(thatOtp.getStartDateTime())
                         && Objects.equals(thisOtp.getEndDateTime(), thatOtp.getEndDateTime());
@@ -343,12 +359,14 @@ public class Section implements Diffable<Section> {
                     break;
                 }
             }
+        }
 
         // Find removed repeating periods.
         this.repeatingPeriods.stream()
                 .filter(x -> that.repeatingPeriods.stream()
                         .noneMatch(
-                                y -> x.getDayOfWeek().equals(y.getDayOfWeek())
+                                y -> x.getTerm().equals(y.getTerm())
+                                        && x.getDayOfWeek().equals(y.getDayOfWeek())
                                         && x.getStartTime().equals(y.getStartTime())
                                         && x.getEndTime().equals(y.getEndTime())
                         ))
@@ -368,7 +386,8 @@ public class Section implements Diffable<Section> {
         for (RepeatingPeriod thisRp : this.repeatingPeriods)
             for (RepeatingPeriod thatRp : that.repeatingPeriods) {
                 boolean cond = thisRp.getStartTime().equals(thatRp.getStartTime())
-                        && Objects.equals(thisRp.getEndTime(), thatRp.getEndTime());
+                        && thisRp.getEndTime().equals(thatRp.getEndTime())
+                        && thisRp.getDayOfWeek().equals(thatRp.getDayOfWeek());
                 if (cond) {
                     if (!thisRp.equals(thatRp))
                         delta.addChange(thisRp.findDifferences(thatRp));

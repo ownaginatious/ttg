@@ -1,7 +1,10 @@
 package com.timetablegenerator.delta;
 
+import lombok.EqualsAndHashCode;
+
 import javax.annotation.Nonnull;
 
+@EqualsAndHashCode(callSuper = true)
 public class ValueChangeDelta extends Delta {
 
     private final Object oldValue;
@@ -23,7 +26,7 @@ public class ValueChangeDelta extends Delta {
 
         final String tabs = generateTabs(tabAmount);
 
-        return tabs + "MODIFIED [" + this.propertyType.name() + "]\n"
+        return tabs + "MODIFIED [" + this.getPropertyType().name() + "]\n"
                   + tabs + TAB + "Old value : \"" + oldValue + "\"\n"
                   + tabs + TAB + "New value : \"" + newValue + "\"";
     }

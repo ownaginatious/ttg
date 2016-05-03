@@ -74,6 +74,11 @@ public class SectionType implements Comparable<SectionType>, Diffable<SectionTyp
     }
 
     @Override
+    public String getDeltaId(){
+        return this.type;
+    }
+
+    @Override
     public StructureChangeDelta findDifferences(SectionType that) {
 
         if (!this.type.equals(that.type)) {
@@ -81,7 +86,7 @@ public class SectionType implements Comparable<SectionType>, Diffable<SectionTyp
                     + "\" and \"" + that.type + "\"");
         }
 
-        final StructureChangeDelta delta = StructureChangeDelta.of(PropertyType.SECTION_TYPE, this.type);
+        final StructureChangeDelta delta = StructureChangeDelta.of(PropertyType.SECTION_TYPE, this);
 
         Set<String> sectionKeys = new HashSet<>(this.sections.keySet());
         sectionKeys.addAll(that.sections.keySet());

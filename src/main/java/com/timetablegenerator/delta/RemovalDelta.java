@@ -1,7 +1,10 @@
 package com.timetablegenerator.delta;
 
+import lombok.EqualsAndHashCode;
+
 import javax.annotation.Nonnull;
 
+@EqualsAndHashCode(callSuper = true)
 public class RemovalDelta extends Delta {
 
     private final Object oldValue;
@@ -18,7 +21,7 @@ public class RemovalDelta extends Delta {
 
     public String toString(int tabAmount) {
 
-        return "REMOVED [" + this.propertyType.name() + "] : "
+        return "REMOVED [" + this.getPropertyType().name() + "] : "
                 + fixPrinting(TAB + generateTabs(tabAmount), this.oldValue);
     }
 }

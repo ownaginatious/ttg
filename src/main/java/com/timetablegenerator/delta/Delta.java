@@ -1,6 +1,8 @@
 package com.timetablegenerator.delta;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 
 import javax.annotation.Nonnull;
 import java.util.stream.Collectors;
@@ -11,13 +13,14 @@ import java.util.stream.Stream;
  * (e.g. timetable, period. etc).
  *
  */
-public abstract class Delta {
+@EqualsAndHashCode
+public abstract class Delta implements Comparable<Delta> {
 
     protected static final String TAB = "    ";
 
-    @Getter protected final PropertyType propertyType;
+    @Getter private final PropertyType propertyType;
 
-    public Delta(@Nonnull PropertyType propertyType) {
+    public Delta(@NonNull PropertyType propertyType) {
         this.propertyType = propertyType;
     }
 
@@ -44,5 +47,10 @@ public abstract class Delta {
         }
 
         return sb.toString();
+    }
+
+    @Override
+    public final int compareTo(@NonNull @Nonnull Delta that){
+        return this.propertyType.compareTo(that.propertyType);
     }
 }

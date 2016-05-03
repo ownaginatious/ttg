@@ -1,7 +1,10 @@
 package com.timetablegenerator.delta;
 
+import lombok.EqualsAndHashCode;
+
 import javax.annotation.Nonnull;
 
+@EqualsAndHashCode(callSuper = true)
 public class AdditionDelta extends Delta {
 
     private final Object newValue;
@@ -18,7 +21,7 @@ public class AdditionDelta extends Delta {
 
     public String toString(int tabAmount) {
 
-        return "ADDED [" + this.propertyType.name() + "] : "
+        return "ADDED [" + this.getPropertyType().name() + "] : "
                 + fixPrinting(TAB + generateTabs(tabAmount), this.newValue);
     }
 }

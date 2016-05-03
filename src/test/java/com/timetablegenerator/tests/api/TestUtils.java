@@ -11,7 +11,7 @@ public class TestUtils {
     public static String getRandomString(int maxLength){
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < maxLength; i++) {
-            sb.append((char) random.nextInt((122 - 32) + 1));
+            sb.append((char) (random.nextInt((122 - 48) + 1) + 48));
         }
         return sb.toString();
     }

@@ -3,6 +3,7 @@ package com.timetablegenerator.model;
 import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -12,6 +13,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
+@EqualsAndHashCode
 @Accessors(chain = true)
 public class Course implements Comparable<Course>, Diffable<Course> {
 
@@ -31,6 +33,7 @@ public class Course implements Comparable<Course>, Diffable<Course> {
     private final Set<Course> crossListings = new HashSet<>();
     private final Set<Course> prerequisites = new HashSet<>();
     private final Set<Course> antirequisites = new HashSet<>();
+    private final Set<Course> corequisites = new HashSet<>();
 
     private final Map<String, SectionType> sectionTypes = new HashMap<>();
 
@@ -70,6 +73,11 @@ public class Course implements Comparable<Course>, Diffable<Course> {
         return this;
     }
 
+    public Course addCorequesite(Course c){
+        this.corequisites.add(c);
+        return this;
+    }
+
     public Course addCrossListing(Course c) {
         this.crossListings.add(c);
         return this;
@@ -94,6 +102,10 @@ public class Course implements Comparable<Course>, Diffable<Course> {
 
     public Collection<Course> getAntirequisites() {
         return new HashSet<>(this.antirequisites);
+    }
+
+    public Collection<Course> getCorequisites() {
+        return new HashSet<>(this.corequisites);
     }
 
     public SectionType getSectionType(String sectionTypeId) {
@@ -163,54 +175,6 @@ public class Course implements Comparable<Course>, Diffable<Course> {
     }
 
     @Override
-    public boolean equals(Object o) {
-
-        if (this == o)
-            return true;
-
-        if (o == null || getClass() != o.getClass())
-            return false;
-
-        Course that = (Course) o;
-
-        return this.uniqueId.equals(that.uniqueId)
-                && this.school.equals(that.school)
-                && Objects.equals(this.credits, that.credits)
-                && shallowCourseSet(crossListings).equals(shallowCourseSet(that.crossListings))
-                && shallowCourseSet(prerequisites).equals(shallowCourseSet(that.prerequisites))
-                && shallowCourseSet(antirequisites).equals(shallowCourseSet(that.antirequisites))
-                && sectionTypes.equals(that.sectionTypes)
-                && term == that.term
-                && department.equals(that.department)
-                && notes.equals(that.notes)
-                && Objects.equals(this.department, that.department)
-                && Objects.equals(this.courseName, that.courseName);
-    }
-
-    @Override
-    public int hashCode() {
-
-        int result = school.hashCode();
-        long temp;
-
-        result = 31 * result + courseCode.hashCode();
-        result = 31 * result + (courseName != null ? courseName.hashCode() : 0);
-        result = 31 * result + uniqueId.hashCode();
-        result = 31 * result + department.hashCode();
-        result = 31 * result + term.hashCode();
-        temp = Double.doubleToLongBits(credits);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + notes.hashCode();
-        result = 31 * result + shallowCourseSet(crossListings).hashCode();
-        result = 31 * result + shallowCourseSet(prerequisites).hashCode();
-        result = 31 * result + shallowCourseSet(antirequisites).hashCode();
-        result = 31 * result + sectionTypes.hashCode();
-
-        return result;
-    }
-
-    @Override
     public int compareTo(@Nonnull Course c) {
 
         int departmentComparison = this.department.compareTo(c.department);
@@ -222,6 +186,11 @@ public class Course implements Comparable<Course>, Diffable<Course> {
     }
 
     @Override
+    public String getDeltaId(){
+        return this.uniqueId;
+    }
+
+    @Override
     public StructureChangeDelta findDifferences(Course that) {
 
         if (!this.uniqueId.equals(that.uniqueId)) {
@@ -229,7 +198,7 @@ public class Course implements Comparable<Course>, Diffable<Course> {
                     + "\" and \"" + that.uniqueId + "\"");
         }
 
-        final StructureChangeDelta delta = StructureChangeDelta.of(PropertyType.COURSE, this.uniqueId);
+        final StructureChangeDelta delta = StructureChangeDelta.of(PropertyType.COURSE, this);
 
         delta.addIfChanged(PropertyType.NAME, this.courseName, that.courseName);
         delta.addIfChanged(PropertyType.DESCRIPTION, this.description, that.description);
@@ -244,9 +213,9 @@ public class Course implements Comparable<Course>, Diffable<Course> {
                 .filter(x -> !that.notes.contains(x))
                 .forEach(x -> delta.addRemoved(PropertyType.NOTE, x));
 
-        recordCourseRelationDiff(delta, PropertyType.CROSSLISTING, this.crossListings, that.crossListings);
-        recordCourseRelationDiff(delta, PropertyType.PREREQUISITE, this.prerequisites, that.prerequisites);
-        recordCourseRelationDiff(delta, PropertyType.ANTIREQUISITE, this.antirequisites, that.antirequisites);
+        recordCourseRelationDiff(delta, PropertyType.CROSS_LISTING, this.crossListings, that.crossListings);
+        recordCourseRelationDiff(delta, PropertyType.PRE_REQUISITE, this.prerequisites, that.prerequisites);
+        recordCourseRelationDiff(delta, PropertyType.ANTI_REQUISITE, this.antirequisites, that.antirequisites);
 
         Set<String> sectionTypeKeys = new HashSet<>(this.sectionTypes.keySet());
         sectionTypeKeys.addAll(that.sectionTypes.keySet());

@@ -69,6 +69,11 @@ public class TimeTable implements Comparable<TimeTable>, Diffable<TimeTable> {
     }
 
     @Override
+    public String getDeltaId(){
+        return school.getSchoolId() + "/" + this.term.getYear() + "/" + this.term.getTermId().getId();
+    }
+
+    @Override
     public StructureChangeDelta findDifferences(TimeTable that) {
 
         if (!this.term.equals(that.term)) {
@@ -81,8 +86,7 @@ public class TimeTable implements Comparable<TimeTable>, Diffable<TimeTable> {
                     + this.school.getSchoolId() + "\" and \"" + that.school.getSchoolId() + "\"");
         }
 
-        final StructureChangeDelta delta = StructureChangeDelta.of(PropertyType.TIMETABLE,
-                school.getSchoolId() + "/" + this.term.getYear() + "/" + this.term.getTermId().getId());
+        final StructureChangeDelta delta = StructureChangeDelta.of(PropertyType.TIMETABLE, this);
 
         // Record courses that were added.
         that.courses.values().stream()
