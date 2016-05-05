@@ -13,17 +13,28 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-SYSTEM_APPS = []
+SYSTEM_APPS = [
+    'django.contrib.contenttypes',
+    'django.contrib.auth'
+]
 
 THIRD_PARTY_APPS = [
     'rest_framework'
 ]
 
 TTG_APPS = [
-    'ttg_model'
+#    'ttg_model' # Enable when more support is added to scrapers.
+    'ttg_legacy'
 ]
 
 INSTALLED_APPS = SYSTEM_APPS + THIRD_PARTY_APPS + TTG_APPS
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'legacy',
+    }
+}
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.locale.LocaleMiddleware'
@@ -56,3 +67,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+LEGACY_DIR = os.environ.get('LEGACY_DIR', '/tmp/ttg-legacy')
+LEGACY_POST_KEY = os.environ.get('LEGACY_POST_KEY', 'changemeinprod')
