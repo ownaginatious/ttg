@@ -1,5 +1,6 @@
 package com.timetablegenerator.model.period;
 
+import com.timetablegenerator.Settings;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
 import com.timetablegenerator.model.TermClassifier;
@@ -14,6 +15,8 @@ import java.util.*;
 @Accessors(chain = true)
 @EqualsAndHashCode()
 public abstract class Period {
+
+    protected static final String TAB = Settings.getTab();
 
     @Getter private final TermClassifier term;
     @Getter private final Set<String> supervisors = new TreeSet<>();

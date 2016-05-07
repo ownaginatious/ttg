@@ -1,5 +1,7 @@
 package com.timetablegenerator.model;
 
+import com.timetablegenerator.Settings;
+import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.model.period.Period;
 import com.timetablegenerator.delta.Diffable;
@@ -13,12 +15,12 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @EqualsAndHashCode()
 @Accessors(chain = true)
 public class Section implements Diffable<Section> {
+
+    private static final String TAB = Settings.getTab();
 
     @Setter private String serialNumber;
     @Getter private final String sectionId;
@@ -33,13 +35,13 @@ public class Section implements Diffable<Section> {
     private int enrollment = -1;
     private int maxEnrollment = -1;
 
-    private Boolean cancelled = null;
 
     private final Set<RepeatingPeriod> repeatingPeriods = new TreeSet<>();
     private final Set<OneTimePeriod> oneTimePeriods = new TreeSet<>();
 
     private final List<String> notes = new ArrayList<>();
 
+    @Setter private Boolean cancelled = null;
     @Setter private Boolean online = null;
     @Setter private Boolean alternating = null;
 
@@ -73,11 +75,6 @@ public class Section implements Diffable<Section> {
         return this.online == null ? Optional.empty() : Optional.of(this.online);
     }
 
-    public Section setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
-        return this;
-    }
-
     public Optional<Boolean> isCancelled() {
         return this.cancelled == null ? Optional.empty() : Optional.of(this.cancelled);
     }
@@ -90,9 +87,9 @@ public class Section implements Diffable<Section> {
 
         this.waitingList = waitingList;
 
-        if (!this.waitingList)
+        if (!this.waitingList) {
             this.waiting = -1;
-
+        }
         return this;
     }
 
@@ -217,70 +214,50 @@ public class Section implements Diffable<Section> {
 
     @Override
     public String toString() {
-        return toString(0);
-    }
 
-    public String toString(int tabAmount) {
+        StringBuilder sb = new StringBuilder();
 
-        String preTabs = IntStream.rangeClosed(1, tabAmount).mapToObj(x -> "\t").collect(Collectors.joining());
+        sb.append(this.sectionId);
 
-        StringBuilder sb = new StringBuilder("\n");
+        this.getSerialNumber().ifPresent(x -> sb.append(" {").append(this.serialNumber).append('}'));
+        this.isCancelled().ifPresent(x -> sb.append(x ? " [CANCELLED]" : ""));
+        this.isOnline().ifPresent(x -> sb.append(x ? " [ONLINE]" : ""));
+        this.isAlternating().ifPresent(x -> sb.append(x ? " [ALTERNATES]" : ""));
+        this.isFull().ifPresent(x -> sb.append(x ? " [FULL]" : " [AVAILABLE]"));
 
-        sb.append(preTabs).append(this.sectionId);
-
-        if (this.serialNumber != null) {
-            sb.append(" {").append(this.serialNumber).append('}');
+        if (this.getEnrollment().isPresent() || this.getMaxEnrollment().isPresent()) {
+            sb.append(" [enrolled: ");
+            sb.append(this.getEnrollment().map(Object::toString).orElse("?"));
+            sb.append('/');
+            sb.append(this.getMaxEnrollment().map(Object::toString).orElse("?"));
+            sb.append(']');
         }
 
-        if (this.cancelled != null && this.cancelled) {
-            return sb.append(" [CANCELLED]\n").toString();
+        if (this.getWaiting().isPresent()) {
+            sb.append(" [waiting: ");
+            sb.append(this.getWaiting().map(Object::toString).orElse("?"));
+            sb.append('/');
+            sb.append(this.getMaxWaiting().map(Object::toString).orElse("?"));
+            sb.append(']');
         }
 
-        if (this.full != null) {
-
-            if (this.full) {
-                sb.append(" [FULL]");
-            } else {
-                sb.append(" [AVAILABLE]");
-            }
+        if (!this.notes.isEmpty()) {
+            sb.append("\n\n").append(TAB).append("Notes:\n");
+            this.notes.forEach(x ->
+                sb.append('\n').append(TAB).append(TAB)
+                        .append(StringUtilities.indent(3, "- " + x)));
         }
-
-        if (this.enrollment > -1 || this.maxEnrollment > -1) {
-
-            sb.append(" [enrolled: ")
-                    .append(this.enrollment > -1 ? this.enrollment : "?")
-                    .append('/')
-                    .append(this.maxEnrollment > -1 ? this.maxEnrollment : "?")
-                    .append(" ]");
-        }
-
-        if (this.waitingList != null) {
-
-            sb.append(" [waiting: ")
-                    .append(this.waiting > -1 ? this.waiting : "?")
-                    .append('/')
-                    .append(this.maxWaiting > -1 ? this.maxWaiting : "?")
-                    .append(" ]");
-        }
-
-        sb.append('\n');
 
         if (!this.repeatingPeriods.isEmpty()) {
-
-            sb.append("\n").append(preTabs).append("\tRepeating periods:\n").append(preTabs).append('\n');
-
-            for (RepeatingPeriod rp : this.repeatingPeriods) {
-                sb.append(preTabs).append("\t\t").append(rp).append('\n');
-            }
+            sb.append("\n\n").append(TAB).append("Repeating periods:\n");
+            this.repeatingPeriods.forEach(x -> sb.append('\n')
+                    .append(StringUtilities.indent(3, "- " + x)));
         }
 
         if (!this.oneTimePeriods.isEmpty()) {
-
-            sb.append("\n").append(preTabs).append("\tOne time periods:\n").append(preTabs).append('\n');
-
-            for (OneTimePeriod sp : this.oneTimePeriods) {
-                sb.append(preTabs).append("\t\t").append(sp).append('\n');
-            }
+            sb.append("\n\n").append(TAB).append("One time periods:\n");
+            this.oneTimePeriods.forEach(x -> sb.append('\n')
+                    .append(StringUtilities.indent(3, "- " + x)));
         }
 
         return sb.toString();

@@ -1,5 +1,6 @@
 package com.timetablegenerator.model.period;
 
+import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
@@ -10,6 +11,7 @@ import lombok.NonNull;
 import javax.annotation.Nonnull;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -88,6 +90,15 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
                     .map(x -> "'" + x + "'")
                     .collect(Collectors.joining(", "))).append(']');
         }
+
+        Collection<String> notes = this.getNotes();
+
+        if (!notes.isEmpty()) {
+            sb.append("\n\n").append(TAB).append("Notes:\n");
+            notes.forEach(x -> sb.append('\n').append(TAB).append(TAB)
+                    .append(StringUtilities.indent(3, "- " + x)));
+        }
+
         return sb.toString();
     }
 

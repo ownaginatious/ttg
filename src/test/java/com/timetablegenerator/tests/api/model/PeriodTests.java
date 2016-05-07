@@ -1,5 +1,6 @@
 package com.timetablegenerator.tests.api.model;
 
+import com.timetablegenerator.Settings;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
 import com.timetablegenerator.model.TermClassifier;
@@ -22,6 +23,13 @@ import static org.hamcrest.Matchers.*;
 
 public class PeriodTests {
 
+    private static String TAB;
+
+    static {
+        Settings.setTabSize(4);
+        TAB = Settings.getTab();
+    }
+
     private RepeatingPeriod rp1;
     private RepeatingPeriod rp2;
     private OneTimePeriod otp1;
@@ -29,6 +37,7 @@ public class PeriodTests {
 
     @Before
     public void setUp(){
+        Settings.setTabSize(4);
         TermClassifier t = TermClassifier.FALL;
         this.rp1 = RepeatingPeriod.of(t);
         this.rp2 = RepeatingPeriod.of(t);
@@ -257,7 +266,7 @@ public class PeriodTests {
         p2.addNotes("123");
         assertNotEquals(p1, p2);
 
-        // Set the campus.
+        // Set the room.
         p2 = RepeatingPeriod.of(TermClassifier.FALL);
         p2.setRoom("123");
         assertNotEquals(p1, p2);

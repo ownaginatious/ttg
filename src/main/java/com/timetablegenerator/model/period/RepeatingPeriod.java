@@ -1,5 +1,6 @@
 package com.timetablegenerator.model.period;
 
+import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
@@ -116,6 +117,15 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
                     .map(x -> "'" + x + "'")
                     .collect(Collectors.joining(", "))).append(']');
         }
+
+        Collection<String> notes = this.getNotes();
+
+        if (!notes.isEmpty()) {
+            sb.append("\n\n").append(TAB).append("Notes:\n");
+            notes.forEach(x -> sb.append('\n').append(TAB).append(TAB)
+                            .append(StringUtilities.indent(3, "- " + x)));
+        }
+
         return sb.toString();
     }
 

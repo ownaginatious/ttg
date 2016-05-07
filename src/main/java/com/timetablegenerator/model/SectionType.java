@@ -45,24 +45,15 @@ public class SectionType implements Comparable<SectionType>, Diffable<SectionTyp
 
     @Override
     public String toString() {
-        return toString(0);
-    }
-
-    public String toString(int tabAmount) {
-
-        String preTabs = IntStream.rangeClosed(1, tabAmount).mapToObj(x -> "\t").collect(Collectors.joining());
 
         StringBuilder sb = new StringBuilder("\n");
 
-        sb.append(preTabs).append(school.getSectionTypeNameByCode(this.type)).append(" data:\n");
+        sb.append(school.getSectionTypeNameByCode(this.type)).append(" data:\n");
 
         if (this.sections.isEmpty()){
-
-            sb.append('\n').append("NONE LISTED\n");
-
+            sb.append('\n').append("NONE LISTED");
         } else {
-            for (String sectionId : this.sections.keySet())
-                sb.append(this.sections.get(sectionId).toString(tabAmount + 1));
+            this.sections.values().forEach(sb::append);
         }
 
         return sb.toString();

@@ -152,23 +152,34 @@ public class Course implements Comparable<Course>, Diffable<Course> {
                 sb.append("\t[").append(++i).append("] ").append(note);
         }
 
-        if (!this.crossListings.isEmpty())
-            sb.append("* Cross-listings: ").append(this.crossListings.stream()).append('\n');
-
-        if (!this.prerequisites.isEmpty())
-            sb.append("* Pre-requisites: ").append(this.prerequisites).append('\n');
-
-        if (!this.antirequisites.isEmpty())
-            sb.append("* Anti-requisites: ").append(this.antirequisites).append('\n');
+        if (!this.crossListings.isEmpty()) {
+            sb.append("* Cross-listings: ")
+                    .append(this.crossListings.stream()
+                            .map(Course::getUniqueId)
+                            .collect(Collectors.joining(", ")))
+                    .append('\n');
+        }
+        if (!this.prerequisites.isEmpty()) {
+            sb.append("* Pre-requisites: ")
+                    .append(this.prerequisites.stream()
+                            .map(Course::getUniqueId)
+                            .collect(Collectors.joining(", ")))
+                    .append('\n');
+        }
+        if (!this.antirequisites.isEmpty()) {
+            sb.append("* Anti-requisites: ")
+                    .append(this.antirequisites.stream()
+                            .map(Course::getUniqueId)
+                            .collect(Collectors.joining(", ")))
+                    .append('\n');
+        }
 
         sb.append("* Sections:\n");
 
         if (this.sectionTypes.isEmpty())
-            sb.append("\t").append("NONE").append('\n');
+            sb.append('\t').append("NONE");
         else {
-            // Print each section.
-            for (String k : this.sectionTypes.keySet())
-                sb.append(this.sectionTypes.get(k).toString(1));
+            this.sectionTypes.values().forEach(x -> sb.append('\n').append(x));
         }
 
         return sb.toString();

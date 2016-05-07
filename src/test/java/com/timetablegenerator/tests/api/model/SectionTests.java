@@ -1,5 +1,6 @@
 package com.timetablegenerator.tests.api.model;
 
+import com.timetablegenerator.Settings;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
 import com.timetablegenerator.model.Section;
@@ -20,10 +21,18 @@ import static org.hamcrest.Matchers.*;
 
 public class SectionTests {
 
+    private static String TAB;
+
+    static {
+        Settings.setTabSize(4);
+        TAB = Settings.getTab();
+    }
+
     private Section s1, s2;
 
     @Before
     public void setUp() {
+        Settings.setTabSize(4);
         String sectionName = TestUtils.getRandomString(20);
         this.s1 = Section.fromSectionId(sectionName);
         this.s2 = Section.fromSectionId(sectionName);
@@ -420,5 +429,253 @@ public class SectionTests {
 
         assertEquals(expected, s1.findDifferences(s2));
         assertEquals(invertExpected, s2.findDifferences(s1));
+    }
+
+    @Test
+    public void emptySectionString() {
+        assertEquals(s1.getSectionId(), s1.toString());
+    }
+
+    @Test
+    public void sectionWithSerialString(){
+        s1.setSerialNumber("Test Serial");
+        assertEquals(s1.getSectionId() + " {Test Serial}", s1.toString());
+    }
+
+    @Test
+    public void sectionCancelledString(){
+        String header = s1.getSectionId() + " {Test Serial}";
+        s1.setSerialNumber("Test Serial");
+        s1.setCancelled(true);
+        assertEquals(header + " [CANCELLED]", s1.toString());
+        s1.setCancelled(false);
+        assertEquals(header, s1.toString());
+    }
+
+    @Test
+    public void sectionOnlineString(){
+        String header = s1.getSectionId() + " {Test Serial} [CANCELLED]";
+        s1.setSerialNumber("Test Serial");
+        s1.setCancelled(true);
+        s1.setOnline(true);
+        assertEquals(header + " [ONLINE]", s1.toString());
+        s1.setOnline(false);
+        assertEquals(header, s1.toString());
+    }
+
+    @Test
+    public void sectionAlternating(){
+        String header = s1.getSectionId() + " {Test Serial} [CANCELLED] [ONLINE]";
+        s1.setSerialNumber("Test Serial");
+        s1.setCancelled(true);
+        s1.setOnline(true);
+        s1.setAlternating(true);
+        assertEquals(header + " [ALTERNATES]", s1.toString());
+        s1.setAlternating(false);
+        assertEquals(header, s1.toString());
+    }
+
+    @Test
+    public void sectionFullString(){
+        String header = s1.getSectionId() + " {Test Serial} [CANCELLED]";
+        s1.setSerialNumber("Test Serial");
+        s1.setCancelled(true);
+        s1.setFull(true);
+        assertEquals(header + " [FULL]", s1.toString());
+        s1.setFull(false);
+        assertEquals(header + " [AVAILABLE]", s1.toString());
+    }
+
+    @Test
+    public void sectionEnrollmentString(){
+        String header = s1.getSectionId() + " {Test Serial} [CANCELLED] [ONLINE] [ALTERNATES]";
+        s1.setSerialNumber("Test Serial");
+        s1.setCancelled(true);
+        s1.setEnrollment(3);
+        s1.setOnline(true);
+        s1.setAlternating(true);
+        assertEquals(header + " [enrolled: 3/?]", s1.toString());
+        s1.setMaximumEnrollment(4);
+        assertEquals(header + " [AVAILABLE] [enrolled: 3/4]", s1.toString());
+        s1.setMaximumEnrollment(3);
+        assertEquals(header + " [FULL] [enrolled: 3/3]", s1.toString());
+    }
+
+    @Test
+    public void sectionWaitingString(){
+        String header = s1.getSectionId()
+                + " {Test Serial} [CANCELLED] [ONLINE] [ALTERNATES] [enrolled: 3/?]";
+        s1.setSerialNumber("Test Serial");
+        s1.setCancelled(true);
+        s1.setOnline(true);
+        s1.setAlternating(true);
+        s1.setWaiting(50);
+        s1.setEnrollment(3);
+        assertEquals(header + " [waiting: 50/?]", s1.toString());
+        s1.setMaximumWaiting(100);
+        assertEquals(header + " [waiting: 50/100]", s1.toString());
+        s1.setWaiting(100);
+        assertEquals(header + " [waiting: 100/100]", s1.toString());
+    }
+
+    @Test
+    public void sectionPeriodsString(){
+        String header = s1.getSectionId()
+                + " {Test Serial} [CANCELLED] [ONLINE] [ALTERNATES] [enrolled: 3/?] [waiting: 100/100]";
+        s1.setSerialNumber("Test Serial");
+        s1.setCancelled(true);
+        s1.setOnline(true);
+        s1.setAlternating(true);
+        s1.setEnrollment(3);
+        s1.setWaiting(100);
+        s1.setMaximumWaiting(100);
+
+        // Add one-time and unique periods.
+        Period p1 = OneTimePeriod.of(TermClassifier.FALL)
+                .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
+                .addNotes("Test 1", "Test 2", "Test 3");
+        Period p2 = RepeatingPeriod.of(TermClassifier.FALL)
+                .setTime(DayOfWeek.MONDAY, LocalTime.MIN, LocalTime.MAX)
+                .addNotes("Test 1", "Test 2", "Test 3").addSupervisors("A Test", "B Test");
+        Period p3 = RepeatingPeriod.of(TermClassifier.FALL)
+                .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX)
+                .addNotes("Test 1", "Test 2", "Test 3").addSupervisors("A Test");
+
+        s1.addPeriod(p1).addPeriod(p2).addPeriod(p3);
+
+        String expected = header + "\n\n" + TAB + "Repeating periods:\n\n"
+                + TAB + TAB + p2.toString() + "\n" + TAB + TAB + p3.toString()
+                + "\n\n" + TAB + "One time periods:\n\n" + TAB + TAB + p1.toString();
+
+        assertEquals(expected, s1.toString());
+    }
+
+    @Test
+    public void sectionNotesString(){
+
+        s1.setSerialNumber("Test Serial");
+        s1.setCancelled(true);
+        s1.setOnline(true);
+        s1.setAlternating(true);
+        s1.setEnrollment(3);
+        s1.setWaiting(100);
+        s1.setMaximumWaiting(100);
+
+        // Add one-time and unique periods.
+        Period p1 = OneTimePeriod.of(TermClassifier.FALL)
+                .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
+                .addNotes("Test 1", "Test 2", "Test 3");
+        Period p2 = RepeatingPeriod.of(TermClassifier.FALL)
+                .setTime(DayOfWeek.MONDAY, LocalTime.MIN, LocalTime.MAX)
+                .addNotes("Test 1", "Test 2", "Test 3").addSupervisors("A Test", "B Test");
+        Period p3 = RepeatingPeriod.of(TermClassifier.FALL)
+                .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX)
+                .addNotes("Test 1", "Test 2", "Test 3").addSupervisors("A Test");
+
+        String expected = s1.getSectionId() +
+                " {Test Serial} [CANCELLED] [ONLINE] [ALTERNATES] [enrolled: 3/?] [waiting: 100/100]\n\n"
+                + TAB + "Notes:\n\n"
+                + TAB + TAB + "- This is my note\n"
+                + TAB + TAB + "- This is my note with a line break\n"
+                + TAB + TAB + "      with a line break\n\n"
+                + TAB + "Repeating periods:\n\n"
+                + TAB + TAB + p2.toString() + "\n" + TAB + TAB + p3.toString()
+                + "\n\n" + TAB + "One time periods:\n\n" + TAB + TAB + p1.toString();
+
+        s1.addPeriod(p1).addPeriod(p2).addPeriod(p3);
+        s1.addNotes("This is my note", "This is my note\n    with a line break");
+
+        assertEquals(expected, s1.toString());
+    }
+
+    @Test
+    public void sectionEquality(){
+
+        // Same section ID.
+        Section s1 = Section.fromSectionId("testing");
+        Section s2 = Section.fromSectionId("testing");
+        assertEquals(s1, s2);
+
+        // Differing section IDs.
+        s2 = Section.fromSectionId("testing 2");
+        assertNotEquals(s1, s2);
+        s2 = Section.fromSectionId("testing");
+
+        // Toggle full
+        s1.setFull(true);
+        assertNotEquals(s1, s2);
+        s1.setFull(false);
+        assertNotEquals(s1, s2);
+        s2.setFull(false);
+        assertEquals(s1, s2);
+
+        // Toggle online
+        s1.setOnline(true);
+        assertNotEquals(s1, s2);
+        s1.setOnline(false);
+        assertNotEquals(s1, s2);
+        s2.setOnline(false);
+        assertEquals(s1, s2);
+
+        // Toggle alternating
+        s1.setAlternating(true);
+        assertNotEquals(s1, s2);
+        s1.setAlternating(false);
+        assertNotEquals(s1, s2);
+        s2.setAlternating(false);
+        assertEquals(s1, s2);
+
+        // Toggle waiting list
+        s1.setWaitingList(true);
+        assertNotEquals(s1, s2);
+        s1.setWaitingList(false);
+        assertNotEquals(s1, s2);
+        s2.setWaitingList(false);
+        assertEquals(s1, s2);
+
+        // Differing serial numbers
+        s1.setSerialNumber("test");
+        assertNotEquals(s1, s2);
+        s2.setSerialNumber("test");
+        assertEquals(s1, s2);
+
+        // Change enrollment
+        s1.setEnrollment(1);
+        assertNotEquals(s1, s2);
+        s2.setEnrollment(1);
+        assertEquals(s1, s2);
+
+        // Change max enrollment
+        s1.setMaximumEnrollment(1);
+        assertNotEquals(s1, s2);
+        s2.setMaximumEnrollment(1);
+        assertEquals(s1, s2);
+
+        // Change waiting
+        s1.setWaiting(1);
+        assertNotEquals(s1, s2);
+        s2.setWaiting(1);
+        assertEquals(s1, s2);
+
+        // Change max waiting
+        s1.setMaximumWaiting(1);
+        assertNotEquals(s1, s2);
+        s2.setMaximumWaiting(1);
+        assertEquals(s1, s2);
+
+        // Modify one-time periods
+        Period p1 = OneTimePeriod.of(TermClassifier.FALL);
+        s1.addPeriod(p1);
+        assertNotEquals(s1, s2);
+        s2.addPeriod(p1);
+        assertEquals(s1, s2);
+
+        // Modify repeating periods
+        p1 = RepeatingPeriod.of(TermClassifier.SUMMER_ONE)
+                .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
+        s1.addPeriod(p1);
+        assertNotEquals(s1, s2);
+        s2.addPeriod(p1);
+        assertEquals(s1, s2);
     }
 }
