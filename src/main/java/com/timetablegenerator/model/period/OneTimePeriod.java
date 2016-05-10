@@ -94,9 +94,9 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
         Collection<String> notes = this.getNotes();
 
         if (!notes.isEmpty()) {
-            sb.append("\n\n").append(TAB).append("Notes:\n");
-            notes.forEach(x -> sb.append('\n').append(TAB).append(TAB)
-                    .append(StringUtilities.indent(3, "- " + x)));
+            sb.append("\n\n").append(I).append("Notes:\n");
+            notes.forEach(x -> sb.append('\n')
+                    .append(StringUtilities.indent(2, x)));
         }
 
         return sb.toString();
@@ -126,6 +126,42 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
                     + this.endDateTime.format(DATETIME_FORMAT);
         }
         return id;
+    }
+
+    @Override
+    public OneTimePeriod addSupervisors(String... supervisors){
+        super.addSupervisors(supervisors);
+        return this;
+    }
+
+    @Override
+    public OneTimePeriod addSupervisors(Collection<String> supervisors){
+        super.addSupervisors(supervisors);
+        return this;
+    }
+
+    @Override
+    public OneTimePeriod addNotes(String... note){
+        super.addNotes(note);
+        return this;
+    }
+
+    @Override
+    public OneTimePeriod addNotes(Collection<String> notes){
+        super.addNotes(notes);
+        return this;
+    }
+
+    @Override
+    public OneTimePeriod setRoom(String room){
+        super.setRoom(room);
+        return this;
+    }
+
+    @Override
+    public OneTimePeriod setCampus(String campus){
+        super.setCampus(campus);
+        return this;
     }
 
     public StructureChangeDelta findDifferences(OneTimePeriod that) {

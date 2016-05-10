@@ -5,7 +5,6 @@ import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
 import com.timetablegenerator.model.TermClassifier;
 import com.timetablegenerator.model.period.OneTimePeriod;
-import com.timetablegenerator.model.period.Period;
 import com.timetablegenerator.model.period.RepeatingPeriod;
 import com.timetablegenerator.tests.api.TestUtils;
 import org.junit.Before;
@@ -15,6 +14,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -23,13 +23,6 @@ import static org.hamcrest.Matchers.*;
 
 public class PeriodTests {
 
-    private static String TAB;
-
-    static {
-        Settings.setTabSize(4);
-        TAB = Settings.getTab();
-    }
-
     private RepeatingPeriod rp1;
     private RepeatingPeriod rp2;
     private OneTimePeriod otp1;
@@ -37,7 +30,7 @@ public class PeriodTests {
 
     @Before
     public void setUp(){
-        Settings.setTabSize(4);
+        Settings.setIndentSize(4);
         TermClassifier t = TermClassifier.FALL;
         this.rp1 = RepeatingPeriod.of(t);
         this.rp2 = RepeatingPeriod.of(t);
@@ -104,42 +97,33 @@ public class PeriodTests {
     }
 
     @Test
-    public void supervisorsRepeating(){
-        this.supervisors(rp1);
-    }
-
-    @Test
-    public void supervisorsOneTime(){
-        this.supervisors(otp1);
-    }
-
-    private void supervisors(Period p){
+    public void supervisors(){
 
         List<String> supervisors = TestUtils.getRandomStrings(10, 20);
 
         // Test singular addition.
-        supervisors.forEach(p::addSupervisors);
-        assertEquals(new HashSet<>(supervisors), p.getSupervisors());
+        supervisors.forEach(rp1::addSupervisors);
+        assertEquals(new HashSet<>(supervisors), rp1.getSupervisors());
 
         setUp();
 
         // Test collection addition.
-        p.addSupervisors(supervisors);
-        assertEquals(new HashSet<>(supervisors), p.getSupervisors());
+        rp1.addSupervisors(supervisors);
+        assertEquals(new HashSet<>(supervisors), rp1.getSupervisors());
 
         setUp();
 
         // Test array addition.
-        p.addSupervisors(supervisors.toArray(new String[supervisors.size()]));
-        assertEquals(new HashSet<>(supervisors), p.getSupervisors());
+        rp1.addSupervisors(supervisors.toArray(new String[supervisors.size()]));
+        assertEquals(new HashSet<>(supervisors), rp1.getSupervisors());
 
         List<String> supervisors2 = TestUtils.getRandomStrings(50, 120);
-        p.addSupervisors(supervisors2);
+        rp1.addSupervisors(supervisors2);
 
         List<String> allSupervisors = new ArrayList<>(supervisors);
         allSupervisors.addAll(supervisors2);
 
-        assertEquals(new HashSet<>(allSupervisors), p.getSupervisors());
+        assertEquals(new HashSet<>(allSupervisors), rp1.getSupervisors());
     }
 
     @Test
@@ -247,36 +231,33 @@ public class PeriodTests {
     @Test
     public void periodEquality() {
 
-        Period p1 = RepeatingPeriod.of(TermClassifier.FALL);
-        Period p2 = RepeatingPeriod.of(TermClassifier.FALL);
-
-        assertEquals(p1, p2);
+        assertEquals(rp1, rp2);
 
         // Different term.
-        p2 = RepeatingPeriod.of(TermClassifier.SPRING);
-        assertNotEquals(p1, p2);
+        rp2 = RepeatingPeriod.of(TermClassifier.SPRING);
+        assertNotEquals(rp1, rp2);
 
         // Add a supervisor.
-        p1 = RepeatingPeriod.of(TermClassifier.FALL);
-        p2.addSupervisors("Test");
-        assertNotEquals(p1, p2);
+        rp1 = RepeatingPeriod.of(TermClassifier.FALL);
+        rp2.addSupervisors("Test");
+        assertNotEquals(rp1, rp2);
 
         // Add a note.
-        p2 = RepeatingPeriod.of(TermClassifier.FALL);
-        p2.addNotes("123");
-        assertNotEquals(p1, p2);
+        rp2 = RepeatingPeriod.of(TermClassifier.FALL);
+        rp2.addNotes("123");
+        assertNotEquals(rp1, rp2);
 
         // Set the room.
-        p2 = RepeatingPeriod.of(TermClassifier.FALL);
-        p2.setRoom("123");
-        assertNotEquals(p1, p2);
+        rp2 = RepeatingPeriod.of(TermClassifier.FALL);
+        rp2.setRoom("123");
+        assertNotEquals(rp1, rp2);
 
         // Set online.
-        p2 = RepeatingPeriod.of(TermClassifier.FALL);
-        p2.setOnline(true);
-        assertNotEquals(p1, p2);
-        p2.setOnline(false);
-        assertNotEquals(p1, p2);
+        rp2 = RepeatingPeriod.of(TermClassifier.FALL);
+        rp2.setOnline(true);
+        assertNotEquals(rp1, rp2);
+        rp2.setOnline(false);
+        assertNotEquals(rp1, rp2);
     }
 
     @Test
@@ -471,8 +452,8 @@ public class PeriodTests {
         // Campus change.
         rp1.setCampus("Test campus");
         rp2.setCampus("Test campus 1");
-        expected.addIfChanged(PropertyType.CAMPUS, "Test campus 1", "Test campus");
-        invertExpected.addIfChanged(PropertyType.CAMPUS, "Test campus", "Test campus 1");
+        expected.addValueIfChanged(PropertyType.CAMPUS, "Test campus 1", "Test campus");
+        invertExpected.addValueIfChanged(PropertyType.CAMPUS, "Test campus", "Test campus 1");
 
         assertEquals(expected, rp2.findDifferences(rp1));
         assertEquals(invertExpected, rp1.findDifferences(rp2));
@@ -489,7 +470,7 @@ public class PeriodTests {
     @Test
     public void periodStructuralPropertySupervisorsDelta() {
 
-        otp1.addSupervisors("test1", "test 2", "test 3");
+        otp1.addSupervisors(Arrays.asList("test1", "test 2", "test 3"));
         otp2.addSupervisors("test 4", "test 2", "test 7", "test 8");
 
         StructureChangeDelta expected = StructureChangeDelta.of(PropertyType.ONE_TIME_PERIOD, otp1)
@@ -509,7 +490,7 @@ public class PeriodTests {
     @Test
     public void periodStructuralPropertyNotesDelta() {
 
-        otp1.addNotes("test1", "test 2", "test 3");
+        otp1.addNotes(Arrays.asList("test1", "test 2", "test 3"));
         otp2.addNotes("test 4", "test 2", "test 7", "test 8");
 
         StructureChangeDelta expected = StructureChangeDelta.of(PropertyType.ONE_TIME_PERIOD, otp1)

@@ -211,8 +211,8 @@ public class Course implements Comparable<Course>, Diffable<Course> {
 
         final StructureChangeDelta delta = StructureChangeDelta.of(PropertyType.COURSE, this);
 
-        delta.addIfChanged(PropertyType.NAME, this.courseName, that.courseName);
-        delta.addIfChanged(PropertyType.DESCRIPTION, this.description, that.description);
+        delta.addValueIfChanged(PropertyType.NAME, this.courseName, that.courseName);
+        delta.addValueIfChanged(PropertyType.DESCRIPTION, this.description, that.description);
 
         // Add added notes.
         that.notes.stream()

@@ -14,9 +14,9 @@ import java.util.*;
 
 @Accessors(chain = true)
 @EqualsAndHashCode()
-public abstract class Period {
+abstract class Period {
 
-    protected static final String TAB = Settings.getTab();
+    protected static final String I = Settings.getIndent();
 
     @Getter private final TermClassifier term;
     @Getter private final Set<String> supervisors = new TreeSet<>();
@@ -71,9 +71,9 @@ public abstract class Period {
 
     protected void savePeriodDifferences(StructureChangeDelta delta, Period that) {
 
-        delta.addIfChanged(PropertyType.ROOM, this.room, that.room);
-        delta.addIfChanged(PropertyType.CAMPUS, this.campus, that.campus);
-        delta.addIfChanged(PropertyType.IS_ONLINE, this.online, that.online);
+        delta.addValueIfChanged(PropertyType.ROOM, this.room, that.room);
+        delta.addValueIfChanged(PropertyType.CAMPUS, this.campus, that.campus);
+        delta.addValueIfChanged(PropertyType.IS_ONLINE, this.online, that.online);
 
         // Add added notes.
         that.notes.stream()

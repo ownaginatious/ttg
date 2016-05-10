@@ -65,17 +65,6 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
         return this.dayOfWeek != null;
     }
 
-    public RepeatingPeriod addSupervisors(String... supervisors) {
-
-        super.addSupervisors(supervisors);
-        return this;
-    }
-
-    public RepeatingPeriod addSupervisors(Collection<String> supervisors) {
-        super.addSupervisors(supervisors);
-        return this;
-    }
-
     @Override
     public String toString() {
 
@@ -87,7 +76,7 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
             sb.append(this.dayOfWeek.toString());
         }
 
-        sb.append(" ");
+        sb.append(' ');
 
         if (this.startTime != null && this.endTime != null) {
             sb.append(this.startTime.format(TIME_FORMAT))
@@ -121,9 +110,9 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
         Collection<String> notes = this.getNotes();
 
         if (!notes.isEmpty()) {
-            sb.append("\n\n").append(TAB).append("Notes:\n");
-            notes.forEach(x -> sb.append('\n').append(TAB).append(TAB)
-                            .append(StringUtilities.indent(3, "- " + x)));
+            sb.append("\n\n").append(I).append("Notes:\n");
+            notes.forEach(x -> sb.append('\n')
+                            .append(StringUtilities.indent(2, x)));
         }
 
         return sb.toString();
@@ -149,6 +138,42 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
         }
 
         return this.startTime.compareTo(rp.startTime);
+    }
+
+    @Override
+    public RepeatingPeriod addSupervisors(String... supervisors){
+        super.addSupervisors(supervisors);
+        return this;
+    }
+
+    @Override
+    public RepeatingPeriod addSupervisors(Collection<String> supervisors){
+        super.addSupervisors(supervisors);
+        return this;
+    }
+
+    @Override
+    public RepeatingPeriod addNotes(String... note){
+        super.addNotes(note);
+        return this;
+    }
+
+    @Override
+    public RepeatingPeriod addNotes(Collection<String> notes){
+        super.addNotes(notes);
+        return this;
+    }
+
+    @Override
+    public RepeatingPeriod setRoom(String room){
+        super.setRoom(room);
+        return this;
+    }
+
+    @Override
+    public RepeatingPeriod setCampus(String campus){
+        super.setCampus(campus);
+        return this;
     }
 
     @Override

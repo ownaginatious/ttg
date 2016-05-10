@@ -3,7 +3,6 @@ package com.timetablegenerator.model;
 import com.timetablegenerator.Settings;
 import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.PropertyType;
-import com.timetablegenerator.model.period.Period;
 import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.StructureChangeDelta;
 import com.timetablegenerator.model.period.RepeatingPeriod;
@@ -20,7 +19,7 @@ import java.util.*;
 @Accessors(chain = true)
 public class Section implements Diffable<Section> {
 
-    private static final String TAB = Settings.getTab();
+    private static final String I = Settings.getIndent();
 
     @Setter private String serialNumber;
     @Getter private final String sectionId;
@@ -194,13 +193,13 @@ public class Section implements Diffable<Section> {
         return this;
     }
 
-    public Section addPeriod(Period period) {
+    public Section addPeriod(OneTimePeriod period){
+        this.oneTimePeriods.add(period);
+        return this;
+    }
 
-        if (period instanceof OneTimePeriod) {
-            this.oneTimePeriods.add((OneTimePeriod) period);
-        } else {
-            this.repeatingPeriods.add((RepeatingPeriod) period);
-        }
+    public Section addPeriod(RepeatingPeriod period){
+        this.repeatingPeriods.add(period);
         return this;
     }
 
@@ -242,22 +241,21 @@ public class Section implements Diffable<Section> {
         }
 
         if (!this.notes.isEmpty()) {
-            sb.append("\n\n").append(TAB).append("Notes:\n");
+            sb.append("\n\n").append(I).append("Notes:\n");
             this.notes.forEach(x ->
-                sb.append('\n').append(TAB).append(TAB)
-                        .append(StringUtilities.indent(3, "- " + x)));
+                sb.append('\n').append(StringUtilities.indent(2, x)));
         }
 
         if (!this.repeatingPeriods.isEmpty()) {
-            sb.append("\n\n").append(TAB).append("Repeating periods:\n");
-            this.repeatingPeriods.forEach(x -> sb.append('\n')
-                    .append(StringUtilities.indent(3, "- " + x)));
+            sb.append("\n\n").append(I).append("Repeating periods:");
+            this.repeatingPeriods.forEach(x -> sb.append("\n\n")
+                    .append(StringUtilities.indent(2, x.toString())));
         }
 
         if (!this.oneTimePeriods.isEmpty()) {
-            sb.append("\n\n").append(TAB).append("One time periods:\n");
-            this.oneTimePeriods.forEach(x -> sb.append('\n')
-                    .append(StringUtilities.indent(3, "- " + x)));
+            sb.append("\n\n").append(I).append("One time periods:");
+            this.oneTimePeriods.forEach(x -> sb.append("\n\n")
+                    .append(StringUtilities.indent(2, x.toString())));
         }
 
         return sb.toString();
@@ -278,24 +276,24 @@ public class Section implements Diffable<Section> {
 
         final StructureChangeDelta delta = StructureChangeDelta.of(PropertyType.SECTION, this);
 
-        delta.addIfChanged(PropertyType.SERIAL_NUMBER, this.serialNumber, that.serialNumber);
+        delta.addValueIfChanged(PropertyType.SERIAL_NUMBER, this.serialNumber, that.serialNumber);
 
-        delta.addIfChanged(PropertyType.WAITING_LIST, this.waitingList, that.waitingList);
-        delta.addIfChanged(PropertyType.NUM_WAITING,
+        delta.addValueIfChanged(PropertyType.WAITING_LIST, this.waitingList, that.waitingList);
+        delta.addValueIfChanged(PropertyType.NUM_WAITING,
                 this.getWaiting().orElse(null), that.getWaiting().orElse(null));
-        delta.addIfChanged(PropertyType.MAX_WAITING,
+        delta.addValueIfChanged(PropertyType.MAX_WAITING,
                 this.getMaxWaiting().orElse(null), that.getMaxWaiting().orElse(null));
 
-        delta.addIfChanged(PropertyType.IS_FULL, this.full, that.full);
-        delta.addIfChanged(PropertyType.NUM_ENROLLED,
+        delta.addValueIfChanged(PropertyType.IS_FULL, this.full, that.full);
+        delta.addValueIfChanged(PropertyType.NUM_ENROLLED,
                 this.getEnrollment().orElse(null), that.getEnrollment().orElse(null));
-        delta.addIfChanged(PropertyType.MAX_ENROLLED,
+        delta.addValueIfChanged(PropertyType.MAX_ENROLLED,
                 this.getMaxEnrollment().orElse(null), that.getMaxEnrollment().orElse(null));
 
-        delta.addIfChanged(PropertyType.IS_CANCELLED, this.cancelled, that.cancelled);
+        delta.addValueIfChanged(PropertyType.IS_CANCELLED, this.cancelled, that.cancelled);
 
-        delta.addIfChanged(PropertyType.IS_ONLINE, this.online, that.online);
-        delta.addIfChanged(PropertyType.IS_ALTERNATING, this.alternating, that.alternating);
+        delta.addValueIfChanged(PropertyType.IS_ONLINE, this.online, that.online);
+        delta.addValueIfChanged(PropertyType.IS_ALTERNATING, this.alternating, that.alternating);
 
         // Add added notes.
         that.notes.stream()
@@ -311,8 +309,9 @@ public class Section implements Diffable<Section> {
         this.oneTimePeriods.stream()
                 .filter(x -> that.oneTimePeriods.stream()
                         .noneMatch(
-                                y -> Objects.equals(x.getStartDateTime(), y.getStartDateTime())
-                                        && Objects.equals(x.getEndDateTime(), y.getEndDateTime())
+                                y -> x.getTerm().equals(y.getTerm()) &&
+                                        Objects.equals(x.getStartDateTime(), y.getStartDateTime()) &&
+                                        Objects.equals(x.getEndDateTime(), y.getEndDateTime())
                         ))
                 .forEach(x -> delta.addRemoved(PropertyType.ONE_TIME_PERIOD, x));
 
@@ -320,16 +319,18 @@ public class Section implements Diffable<Section> {
         that.oneTimePeriods.stream()
                 .filter(x -> this.oneTimePeriods.stream()
                         .noneMatch(
-                                y -> x.getStartDateTime().equals(y.getStartDateTime())
-                                        && x.getEndDateTime().equals(y.getEndDateTime())
+                                y -> x.getTerm().equals(y.getTerm()) &&
+                                        x.getStartDateTime().equals(y.getStartDateTime()) &&
+                                        x.getEndDateTime().equals(y.getEndDateTime())
                         ))
                 .forEach(x -> delta.addAdded(PropertyType.ONE_TIME_PERIOD, x));
 
         // Find changed one-time periods.
         for (OneTimePeriod thisOtp : this.oneTimePeriods) {
             for (OneTimePeriod thatOtp : that.oneTimePeriods) {
-                boolean cond = thisOtp.getStartDateTime().equals(thatOtp.getStartDateTime())
-                        && Objects.equals(thisOtp.getEndDateTime(), thatOtp.getEndDateTime());
+                boolean cond = thisOtp.getTerm().equals(thatOtp.getTerm()) &&
+                        thisOtp.getStartDateTime().equals(thatOtp.getStartDateTime()) &&
+                        Objects.equals(thisOtp.getEndDateTime(), thatOtp.getEndDateTime());
                 if (cond) {
                     if (!thisOtp.equals(thatOtp))
                         delta.addChange(thisOtp.findDifferences(thatOtp));
@@ -353,7 +354,8 @@ public class Section implements Diffable<Section> {
         that.repeatingPeriods.stream()
                 .filter(x -> this.repeatingPeriods.stream()
                         .noneMatch(
-                                y -> x.getDayOfWeek().equals(y.getDayOfWeek())
+                                y -> x.getTerm().equals(y.getTerm())
+                                        && x.getDayOfWeek().equals(y.getDayOfWeek())
                                         && x.getStartTime().equals(y.getStartTime())
                                         && x.getEndTime().equals(y.getEndTime())
                         )
@@ -362,7 +364,8 @@ public class Section implements Diffable<Section> {
         // Find changed repeating periods.
         for (RepeatingPeriod thisRp : this.repeatingPeriods)
             for (RepeatingPeriod thatRp : that.repeatingPeriods) {
-                boolean cond = thisRp.getStartTime().equals(thatRp.getStartTime())
+                boolean cond = thisRp.getTerm().equals(thatRp.getTerm())
+                        && thisRp.getStartTime().equals(thatRp.getStartTime())
                         && thisRp.getEndTime().equals(thatRp.getEndTime())
                         && thisRp.getDayOfWeek().equals(thatRp.getDayOfWeek());
                 if (cond) {

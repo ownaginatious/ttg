@@ -1,5 +1,6 @@
 package com.timetablegenerator.delta;
 
+import com.timetablegenerator.Settings;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -8,6 +9,8 @@ import java.util.*;
 
 @EqualsAndHashCode(callSuper = true)
 public class StructureChangeDelta extends Delta {
+
+    private static String I = Settings.getIndent();
 
     private static class DeltaSort implements Comparator<Delta>{
         @Override
@@ -33,26 +36,90 @@ public class StructureChangeDelta extends Delta {
         this.identifier = identifier;
     }
 
-    public StructureChangeDelta addAdded(PropertyType propertyType, @NonNull Object value) {
-        this.propertyChangeDeltas.add(new AdditionDelta(propertyType, value));
+    public StructureChangeDelta addAdded(PropertyType propertyType, @NonNull Diffable<?> value) {
+        this.propertyChangeDeltas.add(new StructureAdditionDelta(propertyType, value));
         return this;
     }
 
-    public StructureChangeDelta addRemoved(PropertyType propertyType, @NonNull Object value) {
-        this.propertyChangeDeltas.add(new RemovalDelta(propertyType, value));
+    public StructureChangeDelta addAdded(PropertyType propertyType, @NonNull Boolean value) {
+        this.propertyChangeDeltas.add(new ValueAdditionDelta(propertyType, value));
         return this;
     }
 
-    public <T> StructureChangeDelta addIfChanged(PropertyType propertyType, T oldValue, T newValue) {
+    public StructureChangeDelta addAdded(PropertyType propertyType, @NonNull Number value) {
+        this.propertyChangeDeltas.add(new ValueAdditionDelta(propertyType, value));
+        return this;
+    }
 
+    public StructureChangeDelta addAdded(PropertyType propertyType, @NonNull String value) {
+        this.propertyChangeDeltas.add(new ValueAdditionDelta(propertyType, value));
+        return this;
+    }
+
+    public StructureChangeDelta addRemoved(PropertyType propertyType, @NonNull Diffable<?> value) {
+        this.propertyChangeDeltas.add(new StructureRemovalDelta(propertyType, value));
+        return this;
+    }
+
+    public StructureChangeDelta addRemoved(PropertyType propertyType, @NonNull Boolean value) {
+        this.propertyChangeDeltas.add(new ValueRemovalDelta(propertyType, value));
+        return this;
+    }
+
+    public StructureChangeDelta addRemoved(PropertyType propertyType, @NonNull Number value) {
+        this.propertyChangeDeltas.add(new ValueRemovalDelta(propertyType, value));
+        return this;
+    }
+
+    public StructureChangeDelta addRemoved(PropertyType propertyType, @NonNull String value) {
+        this.propertyChangeDeltas.add(new ValueRemovalDelta(propertyType, value));
+        return this;
+    }
+
+    public StructureChangeDelta addValueIfChanged(PropertyType propertyType,
+                                                 Boolean oldValue, Boolean newValue) {
         if (Objects.equals(newValue, oldValue)) {
             return this;
         }
 
         if (newValue == null) {
-            this.propertyChangeDeltas.add(new RemovalDelta(propertyType, oldValue));
+            this.propertyChangeDeltas.add(new ValueRemovalDelta(propertyType, oldValue));
         } else if (oldValue == null) {
-            this.propertyChangeDeltas.add(new AdditionDelta(propertyType, newValue));
+            this.propertyChangeDeltas.add(new ValueAdditionDelta(propertyType, newValue));
+        } else {
+            this.propertyChangeDeltas.add(new ValueChangeDelta(propertyType, newValue, oldValue));
+        }
+
+        return this;
+    }
+
+    public StructureChangeDelta addValueIfChanged(PropertyType propertyType,
+                                                  Number oldValue, Number newValue) {
+        if (Objects.equals(newValue, oldValue)) {
+            return this;
+        }
+
+        if (newValue == null) {
+            this.propertyChangeDeltas.add(new ValueRemovalDelta(propertyType, oldValue));
+        } else if (oldValue == null) {
+            this.propertyChangeDeltas.add(new ValueAdditionDelta(propertyType, newValue));
+        } else {
+            this.propertyChangeDeltas.add(new ValueChangeDelta(propertyType, newValue, oldValue));
+        }
+
+        return this;
+    }
+
+    public StructureChangeDelta addValueIfChanged(PropertyType propertyType,
+                                                  String oldValue, String newValue) {
+        if (Objects.equals(newValue, oldValue)) {
+            return this;
+        }
+
+        if (newValue == null) {
+            this.propertyChangeDeltas.add(new ValueRemovalDelta(propertyType, oldValue));
+        } else if (oldValue == null) {
+            this.propertyChangeDeltas.add(new ValueAdditionDelta(propertyType, newValue));
         } else {
             this.propertyChangeDeltas.add(new ValueChangeDelta(propertyType, newValue, oldValue));
         }
@@ -98,8 +165,6 @@ public class StructureChangeDelta extends Delta {
 
     public String toString(int tabAmount) {
 
-        final String tabs = generateTabs(tabAmount);
-
         StringBuilder sb = new StringBuilder();
 
         sb.append("MODIFIED [").append(this.getPropertyType().name()).append(']');
@@ -109,10 +174,10 @@ public class StructureChangeDelta extends Delta {
 
         if (this.hasValueChanges()) {
 
-            sb.append("\n\n").append(tabs).append(tabs).append("Property changes:\n");
+            sb.append("\n\n").append(I).append(I).append("Property changes:\n");
 
             this.propertyChangeDeltas.stream().sorted(sorter)
-                    .forEach(d -> sb.append('\n').append(tabs).append(tabs).append(tabs)
+                    .forEach(d -> sb.append('\n').append(I).append(I).append(I)
                             .append('[').append(++i[0]).append("] ").append(d));
         }
 
@@ -120,10 +185,10 @@ public class StructureChangeDelta extends Delta {
 
         if (this.hasChildStructureChanges()) {
 
-            sb.append("\n\n").append(tabs).append(tabs).append("Child property changes:");
+            sb.append("\n\n").append(I).append(I).append("Child property changes:");
 
             this.structureChangeDeltas.values().stream().sorted(sorter)
-                    .forEach(d -> sb.append("\n\n").append(tabs).append(tabs).append(tabs)
+                    .forEach(d -> sb.append("\n\n").append(I).append(I).append(I)
                         .append('[').append(++i[0]).append("] ").append(d.toString(tabAmount + 1)));
         }
 

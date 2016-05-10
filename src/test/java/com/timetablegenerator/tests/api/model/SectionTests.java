@@ -1,12 +1,12 @@
 package com.timetablegenerator.tests.api.model;
 
 import com.timetablegenerator.Settings;
+import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
 import com.timetablegenerator.model.Section;
 import com.timetablegenerator.model.TermClassifier;
 import com.timetablegenerator.model.period.OneTimePeriod;
-import com.timetablegenerator.model.period.Period;
 import com.timetablegenerator.model.period.RepeatingPeriod;
 import com.timetablegenerator.tests.api.TestUtils;
 import org.junit.*;
@@ -21,18 +21,18 @@ import static org.hamcrest.Matchers.*;
 
 public class SectionTests {
 
-    private static String TAB;
+    private static String I;
 
     static {
-        Settings.setTabSize(4);
-        TAB = Settings.getTab();
+        Settings.setIndentSize(4);
+        I = Settings.getIndent();
     }
 
     private Section s1, s2;
 
     @Before
     public void setUp() {
-        Settings.setTabSize(4);
+        Settings.setIndentSize(4);
         String sectionName = TestUtils.getRandomString(20);
         this.s1 = Section.fromSectionId(sectionName);
         this.s2 = Section.fromSectionId(sectionName);
@@ -272,9 +272,12 @@ public class SectionTests {
     @Test
     public void periods() {
 
-        Period p1 = RepeatingPeriod.of(TermClassifier.FALL).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
-        Period p2 = RepeatingPeriod.of(TermClassifier.SPRING).setTime(DayOfWeek.TUESDAY, LocalTime.MIN, LocalTime.MAX);
-        Period p3 = OneTimePeriod.of(TermClassifier.SPRING).setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX);
+        RepeatingPeriod p1 = RepeatingPeriod.of(TermClassifier.FALL)
+                .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
+        RepeatingPeriod p2 = RepeatingPeriod.of(TermClassifier.SPRING)
+                .setTime(DayOfWeek.TUESDAY, LocalTime.MIN, LocalTime.MAX);
+        OneTimePeriod p3 = OneTimePeriod.of(TermClassifier.SPRING)
+                .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX);
 
         s1.addPeriod(p1);
         s1.addPeriod(p1);
@@ -302,9 +305,9 @@ public class SectionTests {
         s2.setSerialNumber("456");
 
         StructureChangeDelta expected = StructureChangeDelta.of(PropertyType.SECTION, s1)
-                .addIfChanged(PropertyType.SERIAL_NUMBER, "123", "456");
+                .addValueIfChanged(PropertyType.SERIAL_NUMBER, "123", "456");
         StructureChangeDelta invertExpected = StructureChangeDelta.of(PropertyType.SECTION, s2)
-                .addIfChanged(PropertyType.SERIAL_NUMBER, "456", "123");
+                .addValueIfChanged(PropertyType.SERIAL_NUMBER, "456", "123");
 
         assertEquals(expected, s1.findDifferences(s2));
         assertEquals(invertExpected, s2.findDifferences(s1));
@@ -335,8 +338,8 @@ public class SectionTests {
         s2.setCancelled(true);
         s1.setCancelled(false);
 
-        expected.addIfChanged(PropertyType.IS_CANCELLED, false, true);
-        invertExpected.addIfChanged(PropertyType.IS_CANCELLED, true, false);
+        expected.addValueIfChanged(PropertyType.IS_CANCELLED, false, true);
+        invertExpected.addValueIfChanged(PropertyType.IS_CANCELLED, true, false);
 
         assertEquals(expected, s1.findDifferences(s2));
         assertEquals(invertExpected, s2.findDifferences(s1));
@@ -345,8 +348,8 @@ public class SectionTests {
         s2.setOnline(true);
         s1.setOnline(false);
 
-        expected.addIfChanged(PropertyType.IS_ONLINE, false, true);
-        invertExpected.addIfChanged(PropertyType.IS_ONLINE, true, false);
+        expected.addValueIfChanged(PropertyType.IS_ONLINE, false, true);
+        invertExpected.addValueIfChanged(PropertyType.IS_ONLINE, true, false);
 
         assertEquals(expected, s1.findDifferences(s2));
         assertEquals(invertExpected, s2.findDifferences(s1));
@@ -355,8 +358,8 @@ public class SectionTests {
         s2.setAlternating(true);
         s1.setAlternating(false);
 
-        expected.addIfChanged(PropertyType.IS_ALTERNATING, false, true);
-        invertExpected.addIfChanged(PropertyType.IS_ALTERNATING, true, false);
+        expected.addValueIfChanged(PropertyType.IS_ALTERNATING, false, true);
+        invertExpected.addValueIfChanged(PropertyType.IS_ALTERNATING, true, false);
 
         assertEquals(expected, s1.findDifferences(s2));
         assertEquals(invertExpected, s2.findDifferences(s1));
@@ -385,26 +388,31 @@ public class SectionTests {
     @Test
     public void sectionStructuralPropertyPeriodsDelta() {
 
-        Period p1 = RepeatingPeriod.of(TermClassifier.FALL).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
-        Period p2 = RepeatingPeriod.of(TermClassifier.SPRING).setTime(DayOfWeek.TUESDAY, LocalTime.MIN, LocalTime.MAX);
-        Period p3 = OneTimePeriod.of(TermClassifier.SPRING).setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
+        RepeatingPeriod p1 = RepeatingPeriod.of(TermClassifier.FALL).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
+        RepeatingPeriod p2 = RepeatingPeriod.of(TermClassifier.SPRING).setTime(DayOfWeek.TUESDAY, LocalTime.MIN, LocalTime.MAX);
+        OneTimePeriod p3 = OneTimePeriod.of(TermClassifier.SPRING).setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
                 .setRoom("My Room");
 
-        Period p4 = OneTimePeriod.of(TermClassifier.SPRING).setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
+        OneTimePeriod p4 = OneTimePeriod.of(TermClassifier.SPRING).setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
                 .addSupervisors("Test Supervisor 1").addSupervisors("Test Supervisor 2");
 
-        Period p5 = RepeatingPeriod.of(TermClassifier.SPRING).setTime(DayOfWeek.TUESDAY, LocalTime.MIN, LocalTime.MAX)
+        RepeatingPeriod p5 = RepeatingPeriod.of(TermClassifier.SPRING).setTime(DayOfWeek.TUESDAY, LocalTime.MIN, LocalTime.MAX)
                 .setCampus("Test Campus").addNotes("Note 1", "Note 2", "Note 3");
+
+        OneTimePeriod p6 = OneTimePeriod.of(TermClassifier.FULL_SUMMER).setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
+                .addSupervisors("Test Supervisor 1");
 
         s2.addPeriod(p1);
         s2.addPeriod(p2);
         s2.addPeriod(p3);
+        s2.addPeriod(p6);
 
         s1.addPeriod(p4);
         s1.addPeriod(p5);
 
         StructureChangeDelta expected = StructureChangeDelta.of(PropertyType.SECTION, s1)
                 .addAdded(PropertyType.REPEATING_PERIOD, p1)
+                .addAdded(PropertyType.ONE_TIME_PERIOD, p6)
                 .addChange(StructureChangeDelta.of(PropertyType.REPEATING_PERIOD, (RepeatingPeriod) p5)
                         .addRemoved(PropertyType.CAMPUS, "Test Campus")
                         .addRemoved(PropertyType.NOTE, "Note 1")
@@ -417,6 +425,7 @@ public class SectionTests {
 
         StructureChangeDelta invertExpected = StructureChangeDelta.of(PropertyType.SECTION, s2)
                 .addRemoved(PropertyType.REPEATING_PERIOD, p1)
+                .addRemoved(PropertyType.ONE_TIME_PERIOD, p6)
                 .addChange(StructureChangeDelta.of(PropertyType.REPEATING_PERIOD, (RepeatingPeriod) p2)
                         .addAdded(PropertyType.CAMPUS, "Test Campus")
                         .addAdded(PropertyType.NOTE, "Note 1")
@@ -531,21 +540,23 @@ public class SectionTests {
         s1.setMaximumWaiting(100);
 
         // Add one-time and unique periods.
-        Period p1 = OneTimePeriod.of(TermClassifier.FALL)
+        OneTimePeriod p1 = OneTimePeriod.of(TermClassifier.FALL)
                 .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
                 .addNotes("Test 1", "Test 2", "Test 3");
-        Period p2 = RepeatingPeriod.of(TermClassifier.FALL)
+        RepeatingPeriod p2 = RepeatingPeriod.of(TermClassifier.FALL)
                 .setTime(DayOfWeek.MONDAY, LocalTime.MIN, LocalTime.MAX)
                 .addNotes("Test 1", "Test 2", "Test 3").addSupervisors("A Test", "B Test");
-        Period p3 = RepeatingPeriod.of(TermClassifier.FALL)
+        RepeatingPeriod p3 = RepeatingPeriod.of(TermClassifier.FALL)
                 .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX)
                 .addNotes("Test 1", "Test 2", "Test 3").addSupervisors("A Test");
 
         s1.addPeriod(p1).addPeriod(p2).addPeriod(p3);
 
-        String expected = header + "\n\n" + TAB + "Repeating periods:\n\n"
-                + TAB + TAB + p2.toString() + "\n" + TAB + TAB + p3.toString()
-                + "\n\n" + TAB + "One time periods:\n\n" + TAB + TAB + p1.toString();
+        String expected = header + "\n\n" + I + "Repeating periods:\n\n"
+                + StringUtilities.indent(2, p2.toString()) + "\n\n"
+                + StringUtilities.indent(2, p3.toString()) + "\n"
+                + "\n" + I + "One time periods:\n\n"
+                + StringUtilities.indent(2, p1.toString());
 
         assertEquals(expected, s1.toString());
     }
@@ -562,28 +573,30 @@ public class SectionTests {
         s1.setMaximumWaiting(100);
 
         // Add one-time and unique periods.
-        Period p1 = OneTimePeriod.of(TermClassifier.FALL)
+        OneTimePeriod p1 = OneTimePeriod.of(TermClassifier.FALL)
                 .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
                 .addNotes("Test 1", "Test 2", "Test 3");
-        Period p2 = RepeatingPeriod.of(TermClassifier.FALL)
+        RepeatingPeriod p2 = RepeatingPeriod.of(TermClassifier.FALL)
                 .setTime(DayOfWeek.MONDAY, LocalTime.MIN, LocalTime.MAX)
                 .addNotes("Test 1", "Test 2", "Test 3").addSupervisors("A Test", "B Test");
-        Period p3 = RepeatingPeriod.of(TermClassifier.FALL)
+        RepeatingPeriod p3 = RepeatingPeriod.of(TermClassifier.FALL)
                 .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX)
                 .addNotes("Test 1", "Test 2", "Test 3").addSupervisors("A Test");
 
         String expected = s1.getSectionId() +
                 " {Test Serial} [CANCELLED] [ONLINE] [ALTERNATES] [enrolled: 3/?] [waiting: 100/100]\n\n"
-                + TAB + "Notes:\n\n"
-                + TAB + TAB + "- This is my note\n"
-                + TAB + TAB + "- This is my note with a line break\n"
-                + TAB + TAB + "      with a line break\n\n"
-                + TAB + "Repeating periods:\n\n"
-                + TAB + TAB + p2.toString() + "\n" + TAB + TAB + p3.toString()
-                + "\n\n" + TAB + "One time periods:\n\n" + TAB + TAB + p1.toString();
+                + I + "Notes:\n\n"
+                + I + I + "This is my note\n"
+                + I + I + "This is my note\n"
+                + I + I + "    with a line break!\n\n"
+                + I + "Repeating periods:\n\n"
+                + StringUtilities.indent(2, p2.toString()) + "\n\n"
+                + StringUtilities.indent(2, p3.toString())
+                + "\n\n" + I + "One time periods:\n\n"
+                + StringUtilities.indent(2, p1.toString());
 
         s1.addPeriod(p1).addPeriod(p2).addPeriod(p3);
-        s1.addNotes("This is my note", "This is my note\n    with a line break");
+        s1.addNotes("This is my note", "This is my note\n    with a line break!");
 
         assertEquals(expected, s1.toString());
     }
@@ -664,18 +677,18 @@ public class SectionTests {
         assertEquals(s1, s2);
 
         // Modify one-time periods
-        Period p1 = OneTimePeriod.of(TermClassifier.FALL);
+        OneTimePeriod p1 = OneTimePeriod.of(TermClassifier.FALL);
         s1.addPeriod(p1);
         assertNotEquals(s1, s2);
         s2.addPeriod(p1);
         assertEquals(s1, s2);
 
         // Modify repeating periods
-        p1 = RepeatingPeriod.of(TermClassifier.SUMMER_ONE)
+        RepeatingPeriod rp1 = RepeatingPeriod.of(TermClassifier.SUMMER_ONE)
                 .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
-        s1.addPeriod(p1);
+        s1.addPeriod(rp1);
         assertNotEquals(s1, s2);
-        s2.addPeriod(p1);
+        s2.addPeriod(rp1);
         assertEquals(s1, s2);
     }
 }

@@ -4,14 +4,12 @@ import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
 import lombok.Getter;
+import lombok.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class SectionType implements Comparable<SectionType>, Diffable<SectionType> {
 
@@ -19,7 +17,7 @@ public class SectionType implements Comparable<SectionType>, Diffable<SectionTyp
     @Getter private final String type;
     private final Map<String, Section> sections = new TreeMap<>();
 
-    public SectionType(@Nonnull School school, @Nonnull String type) {
+    public SectionType(@NonNull School school, @NonNull String type) {
 
         // Force check to ensure the type exists.
         school.getSectionTypeNameByCode(type);
@@ -36,7 +34,7 @@ public class SectionType implements Comparable<SectionType>, Diffable<SectionTyp
         return this.sections.get(sectionId);
     }
 
-    public void addSection(@Nonnull Section s) {
+    public void addSection(@NonNull Section s) {
 
         if (this.sections.putIfAbsent(s.getSectionId(), s) != null)
             throw new IllegalStateException("Attempted to add the section of type \""
@@ -60,7 +58,7 @@ public class SectionType implements Comparable<SectionType>, Diffable<SectionTyp
     }
 
     @Override
-    public int compareTo(@Nonnull SectionType st) {
+    public int compareTo(@NonNull SectionType st) {
         return type.compareTo(st.type);
     }
 

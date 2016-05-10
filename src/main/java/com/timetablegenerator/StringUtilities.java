@@ -3,17 +3,24 @@ package com.timetablegenerator;
 public class StringUtilities {
 
     public static String indent(int tabNum, String string){
-        StringBuilder sb = new StringBuilder();
-        for (String line : string.split("\n")){
-            sb.append(tabs(tabNum)).append(line).append('\n');
-        }
-        return sb.toString().trim();
+        return indent(tabNum, 0, string);
     }
 
-    private static String tabs(int num){
+    public static String indent(int tabNum, int alignmentSpaces, String string){
+        String indent = repeat(Settings.getIndent(), tabNum)
+                + repeat(" ", alignmentSpaces);
+        StringBuilder sb = new StringBuilder();
+        for (String line : string.split("\n")){
+            sb.append(indent).append(line).append('\n');
+        }
+        sb.setLength(sb.length() - 1); // Remove the last new line
+        return sb.toString();
+    }
+
+    private static String repeat(String rep, int num){
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < num; i++){
-            sb.append(Settings.getTab());
+            sb.append(rep);
         }
         return sb.toString();
     }
