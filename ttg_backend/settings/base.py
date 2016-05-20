@@ -5,13 +5,10 @@ import sys
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.join(BASE_DIR, 'apps/'))
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'd0j!b*lis7mo_n_s@pxubobu$x+i=1aai2mjiamo#^4e5z)^6o'
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 SYSTEM_APPS = [
     'django.contrib.contenttypes',
@@ -70,3 +67,5 @@ USE_TZ = True
 
 LEGACY_DIR = os.environ.get('LEGACY_DIR', '/tmp/ttg-legacy')
 LEGACY_POST_KEY = os.environ.get('LEGACY_POST_KEY', 'changemeinprod')
+
+TEMPLATES = []

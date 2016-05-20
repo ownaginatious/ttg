@@ -2,3 +2,4 @@ django
 djangorestframework
 django-model-utils
 djangorestframework-yaml
+dj-static

@@ -1,5 +1,6 @@
 import json
 import os
+import logging
 from pathlib import Path
 from sys import stderr
 from django.shortcuts import render
@@ -29,7 +30,7 @@ class Schedule(APIView):
                 cache.set(cache_name, cached_data, None)
                 return cached_data
         except Exception as e:
-            print(e, file=stderr)
+            logging.error(e)
             return None
 
     def get(self, request, school_id, api_level):
@@ -44,7 +45,7 @@ class Schedule(APIView):
         if data:
             return Response(data=data, status=200)
         else:
-            return Response({'error': 'No such school under API V%S: "%s"'
+            return Response({'error': 'No such school under API V%s: "%s"'
                              % (api_level, school_id)}, status=404)
 
     def post(self, request, school_id, api_level):
@@ -55,7 +56,7 @@ class Schedule(APIView):
             with open(str(Path(dest_dir, '%s.json' % school_id)), 'w') as f:
                 f.write(json.dumps(request.data))
         except Exception as e:
-            print(e, file=stderr)
+            logging.error(e)
             return Response({'error': str(e)}, status=500)
         return Response({'message': 'Data successfully updated for '
                                     '"%s"' % school_id})
