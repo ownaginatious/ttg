@@ -56,6 +56,10 @@ module.exports = function(grunt) {
         },
         src: 'dist/index.html'
       }
+    },
+    watch: {
+      files: ['src/**/*'],
+      tasks: ['dev-build']
     }
   });
 
@@ -67,8 +71,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-bower-task');
   grunt.loadNpmTasks('grunt-wiredep');
   grunt.loadNpmTasks('grunt-contrib-symlink');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
-  grunt.registerTask('build', ['bower', 'clean', 'symlink',
+  grunt.registerTask('dev-build', ['copy', 'wiredep']);
+  grunt.registerTask('prod-build', ['bower', 'clean', 'symlink',
                                'uglify', 'copy', 'wiredep',
                                'htmlmin']);
 };

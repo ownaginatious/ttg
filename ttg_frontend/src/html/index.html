@@ -6,44 +6,15 @@
     
     <head>    
 
-          <!-- bower:js -->
+          <!-- bower:css -->
           <!-- endbower -->
-
-        <script type="text/javascript" src="js/ttg.min.js"></script>
         
         <link rel="icon" type="image/x-icon" href="favicon.ico" />
         <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
 
-        <link rel="stylesheet" href="styles/style.css" type="text/css" />   
-
-          <!-- bower:css -->
-          <!-- endbower -->        
+        <link rel="stylesheet" href="styles/style.css" type="text/css" />
 
         <meta charset="utf-8" />
-        <script>
-        
-            $(document).ready(function() {
-                
-                //if(window.location.host != "www.timetablegenerator.com")
-                //   window.location = window.location.href.replace(window.location.host, "www.timetablegenerator.com");
-                
-                if($.browser.mozilla){
-                    
-                    $("#excel_download_div").html($("<div>The downloading functions are not working in Firefox at the moment. " + 
-                                    "Please use Chrome or Safari. Sorry for the inconvenience.</div>").css({"color" : "red", "margin-bottom" : "5px"}));
-                                    
-                } else if($.browser.msie){
-                
-                    alert("Unfortunately this site does not work at all in any version of Internet Explorer.");
-                    window.location = "http://www.google.com/chrome";
-                }
-                
-                DataLoader.buildTimingMap();
-                DataLoader.retrieveUniversities();
-            });
-            
-        </script>
-
     </head>
     <body>
         <div id="fb-root"></div>
@@ -66,7 +37,7 @@
         }(document, 'script', 'facebook-jssdk'));</script>
 
         <div>
-            <h1>The Quintessential TimeTable Generator</h1>
+            <h1>The TimeTable Generator</h1>
             <h2 style="margin-left: 30px">By Dillon Dixon</h2>
             
             <div class="data_container">
@@ -694,6 +665,17 @@
                 </tr>
             </table>
         </div>
+
+        <!-- bower:js -->
+        <!-- endbower -->
+
+        <script type="text/javascript" src="js/ttg.min.js"></script>
+
+        <script>
+            $(document).ready(function() {
+                DataLoader.buildTimingMap();
+                DataLoader.retrieveUniversities();
+            });
+        </script>
     </body>
 </html>
-

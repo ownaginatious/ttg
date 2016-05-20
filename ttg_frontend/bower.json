@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "jquery": "1.7.2"
+    "jquery": "2.2.3",
+    "bootstrap": "3.3.6"
   }
 }
