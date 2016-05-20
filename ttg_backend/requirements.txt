@@ -5,10 +5,8 @@
 #    pip-compile --output-file requirements.txt requirements.in
 #
 
-dj-static==0.0.6
 django-model-utils==2.4
 django==1.9.5
 djangorestframework-yaml==1.0.3
 djangorestframework==3.3.3
 PyYAML==3.11              # via djangorestframework-yaml
-static3==0.7.0            # via dj-static
