@@ -7,5 +7,5 @@ RUN curl -sL https://deb.nodesource.com/setup_4.x | bash - \
 ADD . /code
 WORKDIR /code
 RUN npm install \
-      && ./node_modules/grunt-cli/bin/grunt prod-build -no-color \
+      && ./node_modules/grunt-cli/bin/grunt prod-build -no-color
 RUN cp -r dist/* /usr/share/nginx/html
