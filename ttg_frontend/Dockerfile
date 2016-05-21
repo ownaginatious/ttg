@@ -9,4 +9,4 @@ WORKDIR /code
 RUN npm install \
       && ./node_modules/grunt-cli/bin/grunt prod-build -no-color \
       && mkdir -p /usr/share/nginx/html
-COPY ./dist /usr/share/nginx/html
+COPY dist/ /usr/share/nginx/html
