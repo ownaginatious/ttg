@@ -1,7 +1,7 @@
 FROM nginx:1.9
 
 ENV LAST_UPDATED = 2016-05-20
-RUN curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash - \
+RUN curl -sL https://deb.nodesource.com/setup_4.x | bash - \
     && apt-get install -y nodejs
 ADD . /code
 WORKDIR /code
