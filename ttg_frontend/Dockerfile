@@ -8,4 +8,4 @@ ADD . /code
 WORKDIR /code
 RUN npm install \
       && ./node_modules/grunt-cli/bin/grunt prod-build -no-color
-RUN cp -r dist/* /usr/share/nginx/html
+RUN mv dist/* /usr/share/nginx/html
