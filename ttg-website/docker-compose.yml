@@ -12,21 +12,21 @@ services:
       - ttg-saved-schedules
 
   ttg-web-backend:
-    image: docker.timetablegenerator.com/ttg/ttg-web-backend
+    image: docker.timetablegenerator.io/ttg/ttg-web-backend
     expose:
       - "80"
 
   ttg-web-frontend:
-    image: docker.timetablegenerator.com/ttg/ttg-web-frontend
+    image: docker.timetablegenerator.io/ttg/ttg-web-frontend
     expose:
       - "80"
 
   ttg-saved-schedules:
-    image: docker.timetablegenerator.com/ttg/ttg-saved-schedules
+    image: docker.timetablegenerator.io/ttg/ttg-saved-schedules
     links:
       - ttg-mongodb
 
   ttg-mongodb:
     image: mongo:3
-    volume:
-      - "${TTG_MONGO_VOL}":/data/db
+    volumes:
+      - "${TTG_MONGO_VOL}:/data/db"
