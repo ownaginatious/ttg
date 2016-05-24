@@ -7,7 +7,7 @@ then
     exit 1
 fi
 
-if [ -z "${TTG_WEB_BACKEND_SECRET}" ]; then
+if [ -z "${TTG_WEB_BACKEND_SECRET:-}" ]; then
    >&2 printf " -> Missing TTG_WEB_BACKEND_SECRET variable definition"
    exit 1
 fi
