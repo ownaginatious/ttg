@@ -13,6 +13,8 @@ services:
 
   ttg-web-backend:
     image: docker.timetablegenerator.io/ttg/ttg-web-backend
+    environment:
+      - "SECRET_KEY=${TTG_WEB_BACKEND_SECRET}"
     expose:
       - "80"
 
