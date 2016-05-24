@@ -7,6 +7,12 @@ then
     exit 1
 fi
 
+if [ -z "${2:-}" ]
+then
+   >&2 printf " -> Missing SSL certs volume argument (arg 2)\n"
+   exit 1
+fi
+
 if [ -z "${TTG_WEB_BACKEND_SECRET:-}" ]; then
    >&2 printf " -> Missing TTG_WEB_BACKEND_SECRET variable definition"
    exit 1
@@ -14,6 +20,7 @@ fi
 
 export TTG_WEB_BACKEND_SECRET="${TTG_WEB_BACKEND_SECRET}"
 export TTG_MONGO_VOL="${1}"
+export TTG_SSL="${2}"
 
 printf " -> Destroying any existing ttg-web containers... \n\n"
 docker-compose down

@@ -6,6 +6,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    volumes:
+      - "${TTG_SSL}:/ssl"
     links:
       - ttg-web-backend
       - ttg-web-frontend
