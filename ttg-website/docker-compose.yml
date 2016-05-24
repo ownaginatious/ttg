@@ -37,9 +37,10 @@ services:
       - "${TTG_MONGO_VOL}:/data/db"
 
   ttg-letsencrypt:
-    image: quay.io/letsencrypt/letsencrypt
+    image: quay.io/letsencrypt/letsencrypt:latest
     expose:
       - "80"
+      - "443"
     volumes:
       - "${TTG_CERTS}/lib:/var/lib/letsencrypt"
       - "${TTG_CERTS}/etc:/etc/letsencrypt"
