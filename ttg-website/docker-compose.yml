@@ -42,5 +42,5 @@ services:
       - "80"
       - "443"
     volumes:
-      - "${TTG_CERTS}/lib:/var/lib/letsencrypt"
-      - "${TTG_CERTS}/etc:/etc/letsencrypt"
+      - "${TTG_SSL}/lib:/var/lib/letsencrypt"
+      - "${TTG_SSL}/etc:/etc/letsencrypt"
