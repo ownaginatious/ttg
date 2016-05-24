@@ -6,12 +6,13 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    volumes:
-      - "${TTG_SSL}:/ssl"
+    volumes_from:
+      - ttg-letsencrypt:ro
     links:
       - ttg-web-backend
       - ttg-web-frontend
       - ttg-saved-schedules
+      - ttg-letsencrypt
 
   ttg-web-backend:
     image: docker.timetablegenerator.io/ttg/ttg-web-backend
@@ -34,3 +35,11 @@ services:
     image: mongo:3
     volumes:
       - "${TTG_MONGO_VOL}:/data/db"
+
+  ttg-letsencrypt:
+    image: quay.io/letsencrypt/letsencrypt
+    expose:
+      - "80"
+    volumes:
+      - "${TTG_CERTS}/lib:/var/lib/letsencrypt"
+      - "${TTG_CERTS}/etc:/etc/letsencrypt"
