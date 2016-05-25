@@ -35,7 +35,12 @@ module.exports = function(grunt) {
             dest: 'dist/lib/',
           },
           { src: 'favicon.ico', dest: 'dist/favicon.ico' },
-          { src: 'src/css/*', dest: 'dist/styles/' }
+          {
+            expand: true,
+            cwd: 'src/css',
+            src: '**',
+            dest: 'dist/styles/'
+          }
         ]
       }
     },
@@ -69,7 +74,14 @@ module.exports = function(grunt) {
     wiredep: {
       main: {
         options: {
-          'directory': 'dist/lib/',
+          directory: 'dist/lib/',
+          fileTypes:{
+            html: {
+              replace: {
+                js: '<script src="static/{{filePath}}"></script>'
+              }
+            }
+          }
         },
         src: 'dist/index.html'
       }
