@@ -133,7 +133,7 @@ var DataLoader = {
             data : JSON.stringify(schedule_data),
             success: function(response){
 
-                var stateLink = "http://www.timetablegenerator.com/#" + response;
+                var stateLink = "https://ttg.fyi/#" + response;
 
                 $("#timetable_link").html($("<a></a>").html("Click for new link").attr("href", stateLink));
 
