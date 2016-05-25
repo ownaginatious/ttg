@@ -54,7 +54,7 @@ var DataLoader = {
 
         $.ajax({
             type: "GET",
-            url: "/data/universities.json",
+            url: "static/data/universities.json",
             dataType: "json",
             success: function(response) {
 

@@ -1,18 +1,18 @@
-<!DOCTYPE html> 
-<html lang="en"> 
+<!DOCTYPE html>
+<html lang="en">
 
     <!-- Course colour          : #CCFF9A -->
     <!-- Course conflict colour : #FABD4E -->
-    
-    <head>    
+
+    <head>
 
           <!-- bower:css -->
           <!-- endbower -->
-        
-        <link rel="icon" type="image/x-icon" href="favicon.ico" />
-        <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
 
-        <link rel="stylesheet" href="styles/style.css" type="text/css" />
+        <link rel="icon" type="image/x-icon" href="static/favicon.ico" />
+        <link rel="shortcut icon" type="image/x-icon" href="static/favicon.ico" />
+
+        <link rel="stylesheet" href="static/styles/style.css" type="text/css" />
 
         <meta charset="utf-8" />
     </head>
@@ -39,14 +39,14 @@
         <div>
             <h1>The TimeTable Generator</h1>
             <h2 style="margin-left: 30px">By Dillon Dixon</h2>
-            
+
             <div class="data_container">
                 <p>
                     This piece of software is designed to allow one to create a course time-table based on publicly available scheduling information
                     provided for a university.
                 </p>
                 <p>
-                    To begin, select your university from the list below. From there, select a course from the drop down list below, starting at department 
+                    To begin, select your university from the list below. From there, select a course from the drop down list below, starting at department
                     and then course name and then sections. More courses can be added after.
                 </p>
                 <p>
@@ -63,9 +63,9 @@
                 </p>
             </div>
         </div>
-        
+
         <div style="position: relative; margin: 10px 0px 10px 70px">
-        
+
             <script type="text/javascript"><!--
                 google_ad_client = "ca-pub-3513621687557611";
                 /* AdUnit3 */
@@ -74,11 +74,11 @@
                 google_ad_height = 90;
                 //-->
             </script>
-            
+
             <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
-            
+
         </div>
-        
+
         <div style="margin-left: 70px;">
             <div style="vertical-align: top; position: relative;">
                 <div id="courses_div">
@@ -94,9 +94,9 @@
             <div style="clear:both"></div>
             <div id="save_state_div" style="display: none; width: 380px; height: 30px; margin-bottom: 1mm; background: rgba(11, 84, 255, 0.2);">
                 <div class="control_text" style="display: block">
-                
+
                     <div style="display: inline-block; vertical-align: middle; width: 380px">
-                        Click to create a link to your current time table: 
+                        Click to create a link to your current time table:
                         <button id="state_create_button" onclick="DataLoader.createStateLink()">Create Link</button>
                     </div>
                     <div id="timetable_link" style="float: left; display: inline-block; vertical-align: middle; width: auto"></div>
@@ -104,9 +104,9 @@
             </div>
 
         </div>
-        
+
         <div style="width: auto; height: auto; clear: both;">
-        
+
             <table id="term1_table" class="term">
                 <tr>
                     <th class="title" id="term1_title" colspan="6">
@@ -126,7 +126,7 @@
                 </tr>
                 <tr id="term1_80">
                     <th bgcolor="#CDCDCB">8:00</th>
-                    
+
                     <td id="term1_mo_80" class="daytime_slot" />
                     <td id="term1_tu_80" class="daytime_slot" />
                     <td id="term1_we_80" class="daytime_slot" />
@@ -135,7 +135,7 @@
                 </tr>
                 <tr id="term1_830">
                     <th bgcolor="#CDCDCB">8:30</th>
-                    
+
                     <td id="term1_mo_830" class="daytime_slot" />
                     <td id="term1_tu_830" class="daytime_slot" />
                     <td id="term1_we_830" class="daytime_slot" />
@@ -143,7 +143,7 @@
                     <td id="term1_fr_830" class="daytime_slot" />
                 <tr id="term1_90">
                     <th bgcolor="#CDCDCB">9:00</th>
-                    
+
                     <td id="term1_mo_90" class="daytime_slot" />
                     <td id="term1_tu_90" class="daytime_slot" />
                     <td id="term1_we_90" class="daytime_slot" />
@@ -152,7 +152,7 @@
                 </tr>
                 <tr id="term1_930">
                     <th bgcolor="#CDCDCB">9:30</th>
-                    
+
                     <td id="term1_mo_930" class="daytime_slot" />
                     <td id="term1_tu_930" class="daytime_slot" />
                     <td id="term1_we_930" class="daytime_slot" />
@@ -161,7 +161,7 @@
                 </tr>
                 <tr id="term1_100">
                     <th bgcolor="#CDCDCB">10:00</th>
-                    
+
                     <td id="term1_mo_100" class="daytime_slot" />
                     <td id="term1_tu_100" class="daytime_slot" />
                     <td id="term1_we_100" class="daytime_slot" />
@@ -170,7 +170,7 @@
                 </tr>
                 <tr id="term1_1030">
                     <th bgcolor="#CDCDCB">10:30</th>
-                    
+
                     <td id="term1_mo_1030" class="daytime_slot" />
                     <td id="term1_tu_1030" class="daytime_slot" />
                     <td id="term1_we_1030" class="daytime_slot" />
@@ -179,7 +179,7 @@
                 </tr>
                 <tr id="term1_110">
                     <th bgcolor="#CDCDCB">11:00</th>
-                    
+
                     <td id="term1_mo_110" class="daytime_slot" />
                     <td id="term1_tu_110" class="daytime_slot" />
                     <td id="term1_we_110" class="daytime_slot" />
@@ -188,7 +188,7 @@
                 </tr>
                 <tr id="term1_1130">
                     <th bgcolor="#CDCDCB">11:30</th>
-                    
+
                     <td id="term1_mo_1130" class="daytime_slot" />
                     <td id="term1_tu_1130" class="daytime_slot" />
                     <td id="term1_we_1130" class="daytime_slot" />
@@ -197,7 +197,7 @@
                 </tr>
                 <tr id="term1_120">
                     <th bgcolor="#CDCDCB">12:00</th>
-                    
+
                     <td id="term1_mo_120" class="daytime_slot" />
                     <td id="term1_tu_120" class="daytime_slot" />
                     <td id="term1_we_120" class="daytime_slot" />
@@ -206,7 +206,7 @@
                 </tr>
                 <tr id="term1_1230">
                     <th bgcolor="#CDCDCB">12:30</th>
-                    
+
                     <td id="term1_mo_1230" class="daytime_slot" />
                     <td id="term1_tu_1230" class="daytime_slot" />
                     <td id="term1_we_1230" class="daytime_slot" />
@@ -215,7 +215,7 @@
                 </tr>
                 <tr id="term1_130">
                     <th bgcolor="#CDCDCB">13:00</th>
-                    
+
                     <td id="term1_mo_130" class="daytime_slot" />
                     <td id="term1_tu_130" class="daytime_slot" />
                     <td id="term1_we_130" class="daytime_slot" />
@@ -224,7 +224,7 @@
                 </tr>
                 <tr id="term1_1330">
                     <th bgcolor="#CDCDCB">13:30</th>
-                    
+
                     <td id="term1_mo_1330" class="daytime_slot" />
                     <td id="term1_tu_1330" class="daytime_slot" />
                     <td id="term1_we_1330" class="daytime_slot" />
@@ -233,7 +233,7 @@
                 </tr>
                 <tr id="term1_140">
                     <th bgcolor="#CDCDCB">14:00</th>
-                    
+
                     <td id="term1_mo_140" class="daytime_slot" />
                     <td id="term1_tu_140" class="daytime_slot" />
                     <td id="term1_we_140" class="daytime_slot" />
@@ -242,7 +242,7 @@
                 </tr>
                 <tr id="term1_1430">
                     <th bgcolor="#CDCDCB">14:30</th>
-                    
+
                     <td id="term1_mo_1430" class="daytime_slot" />
                     <td id="term1_tu_1430" class="daytime_slot" />
                     <td id="term1_we_1430" class="daytime_slot" />
@@ -251,7 +251,7 @@
                 </tr>
                 <tr id="term1_150">
                     <th bgcolor="#CDCDCB">15:00</th>
-                    
+
                     <td id="term1_mo_150" class="daytime_slot" />
                     <td id="term1_tu_150" class="daytime_slot" />
                     <td id="term1_we_150" class="daytime_slot" />
@@ -260,7 +260,7 @@
                 </tr>
                 <tr id="term1_1530">
                     <th bgcolor="#CDCDCB">15:30</th>
-                    
+
                     <td id="term1_mo_1530" class="daytime_slot" />
                     <td id="term1_tu_1530" class="daytime_slot" />
                     <td id="term1_we_1530" class="daytime_slot" />
@@ -269,7 +269,7 @@
                 </tr>
                 <tr id="term1_160">
                     <th bgcolor="#CDCDCB">16:00</th>
-                    
+
                     <td id="term1_mo_160" class="daytime_slot" />
                     <td id="term1_tu_160" class="daytime_slot" />
                     <td id="term1_we_160" class="daytime_slot" />
@@ -278,7 +278,7 @@
                 </tr>
                 <tr id="term1_1630">
                     <th bgcolor="#CDCDCB">16:30</th>
-                    
+
                     <td id="term1_mo_1630" class="daytime_slot" />
                     <td id="term1_tu_1630" class="daytime_slot" />
                     <td id="term1_we_1630" class="daytime_slot" />
@@ -287,7 +287,7 @@
                 </tr>
                 <tr id="term1_170">
                     <th bgcolor="#CDCDCB">17:00</th>
-                    
+
                     <td id="term1_mo_170" class="daytime_slot" />
                     <td id="term1_tu_170" class="daytime_slot" />
                     <td id="term1_we_170" class="daytime_slot" />
@@ -296,7 +296,7 @@
                 </tr>
                 <tr id="term1_1730">
                     <th bgcolor="#CDCDCB">17:30</th>
-                    
+
                     <td id="term1_mo_1730" class="daytime_slot" />
                     <td id="term1_tu_1730" class="daytime_slot" />
                     <td id="term1_we_1730" class="daytime_slot" />
@@ -305,7 +305,7 @@
                 </tr>
                 <tr id="term1_180">
                     <th bgcolor="#CDCDCB">18:00</th>
-                    
+
                     <td id="term1_mo_180" class="daytime_slot" />
                     <td id="term1_tu_180" class="daytime_slot" />
                     <td id="term1_we_180" class="daytime_slot" />
@@ -314,7 +314,7 @@
                 </tr>
                 <tr id="term1_1830">
                     <th bgcolor="#CDCDCB">18:30</th>
-                    
+
                     <td id="term1_mo_1830" class="daytime_slot" />
                     <td id="term1_tu_1830" class="daytime_slot" />
                     <td id="term1_we_1830" class="daytime_slot" />
@@ -323,7 +323,7 @@
                 </tr>
                 <tr id="term1_190">
                     <th bgcolor="#CDCDCB">19:00</th>
-                    
+
                     <td id="term1_mo_190" class="daytime_slot" />
                     <td id="term1_tu_190" class="daytime_slot" />
                     <td id="term1_we_190" class="daytime_slot" />
@@ -332,7 +332,7 @@
                 </tr>
                 <tr id="term1_1930">
                     <th bgcolor="#CDCDCB">19:30</th>
-                    
+
                     <td id="term1_mo_1930" class="daytime_slot" />
                     <td id="term1_tu_1930" class="daytime_slot" />
                     <td id="term1_we_1930" class="daytime_slot" />
@@ -341,7 +341,7 @@
                 </tr>
                 <tr id="term1_200">
                     <th bgcolor="#CDCDCB">20:00</th>
-                    
+
                     <td id="term1_mo_200" class="daytime_slot" />
                     <td id="term1_tu_200" class="daytime_slot" />
                     <td id="term1_we_200" class="daytime_slot" />
@@ -350,7 +350,7 @@
                 </tr>
                 <tr id="term1_2030">
                     <th bgcolor="#CDCDCB">20:30</th>
-                    
+
                     <td id="term1_mo_2030" class="daytime_slot" />
                     <td id="term1_tu_2030" class="daytime_slot" />
                     <td id="term1_we_2030" class="daytime_slot" />
@@ -359,7 +359,7 @@
                 </tr>
                 <tr id="term1_210">
                     <th bgcolor="#CDCDCB">21:00</th>
-                    
+
                     <td id="term1_mo_210" class="daytime_slot" />
                     <td id="term1_tu_210" class="daytime_slot" />
                     <td id="term1_we_210" class="daytime_slot" />
@@ -368,7 +368,7 @@
                 </tr>
                 <tr id="term1_2130">
                     <th bgcolor="#CDCDCB">21:30</th>
-                    
+
                     <td id="term1_mo_2130" class="daytime_slot" />
                     <td id="term1_tu_2130" class="daytime_slot" />
                     <td id="term1_we_2130" class="daytime_slot" />
@@ -377,7 +377,7 @@
                 </tr>
                 <tr id="term1_220">
                     <th bgcolor="#CDCDCB">22:00</th>
-                    
+
                     <td id="term1_mo_220" class="daytime_slot" />
                     <td id="term1_tu_220" class="daytime_slot" />
                     <td id="term1_we_220" class="daytime_slot" />
@@ -385,7 +385,7 @@
                     <td id="term1_fr_220" class="daytime_slot" />
                 </tr>
             </table>
-            
+
             <table id="term2_table" class="term">
                 <tr>
                     <th class="title" id="term2_title" colspan="6">
@@ -405,7 +405,7 @@
                 </tr>
                 <tr id="term2_80">
                     <th bgcolor="#CDCDCB">8:00</th>
-                    
+
                     <td id="term2_mo_80" class="daytime_slot" />
                     <td id="term2_tu_80" class="daytime_slot" />
                     <td id="term2_we_80" class="daytime_slot" />
@@ -414,7 +414,7 @@
                 </tr>
                 <tr id="term2_830">
                     <th bgcolor="#CDCDCB">8:30</th>
-                    
+
                     <td id="term2_mo_830" class="daytime_slot" />
                     <td id="term2_tu_830" class="daytime_slot" />
                     <td id="term2_we_830" class="daytime_slot" />
@@ -422,7 +422,7 @@
                     <td id="term2_fr_830" class="daytime_slot" />
                 <tr id="term2_90">
                     <th bgcolor="#CDCDCB">9:00</th>
-                    
+
                     <td id="term2_mo_90" class="daytime_slot" />
                     <td id="term2_tu_90" class="daytime_slot" />
                     <td id="term2_we_90" class="daytime_slot" />
@@ -431,7 +431,7 @@
                 </tr>
                 <tr id="term2_930">
                     <th bgcolor="#CDCDCB">9:30</th>
-                    
+
                     <td id="term2_mo_930" class="daytime_slot" />
                     <td id="term2_tu_930" class="daytime_slot" />
                     <td id="term2_we_930" class="daytime_slot" />
@@ -440,7 +440,7 @@
                 </tr>
                 <tr id="term2_100">
                     <th bgcolor="#CDCDCB">10:00</th>
-                    
+
                     <td id="term2_mo_100" class="daytime_slot" />
                     <td id="term2_tu_100" class="daytime_slot" />
                     <td id="term2_we_100" class="daytime_slot" />
@@ -449,7 +449,7 @@
                 </tr>
                 <tr id="term2_1030">
                     <th bgcolor="#CDCDCB">10:30</th>
-                    
+
                     <td id="term2_mo_1030" class="daytime_slot" />
                     <td id="term2_tu_1030" class="daytime_slot" />
                     <td id="term2_we_1030" class="daytime_slot" />
@@ -458,7 +458,7 @@
                 </tr>
                 <tr id="term2_110">
                     <th bgcolor="#CDCDCB">11:00</th>
-                    
+
                     <td id="term2_mo_110" class="daytime_slot" />
                     <td id="term2_tu_110" class="daytime_slot" />
                     <td id="term2_we_110" class="daytime_slot" />
@@ -467,7 +467,7 @@
                 </tr>
                 <tr id="term2_1130">
                     <th bgcolor="#CDCDCB">11:30</th>
-                    
+
                     <td id="term2_mo_1130" class="daytime_slot" />
                     <td id="term2_tu_1130" class="daytime_slot" />
                     <td id="term2_we_1130" class="daytime_slot" />
@@ -476,7 +476,7 @@
                 </tr>
                 <tr id="term2_120">
                     <th bgcolor="#CDCDCB">12:00</th>
-                    
+
                     <td id="term2_mo_120" class="daytime_slot" />
                     <td id="term2_tu_120" class="daytime_slot" />
                     <td id="term2_we_120" class="daytime_slot" />
@@ -485,7 +485,7 @@
                 </tr>
                 <tr id="term2_1230">
                     <th bgcolor="#CDCDCB">12:30</th>
-                    
+
                     <td id="term2_mo_1230" class="daytime_slot" />
                     <td id="term2_tu_1230" class="daytime_slot" />
                     <td id="term2_we_1230" class="daytime_slot" />
@@ -494,7 +494,7 @@
                 </tr>
                 <tr id="term2_130">
                     <th bgcolor="#CDCDCB">13:00</th>
-                    
+
                     <td id="term2_mo_130" class="daytime_slot" />
                     <td id="term2_tu_130" class="daytime_slot" />
                     <td id="term2_we_130" class="daytime_slot" />
@@ -503,7 +503,7 @@
                 </tr>
                 <tr id="term2_1330">
                     <th bgcolor="#CDCDCB">13:30</th>
-                    
+
                     <td id="term2_mo_1330" class="daytime_slot" />
                     <td id="term2_tu_1330" class="daytime_slot" />
                     <td id="term2_we_1330" class="daytime_slot" />
@@ -512,7 +512,7 @@
                 </tr>
                 <tr id="term2_140">
                     <th bgcolor="#CDCDCB">14:00</th>
-                    
+
                     <td id="term2_mo_140" class="daytime_slot" />
                     <td id="term2_tu_140" class="daytime_slot" />
                     <td id="term2_we_140" class="daytime_slot" />
@@ -521,7 +521,7 @@
                 </tr>
                 <tr id="term2_1430">
                     <th bgcolor="#CDCDCB">14:30</th>
-                    
+
                     <td id="term2_mo_1430" class="daytime_slot" />
                     <td id="term2_tu_1430" class="daytime_slot" />
                     <td id="term2_we_1430" class="daytime_slot" />
@@ -530,7 +530,7 @@
                 </tr>
                 <tr id="term2_150">
                     <th bgcolor="#CDCDCB">15:00</th>
-                    
+
                     <td id="term2_mo_150" class="daytime_slot" />
                     <td id="term2_tu_150" class="daytime_slot" />
                     <td id="term2_we_150" class="daytime_slot" />
@@ -539,7 +539,7 @@
                 </tr>
                 <tr id="term2_1530">
                     <th bgcolor="#CDCDCB">15:30</th>
-                    
+
                     <td id="term2_mo_1530" class="daytime_slot" />
                     <td id="term2_tu_1530" class="daytime_slot" />
                     <td id="term2_we_1530" class="daytime_slot" />
@@ -548,7 +548,7 @@
                 </tr>
                 <tr id="term2_160">
                     <th bgcolor="#CDCDCB">16:00</th>
-                    
+
                     <td id="term2_mo_160" class="daytime_slot" />
                     <td id="term2_tu_160" class="daytime_slot" />
                     <td id="term2_we_160" class="daytime_slot" />
@@ -557,7 +557,7 @@
                 </tr>
                 <tr id="term2_1630">
                     <th bgcolor="#CDCDCB">16:30</th>
-                    
+
                     <td id="term2_mo_1630" class="daytime_slot" />
                     <td id="term2_tu_1630" class="daytime_slot" />
                     <td id="term2_we_1630" class="daytime_slot" />
@@ -566,7 +566,7 @@
                 </tr>
                 <tr id="term2_170">
                     <th bgcolor="#CDCDCB">17:00</th>
-                    
+
                     <td id="term2_mo_170" class="daytime_slot" />
                     <td id="term2_tu_170" class="daytime_slot" />
                     <td id="term2_we_170" class="daytime_slot" />
@@ -575,7 +575,7 @@
                 </tr>
                 <tr id="term2_1730">
                     <th bgcolor="#CDCDCB">17:30</th>
-                    
+
                     <td id="term2_mo_1730" class="daytime_slot" />
                     <td id="term2_tu_1730" class="daytime_slot" />
                     <td id="term2_we_1730" class="daytime_slot" />
@@ -584,7 +584,7 @@
                 </tr>
                 <tr id="term2_180">
                     <th bgcolor="#CDCDCB">18:00</th>
-                    
+
                     <td id="term2_mo_180" class="daytime_slot" />
                     <td id="term2_tu_180" class="daytime_slot" />
                     <td id="term2_we_180" class="daytime_slot" />
@@ -593,7 +593,7 @@
                 </tr>
                 <tr id="term2_1830">
                     <th bgcolor="#CDCDCB">18:30</th>
-                    
+
                     <td id="term2_mo_1830" class="daytime_slot" />
                     <td id="term2_tu_1830" class="daytime_slot" />
                     <td id="term2_we_1830" class="daytime_slot" />
@@ -602,7 +602,7 @@
                 </tr>
                 <tr id="term2_190">
                     <th bgcolor="#CDCDCB">19:00</th>
-                    
+
                     <td id="term2_mo_190" class="daytime_slot" />
                     <td id="term2_tu_190" class="daytime_slot" />
                     <td id="term2_we_190" class="daytime_slot" />
@@ -611,7 +611,7 @@
                 </tr>
                 <tr id="term2_1930">
                     <th bgcolor="#CDCDCB">19:30</th>
-                    
+
                     <td id="term2_mo_1930" class="daytime_slot" />
                     <td id="term2_tu_1930" class="daytime_slot" />
                     <td id="term2_we_1930" class="daytime_slot" />
@@ -620,7 +620,7 @@
                 </tr>
                 <tr id="term2_200">
                     <th bgcolor="#CDCDCB">20:00</th>
-                    
+
                     <td id="term2_mo_200" class="daytime_slot" />
                     <td id="term2_tu_200" class="daytime_slot" />
                     <td id="term2_we_200" class="daytime_slot" />
@@ -629,7 +629,7 @@
                 </tr>
                 <tr id="term2_2030">
                     <th bgcolor="#CDCDCB">20:30</th>
-                    
+
                     <td id="term2_mo_2030" class="daytime_slot" />
                     <td id="term2_tu_2030" class="daytime_slot" />
                     <td id="term2_we_2030" class="daytime_slot" />
@@ -638,7 +638,7 @@
                 </tr>
                 <tr id="term2_210">
                     <th bgcolor="#CDCDCB">21:00</th>
-                    
+
                     <td id="term2_mo_210" class="daytime_slot" />
                     <td id="term2_tu_210" class="daytime_slot" />
                     <td id="term2_we_210" class="daytime_slot" />
@@ -647,7 +647,7 @@
                 </tr>
                 <tr id="term2_2130">
                     <th bgcolor="#CDCDCB">21:30</th>
-                    
+
                     <td id="term2_mo_2130" class="daytime_slot" />
                     <td id="term2_tu_2130" class="daytime_slot" />
                     <td id="term2_we_2130" class="daytime_slot" />
@@ -656,7 +656,7 @@
                 </tr>
                 <tr id="term2_220">
                     <th bgcolor="#CDCDCB">22:00</th>
-                    
+
                     <td id="term2_mo_220" class="daytime_slot" />
                     <td id="term2_tu_220" class="daytime_slot" />
                     <td id="term2_we_220" class="daytime_slot" />
@@ -669,7 +669,7 @@
         <!-- bower:js -->
         <!-- endbower -->
 
-        <script type="text/javascript" src="js/ttg.min.js"></script>
+        <script type="text/javascript" src="static/js/ttg.min.js"></script>
 
         <script>
             $(document).ready(function() {

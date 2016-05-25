@@ -15,15 +15,32 @@ module.exports = function(grunt) {
       }
     },
     copy: {
-      main: {
+      dev: {
         files: {
           'dist/index.html': 'src/html/index.html',
           'dist/data/universities.json': 'src/json/universities.json'
         }
+      },
+      prod: {
+        files: [
+          { src: 'src/html/index.html', dest: 'dist/index.html' },
+          {
+            src: 'src/json/universities.json',
+            dest: 'dist/data/universities.json'
+          },
+          {
+            expand: true,
+            cwd: 'bower_components/',
+            src: '**',
+            dest: 'dist/lib/',
+          },
+          { src: 'favicon.ico', dest: 'dist/favicon.ico' },
+          { src: 'src/css/*', dest: 'dist/styles/' }
+        ]
       }
     },
     symlink: {
-      main: {
+      dev: {
         files: {
           'dist/lib/': 'bower_components/',
           'dist/favicon.ico': 'favicon.ico',
@@ -73,8 +90,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-symlink');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
-  grunt.registerTask('dev-build', ['copy', 'wiredep']);
-  grunt.registerTask('prod-build', ['bower', 'clean', 'symlink',
-                               'uglify', 'copy', 'wiredep',
-                               'htmlmin']);
+  grunt.registerTask('dev-build', ['copy:dev', 'symlink:dev', 'wiredep']);
+  grunt.registerTask('prod-build',
+                     ['bower', 'clean', 'uglify', 'copy:prod', 'wiredep',
+                      'htmlmin']);
 };
