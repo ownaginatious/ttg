@@ -1,2 +1,2 @@
-FROM nginx:1.9
+FROM nginx:stable-alpine
 COPY ./nginx.conf /etc/nginx/nginx.conf
