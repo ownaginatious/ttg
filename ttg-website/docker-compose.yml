@@ -16,9 +16,11 @@ services:
 
   ttg-web-backend:
     image: docker.timetablegenerator.io/ttg/ttg-web-backend
+    volumes:
+      - "${TTG_LEGACY_DIR}:/data"
     environment:
       - "SECRET_KEY=${TTG_WEB_BACKEND_SECRET}"
-      - "LEGACY_DIR=${TTG_LEGACY_DIR}"
+      - "LEGACY_DIR=/data"
       - "LEGACY_POST_KEY=${TTG_LEGACY_POST_KEY}"
     expose:
       - "80"
