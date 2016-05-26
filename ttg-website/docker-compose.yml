@@ -23,7 +23,7 @@ services:
       - "LEGACY_DIR=/data"
       - "LEGACY_POST_KEY=${TTG_LEGACY_POST_KEY}"
     expose:
-      - "80"
+      - "8080"
 
   ttg-web-frontend:
     image: docker.timetablegenerator.io/ttg/ttg-web-frontend
@@ -32,6 +32,8 @@ services:
 
   ttg-saved-schedules:
     image: docker.timetablegenerator.io/ttg/ttg-saved-schedules
+    expose:
+     - "8080"
     links:
       - ttg-mongodb
 
