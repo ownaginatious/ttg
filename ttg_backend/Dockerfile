@@ -8,4 +8,6 @@ CMD ["uwsgi", "--http", ":8080", "--module", "wsgi"]
 WORKDIR /code
 ADD requirements.txt ./
 RUN pip install -r requirements.txt && pip install uwsgi
-ADD wsgi.py urls.py manage.py __init__.py settings/ apps/ ./
+ADD settings/ ./settings
+ADD apps/ ./apps
+ADD wsgi.py urls.py manage.py __init__.py ./
