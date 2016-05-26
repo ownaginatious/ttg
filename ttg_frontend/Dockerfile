@@ -7,6 +7,7 @@ RUN curl -sL https://deb.nodesource.com/setup_4.x | bash - \
 WORKDIR /code
 COPY package.json ./
 RUN npm install -no-color
-COPY Gruntfile.js bower.json favicon.ico src/ ./
+COPY Gruntfile.js bower.json favicon.ico ./
+COPY src/ ./src
 RUN ./node_modules/grunt-cli/bin/grunt prod-build -no-color
 RUN mv dist/* /usr/share/nginx/html
