@@ -144,7 +144,7 @@ var DataLoader = {
     },
 
     injectStateData :  function() {
-        key = /#([a-zA-Z0-9]+)$/.match(window.location.href);
+        key = window.location.href.match(/#([a-zA-Z0-9]+)$/);
         if (key){
             $.ajax({
                 type: "GET",
