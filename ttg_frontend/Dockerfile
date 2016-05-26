@@ -1,4 +1,4 @@
-FROM nginx:1.9
+FROM nginx:stable
 
 ENV LAST_UPDATED = 2016-05-20
 RUN apt-get update && apt-get install -y curl git
