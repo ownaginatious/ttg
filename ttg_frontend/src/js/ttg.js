@@ -144,29 +144,16 @@ var DataLoader = {
     },
 
     injectStateData :  function() {
-
-        // Keeping for legacy purposes.
-        var data = DataLoader.getQueryParameters()['data'];
-
-        if(typeof data == 'undefined'){
-
-            // If the legacy key has not been located, try the new version.
-            data = window.location.href.replace("http://www.timetablegenerator.com", "").replace("/", "");
-
-            if(/^#[a-zA-Z0-9]{3,10}/.exec(data) != null){
-
-                $.ajax({
-                    type: "GET",
-                    url: "/api/v1/schedule/" + data.substr(1),
-                    dataType: "json",
-                    success: function(response){
-                        BoxManager.reconstructStage1(response);
-                    },
-                });
-            }
-        } else {
-            data = eval('(' + atob(data) + ')');
-            BoxManager.reconstructStage1(data);
+        key = /#([a-zA-Z0-9]+)$/.match(window.location.href);
+        if (key){
+            $.ajax({
+                type: "GET",
+                url: "/api/v1/schedule/" + key[1],
+                dataType: "json",
+                success: function(response){
+                    BoxManager.reconstructStage1(JSON.parse(response));
+                },
+            });
         }
     },
 
