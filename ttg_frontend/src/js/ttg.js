@@ -133,9 +133,9 @@ var DataLoader = {
             data : JSON.stringify(schedule_data),
             success: function(response){
 
-                var stateLink = "https://ttg.fyi/#" + response;
+                var stateLink = "https://ttg.fyi/#" + JSON.parse(response)['id'];
 
-                $("#timetable_link").html($("<a></a>").html("Click for new link").attr("href", stateLink));
+                $("#timetable_link").html($("<a></a>").html(stateLink).attr("href", stateLink));
 
                 $("#state_create_button").html("Create Link");
                 $("#state_create_button").attr("disabled", false);
@@ -204,10 +204,12 @@ var DataLoader = {
 
         settings_parcel = selectedUniversitySettings.visual_settings;
 
-        $("#courses_div").html("Hold on, retrieving scheduling for " + selectedUniversitySettings.name + "...");
+        $("#courses_div").html("Hold on, retrieving scheduling for "
+            + selectedUniversitySettings.name + "...");
 
         $("#course_add_button").html("<b>Add another course</b>");
-        $("#course_add_button").attr("onclick", "BoxManager.addNewSelector(TimetableManipulator.masterList)");
+        $("#course_add_button").attr("onclick",
+            "BoxManager.addNewSelector(TimetableManipulator.masterList)");
         $("#course_add_button").attr("disabled", true);
 
         $.ajax({
@@ -217,9 +219,8 @@ var DataLoader = {
             success: function(response) {
 
                 $("#course_add_button").attr("disabled", false);
-                $("#courses_div").html("<b>University</b> : " + university_identification.name
-                        + "&nbsp;<a href='/listings/" + university_identification.prefix
-                        + ".html' target='_blank'>(Click here for detailed listings)</a></br>");
+                $("#courses_div").html("<b>University</b> : "
+                  + university_identification.name + "</br>");
 
                 TimetableManipulator.masterCourseList = response.courses;
                 TimetableManipulator.masterDepartmentList = response.departments;
