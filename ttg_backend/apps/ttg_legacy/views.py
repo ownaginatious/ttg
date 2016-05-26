@@ -11,10 +11,12 @@ from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework_yaml.renderers import YAMLRenderer
 from .permissions import ScraperPermission
+from .parsers import GZippedJSONParser
 
 
 class Schedule(APIView):
 
+    parser_classes = (GZippedJSONParser,)
     renderer_classes = (JSONRenderer, YAMLRenderer)
     permission_classes = (ScraperPermission,)
 
