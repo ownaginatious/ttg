@@ -8,6 +8,8 @@ class ScraperPermission(BasePermission):
     """
 
     def has_permission(self, request, view):
-        return request.method in SAFE_METHODS or \
-               request.query_params.get('token', '') == \
-               settings.LEGACY_POST_KEY
+        valid_token = request.query_params.get('token', '')\
+                         == settings.LEGACY_POST_KEY
+        if request.query_params.get('refresh', None):
+            return valid_token
+        return request.method in SAFE_METHODS or valid_token
