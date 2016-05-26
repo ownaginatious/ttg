@@ -128,12 +128,12 @@ var DataLoader = {
         $.ajax({
             type: "POST",
             url: "/api/v1/schedule",
-            dataType: "text",
+            dataType: "json",
             contentType: "application/json",
             data : JSON.stringify(schedule_data),
             success: function(response){
 
-                var stateLink = "https://ttg.fyi/#" + JSON.parse(response)['id'];
+                var stateLink = "https://ttg.fyi/#" + response.id;
 
                 $("#timetable_link").html($("<a></a>").html(stateLink).attr("href", stateLink));
 
@@ -151,7 +151,7 @@ var DataLoader = {
                 url: "/api/v1/schedule/" + key[1],
                 dataType: "json",
                 success: function(response){
-                    BoxManager.reconstructStage1(JSON.parse(response));
+                    BoxManager.reconstructStage1(response);
                 },
             });
         }
