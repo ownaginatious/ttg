@@ -12,4 +12,4 @@ COPY src/ ./src
 RUN ./node_modules/grunt-cli/bin/grunt prod-build -no-color
 COPY ./nginx.conf /etc/nginx/nginx.conf
 WORKDIR /dist
-RUN mv /code/dist /dist && rm -rf /code
+RUN mv /code/dist/* /dist && rm -rf /code
