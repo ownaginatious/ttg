@@ -10,6 +10,6 @@ RUN npm install -no-color
 COPY Gruntfile.js bower.json favicon.ico ./
 COPY src/ ./src
 RUN ./node_modules/grunt-cli/bin/grunt prod-build -no-color
-WORKDIR /dist
-RUN mv ./dist /dist && rm -rf /code
 COPY ./nginx.conf /etc/nginx/nginx.conf
+WORKDIR /dist
+RUN mv /code/dist /dist && rm -rf /code
