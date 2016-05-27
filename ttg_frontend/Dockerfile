@@ -11,3 +11,4 @@ COPY Gruntfile.js bower.json favicon.ico ./
 COPY src/ ./src
 RUN ./node_modules/grunt-cli/bin/grunt prod-build -no-color
 RUN mv dist/* /usr/share/nginx/html
+COPY ./nginx.conf /etc/nginx/nginx.conf
