@@ -151,7 +151,7 @@ var DataLoader = {
                 url: "/api/v1/schedule/" + key[1],
                 dataType: "json",
                 success: function(response){
-                    BoxManager.reconstructStage1(response);
+                    BoxManager.reconstructStage1(response.data);
                 },
             });
         }
