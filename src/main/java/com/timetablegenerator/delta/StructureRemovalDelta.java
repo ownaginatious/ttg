@@ -17,7 +17,7 @@ public class StructureRemovalDelta extends Delta {
 
     public String toString() {
 
-        return "REMOVED [" + this.getPropertyType().name() + "] (id ="
+        return "REMOVED [" + this.getPropertyType().name() + "] (id = "
                 + this.oldValue.getDeltaId() + ")";
     }
 }

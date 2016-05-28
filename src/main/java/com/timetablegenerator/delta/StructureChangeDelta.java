@@ -1,6 +1,7 @@
 package com.timetablegenerator.delta;
 
 import com.timetablegenerator.Settings;
+import com.timetablegenerator.StringUtilities;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -13,8 +14,22 @@ public class StructureChangeDelta extends Delta {
     private static String I = Settings.getIndent();
 
     private static class DeltaSort implements Comparator<Delta>{
+
+        private int operationValue(Delta delta){
+            if (delta instanceof ValueAdditionDelta || delta instanceof StructureAdditionDelta) {
+                return 0;
+            } else if (delta instanceof ValueChangeDelta || delta instanceof StructureChangeDelta) {
+                return 1;
+            }
+            return 2;
+        }
+
         @Override
         public int compare(Delta d1, Delta d2) {
+            int opDiff = operationValue(d1) - operationValue(d2);
+            if (opDiff != 0) {
+                return opDiff;
+            }
             return d1.getPropertyType().compareTo(d2.getPropertyType());
         }
     }
@@ -160,10 +175,6 @@ public class StructureChangeDelta extends Delta {
     }
 
     public String toString() {
-        return this.toString(0);
-    }
-
-    public String toString(int tabAmount) {
 
         StringBuilder sb = new StringBuilder();
 
@@ -174,22 +185,22 @@ public class StructureChangeDelta extends Delta {
 
         if (this.hasValueChanges()) {
 
-            sb.append("\n\n").append(I).append(I).append("Property changes:\n");
+            sb.append("\n\n").append(I).append("Property changes:\n");
 
             this.propertyChangeDeltas.stream().sorted(sorter)
-                    .forEach(d -> sb.append('\n').append(I).append(I).append(I)
-                            .append('[').append(++i[0]).append("] ").append(d));
+                    .forEach(d -> sb.append('\n')
+                            .append(StringUtilities.indent(2, d.toString())));
         }
 
         i[0] = 0;
 
         if (this.hasChildStructureChanges()) {
 
-            sb.append("\n\n").append(I).append(I).append("Child property changes:");
+            sb.append("\n\n").append(I).append("Child property changes:");
 
             this.structureChangeDeltas.values().stream().sorted(sorter)
-                    .forEach(d -> sb.append("\n\n").append(I).append(I).append(I)
-                        .append('[').append(++i[0]).append("] ").append(d.toString(tabAmount + 1)));
+                    .forEach(d -> sb.append("\n\n")
+                            .append(StringUtilities.indent(2, d.toString())));
         }
 
         return sb.toString();

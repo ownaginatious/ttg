@@ -1,78 +1,89 @@
 package com.timetablegenerator.model;
 
+import com.timetablegenerator.Settings;
+import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import javax.annotation.Nonnull;
+import java.util.*;
 
+@EqualsAndHashCode
 public class SectionType implements Comparable<SectionType>, Diffable<SectionType> {
 
+    private static final String I = Settings.getIndent();
+
     @Getter private final School school;
-    @Getter private final String type;
+    @Getter private final String code;
+    @Getter private final String name;
+
     private final Map<String, Section> sections = new TreeMap<>();
 
-    public SectionType(@NonNull School school, @NonNull String type) {
-
-        // Force check to ensure the type exists.
-        school.getSectionTypeNameByCode(type);
-
+    private SectionType(@NonNull School school, @NonNull String type) {
         this.school = school;
-        this.type = type;
+        this.code = type;
+        this.name = school.getSectionTypeNameByCode(this.code);
+    }
+
+    public static SectionType of(@NonNull School school, @NonNull String type){
+        // Force check to ensure the code exists.
+        school.getSectionTypeNameByCode(type);
+        return new SectionType(school, type);
     }
 
     public Set<String> getSectionKeys(){
         return this.sections.keySet();
     }
 
-    public Section getSection(String sectionId) {
-        return this.sections.get(sectionId);
+    public Optional<Section> getSection(String sectionId) {
+        return this.sections.containsKey(sectionId) ?
+                Optional.of(this.sections.get(sectionId)) : Optional.empty();
     }
 
-    public void addSection(@NonNull Section s) {
-
-        if (this.sections.putIfAbsent(s.getSectionId(), s) != null)
-            throw new IllegalStateException("Attempted to add the section of type \""
-                    + this.type + "\" with ID \"" + s.getSectionId() + "\" twice");
+    public SectionType addSection(@NonNull Section s) {
+        if (this.sections.putIfAbsent(s.getSectionId(), s) != null) {
+            throw new IllegalStateException("Attempted to add the section of code \""
+                    + this.code + "\" with ID \"" + s.getSectionId() + "\" twice");
+        }
+        return this;
     }
 
     @Override
     public String toString() {
 
-        StringBuilder sb = new StringBuilder("\n");
-
-        sb.append(school.getSectionTypeNameByCode(this.type)).append(" data:\n");
+        StringBuilder sb = new StringBuilder(this.name)
+                .append(" sections:");
 
         if (this.sections.isEmpty()){
-            sb.append('\n').append("NONE LISTED");
+            sb.append("\n\n").append(I).append("NONE LISTED");
         } else {
-            this.sections.values().forEach(sb::append);
+            this.sections.values().forEach(x -> sb.append("\n\n")
+                    .append(StringUtilities.indent(1, x.toString())));
         }
 
         return sb.toString();
     }
 
     @Override
-    public int compareTo(@NonNull SectionType st) {
-        return type.compareTo(st.type);
+    public int compareTo(@Nonnull SectionType st) {
+        return code.compareTo(st.code);
     }
 
     @Override
     public String getDeltaId(){
-        return this.type;
+        return this.code;
     }
 
     @Override
     public StructureChangeDelta findDifferences(SectionType that) {
 
-        if (!this.type.equals(that.type)) {
-            throw new IllegalArgumentException("Section types are not related: \"" + this.type
-                    + "\" and \"" + that.type + "\"");
+        if (!this.code.equals(that.code)) {
+            throw new IllegalArgumentException("Section types are not related: \"" + this.code
+                    + "\" and \"" + that.code + "\"");
         }
 
         final StructureChangeDelta delta = StructureChangeDelta.of(PropertyType.SECTION_TYPE, this);

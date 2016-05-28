@@ -40,7 +40,7 @@ public class Course implements Comparable<Course>, Diffable<Course> {
     /**
      * Creates a new course object representing a single course within a timetable.
      *
-     * @param school The school for the school's terms.
+     * @param school        The school for the school's terms.
      * @param term          The term this course is part fromSectionId.
      * @param department    The department to which this course belongs.
      * @param courseCode    The code of this course.
@@ -122,7 +122,7 @@ public class Course implements Comparable<Course>, Diffable<Course> {
 
         if (st == null) {
 
-            st = new SectionType(this.school, sectionTypeId);
+            st = SectionType.of(this.school, sectionTypeId);
             sectionTypes.put(sectionTypeId, st);
         }
 
