@@ -121,11 +121,11 @@ var DataLoader = {
 
                 var selection_array = new Array();
 
-                selection_array.push($(`#dep_select_${i} option:selected`).attr("value"));
-                selection_array.push($(`#course_select_${i} option:selected`).attr("value"));
-                selection_array.push($(`#core_select_${i} option:selected`).attr("value"));
-                selection_array.push($(`#tutorial_select_${i} option:selected`).attr("value"));
-                selection_array.push($(`#lab_select_${i} option:selected`).attr("value"));
+                selection_array.push($("#dep_select_" + i + " option:selected").attr("value"));
+                selection_array.push($("#course_select_" + i + " option:selected").attr("value"));
+                selection_array.push($("#core_select_" + i + " option:selected").attr("value"));
+                selection_array.push($("#tutorial_select_" + i + " option:selected").attr("value"));
+                selection_array.push($("#lab_select_" + i + " option:selected").attr("value"));
 
                 selectors.push(selection_array);
             }
@@ -156,10 +156,10 @@ var DataLoader = {
                 $("#state_create_button").attr("disabled", false);
             },
             error: function(jqXHR, textStatus, errorThrown){
-                $("#timetable_link").html(`Failure code ${textStatus}. Try ` +
-                                          `again in a few minutes, or ` +
-                                          `contact the admin if the issue ` +
-                                          `persists.`);
+                $("#timetable_link").html("Failure code " + textStatus +
+                                          ". Try again in a few minutes, or " +
+                                          "contact the admin if the issue " +
+                                          "persists.");
             }
         });
     },
@@ -176,11 +176,10 @@ var DataLoader = {
                 },
                 error: function(jqXHR, textStatus, errorThrown){
                     if (textStatus === '404') {
-                        alert(`No such schedule with key "${key[1]}"`);
+                        alert("No such schedule with key \"" + key[1] + "\"");
                     } else {
-                        alert(`Failed to load saved schedule ` +
-                          `(error ${textStatus}). Please contact the system ` +
-                          `admin `);
+                        alert("Failed to load saved schedule (error " +
+                              textStatus + ". Please contact the system admin.");
                     }
                 }
             });
@@ -235,8 +234,8 @@ var DataLoader = {
             dataType: "json",
             success: function(response) {
                 $("#course_add_button").attr("disabled", false);
-                $("#courses_div").html(`<b>University</b> : ` +
-                    `${university_identification.name}</br>`);
+                $("#courses_div").html("<b>University</b> : " +
+                    university_identification.name + "</br>");
 
                 TimetableManipulator.masterCourseList = response.courses;
                 TimetableManipulator.masterDepartmentList = response.departments;
