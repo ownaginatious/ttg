@@ -84,7 +84,7 @@ MongoClient.connect(DB_URL, function(err, database) {
 
 var app = express();
 app.use(function (err, req, res, next) {
-    console.error(err.stack); 
+    console.error(err.stack);
     res.setHeader('Content-Type', 'application/json');
     res.status(500).send(JSON.stringify({ error: 'Something broke!' }, null, 2));
 });
@@ -100,13 +100,13 @@ app.use(function (req, res, next) {
 
         // If date is invalid, return error
         } else {
-            var error = { 
+            var error = {
                 error: 'invalid date specified; please use iso 8601 format'
-            }; 
+            };
             res.setHeader('Content-Type', 'application/json');
             return res.status(400).send(JSON.stringify(error, null, 2));
         }
-    } 
+    }
     next();
 });
 
@@ -125,7 +125,7 @@ app
                 var doc = {
                     data: result.data,
                 }
-                console.log('Writing JSON data to client...');
+                console.log(`Writing JSON data to client (${id})...`);
                 res.setHeader('Content-Type', 'application/json');
                 res.send(JSON.stringify(doc, null, 2)); // To prettify the JSON
 
@@ -246,7 +246,7 @@ function insertJsonDocument(jsonData, callback) {
             }
         }
 
-        // If a duplicate was found, just call callback with 
+        // If a duplicate was found, just call callback with
         // duplicate document's id
         if (id != null) {
             callback(id);
@@ -277,23 +277,23 @@ function fetchJsonDocument(id, callback) {
         { $currentDate: { last_access_dt: true } },
         function(err, result) {
             if (err) throw err;
-            if (DEBUG) console.log('Fetching JSON document (id=%s).', id);
-            
+            if (DEBUG) {
+                console.log(`Fetching JSON document (id=${id}).`);
+            }
+
             if (callback) {
                 if (result.value) {
                     if (DEBUG) {
-                        console.log('JSON document:\n' + 
+                        console.log('JSON document:\n' +
                         JSON.stringify(result.value, null, 2));
                     }
-
                     callback(result.value);
-                
-                // If no document with the given id is in the db, 
-                // try fetching from the old workaround is.gd
                 } else {
+                    // If no document with the given id is in the db,
+                    // try fetching from the old workaround is.gd
                     tryOldWorkAround(id, callback);
                 }
-            } 
+            }
         });
 }; // End function fetchJsonDocument
 
@@ -310,15 +310,23 @@ function tryOldWorkAround(id, callback) {
     };
     http.get(options, function (res) {
 
-        // If is.gd gives a result, store in db and 
+        // If is.gd gives a result, store in db and
         // return the JSON data to the client
         if (typeof res.headers['location'] !== 'undefined') {
             var buf = new Buffer(res.headers['location'].replace(
                     'http://www.timetablegenerator.com/', ''),
                     'base64');
-            if (DEBUG) console.log(buf.toString('ascii'));
-            var jsonData = JSON.parse(buf.toString('ascii'));
-
+            try {
+                var jsonData = JSON.parse(buf.toString('ascii'));
+            } catch(err) {
+                console.error(`Bad data recovered from is.gd path: ${options.path}`);
+                console.error(err);
+                callback(null);
+                return;
+            }
+            if (DEBUG) {
+                console.log(jsonData);
+            }
             // Create new record to store in db
             var record = {
                 id: id,
@@ -333,8 +341,7 @@ function tryOldWorkAround(id, callback) {
                     if (DEBUG) console.log('Stored JSON document (id=%s).', record['id']);
                 });
             } catch(err) {
-                console.error('Unable to store JSON document (id=' 
-                            + record['id'] + ') after fetching from is.gd');
+                console.error(`Unable to store JSON document (id=${record.id}) after fetching from is.gd`);
                 console.error(err.message);
                 console.error(err.stack);
             }
@@ -352,14 +359,14 @@ function tryOldWorkAround(id, callback) {
 // Function for deleting JSON documents last accessed before the given date
 // Callback called with the number of documents deleted as its argument.
 function reapDocuments(date, callback) {
-    console.log("Deleting documents that haven't been accessed since date: " 
+    console.log("Deleting documents that haven't been accessed since date: "
             + date);
     db.collection(COLLECTION).deleteMany(
-        { 
-            last_access_dt: { 
+        {
+            last_access_dt: {
                 $lt: date
             }
-        }, 
+        },
         function(err, result) {
             if (err) throw err;
             console.log(result.result.n + " documents deleted.");
