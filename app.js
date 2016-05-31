@@ -1,5 +1,5 @@
 // Other libraries
-var http = require('http');
+var https = require('https');
 var url = require('url');
 var assert = require('assert');
 var queryString = require('querystring');
@@ -276,7 +276,9 @@ function fetchJsonDocument(id, callback) {
         { id: id },
         { $currentDate: { last_access_dt: true } },
         function(err, result) {
-            if (err) throw err;
+            if (err) {
+                throw err;
+            }
             if (DEBUG) {
                 console.log(`Fetching JSON document (id=${id}).`);
             }
@@ -308,7 +310,7 @@ function tryOldWorkAround(id, callback) {
         host: 'is.gd',
         path: '/' + id
     };
-    http.get(options, function (res) {
+    https.get(options, function (res) {
 
         // If is.gd gives a result, store in db and
         // return the JSON data to the client
