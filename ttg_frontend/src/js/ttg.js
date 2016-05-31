@@ -69,7 +69,13 @@ var DataLoader = {
 
                 var selector = $('<select></select>').attr("id", "university_selector");
 
-                selector.append($('<option></option>').html('Select a university...').attr({'selected' : 'selected', 'value' : 'bad'}));
+                selector.append(
+                    $('<option></option>').html('Select a university...')
+                        .attr({
+                            'selected' : 'selected',
+                            'value' : 'bad'
+                        })
+                );
 
                 var depNames = new Array();
 
@@ -81,13 +87,20 @@ var DataLoader = {
                 depNames.sort();
 
                 for (var x = 0; x < depNames.length; x++) {
-                    selector.append($('<option></option>').html(response[depNames[x]].name).attr('value', depNames[x]));
+                    selector.append(
+                        $('<option></option>').html(response[depNames[x]].name)
+                            .attr('value', depNames[x])
+                    );
                 }
 
                 $("#courses_div").append(selector);
 
                 DataLoader.injectStateData();
             },
+            error: function(jqXHR, textStatus, errorThrown) {
+                alert("Failed to load supported university data. Please " +
+                      "contact the admin.")
+            }
         });
     },
 
@@ -108,11 +121,11 @@ var DataLoader = {
 
                 var selection_array = new Array();
 
-                selection_array.push($("#dep_select_" + i + " option:selected").attr("value"));
-                selection_array.push($("#course_select_" + i + " option:selected").attr("value"));
-                selection_array.push($("#core_select_" + i + " option:selected").attr("value"));
-                selection_array.push($("#tutorial_select_" + i + " option:selected").attr("value"));
-                selection_array.push($("#lab_select_" + i + " option:selected").attr("value"));
+                selection_array.push($(`#dep_select_${i} option:selected`).attr("value"));
+                selection_array.push($(`#course_select_${i} option:selected`).attr("value"));
+                selection_array.push($(`#core_select_${i} option:selected`).attr("value"));
+                selection_array.push($(`#tutorial_select_${i} option:selected`).attr("value"));
+                selection_array.push($(`#lab_select_${i} option:selected`).attr("value"));
 
                 selectors.push(selection_array);
             }
@@ -124,7 +137,7 @@ var DataLoader = {
             "selectors" : selectors,
             "school" : university_identification.prefix
         };
-
+        $("#timetable_link").html("Saving...");
         $.ajax({
             type: "POST",
             url: "/api/v1/schedule",
@@ -135,11 +148,19 @@ var DataLoader = {
 
                 var stateLink = "https://ttg.fyi/#" + response.id;
 
-                $("#timetable_link").html($("<a></a>").html(stateLink).attr("href", stateLink));
+                $("#timetable_link").html(
+                    $("<a></a>").html(stateLink).attr("href", stateLink)
+                );
 
                 $("#state_create_button").html("Create Link");
                 $("#state_create_button").attr("disabled", false);
             },
+            error: function(jqXHR, textStatus, errorThrown){
+                $("#timetable_link").html(`Failure code ${textStatus}. Try ` +
+                                          `again in a few minutes, or ` +
+                                          `contact the admin if the issue ` +
+                                          `persists.`);
+            }
         });
     },
 
@@ -153,6 +174,15 @@ var DataLoader = {
                 success: function(response){
                     BoxManager.reconstructStage1(response.data);
                 },
+                error: function(jqXHR, textStatus, errorThrown){
+                    if (textStatus === '404') {
+                        alert(`No such schedule with key "${key[1]}"`);
+                    } else {
+                        alert(`Failed to load saved schedule ` +
+                          `(error ${textStatus}). Please contact the system ` +
+                          `admin `);
+                    }
+                }
             });
         }
     },
@@ -204,10 +234,9 @@ var DataLoader = {
             url: "/api/v1/school/" + university_identification.prefix,
             dataType: "json",
             success: function(response) {
-
                 $("#course_add_button").attr("disabled", false);
-                $("#courses_div").html("<b>University</b> : "
-                  + university_identification.name + "</br>");
+                $("#courses_div").html(`<b>University</b> : ` +
+                    `${university_identification.name}</br>`);
 
                 TimetableManipulator.masterCourseList = response.courses;
                 TimetableManipulator.masterDepartmentList = response.departments;
@@ -218,6 +247,9 @@ var DataLoader = {
                     BoxManager.addNewSelector(TimetableManipulator.masterList);
 
                 $("#save_state_div").css("display", "block");
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                alert("Failed to load school data. Please contact the admin.")
             }
         });
     }
