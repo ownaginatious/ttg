@@ -125,7 +125,7 @@ app
                 var doc = {
                     data: result.data,
                 }
-                console.log(`Writing JSON data to client (${id})...`);
+                console.log(`Stored schedule read to client (${id})`);
                 res.setHeader('Content-Type', 'application/json');
                 res.send(JSON.stringify(doc, null, 2)); // To prettify the JSON
 
@@ -182,6 +182,7 @@ app
         // Store new record in db
         try {
             insertJsonDocument(data, function(id) {
+                console.log(`Stored new schedule (${id})`);
                 res.setHeader('Content-Type', 'application/json');
                 return res.send(JSON.stringify({ id: id }, null, 2));
             });
