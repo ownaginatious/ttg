@@ -156,8 +156,8 @@ var DataLoader = {
                 $("#state_create_button").attr("disabled", false);
             },
             error: function(jqXHR, textStatus, errorThrown){
-                $("#timetable_link").html("Failure code " + textStatus +
-                                          ". Try again in a few minutes, or " +
+                $("#timetable_link").html("Error (" + errorThrown +
+                                          "). Try again in a few minutes, or " +
                                           "contact the admin if the issue " +
                                           "persists.");
             }
@@ -175,11 +175,11 @@ var DataLoader = {
                     BoxManager.reconstructStage1(response.data);
                 },
                 error: function(jqXHR, textStatus, errorThrown){
-                    if (textStatus === '404') {
+                    if (jqXHR.status === 404) {
                         alert("No such schedule with key \"" + key[1] + "\"");
                     } else {
-                        alert("Failed to load saved schedule (error " +
-                              textStatus + ". Please contact the system admin.");
+                        alert("Failed to load saved schedule (error: " +
+                              errorThrown + "). Please contact the system admin.");
                     }
                 }
             });
