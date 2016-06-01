@@ -41,14 +41,13 @@ public class StructureChangeDelta extends Delta {
 
     @Getter private final String identifier;
 
-    public static StructureChangeDelta of(@NonNull PropertyType propertyType, @NonNull Diffable<?> diffable) {
-        return new StructureChangeDelta(propertyType, diffable.getDeltaId());
-    }
-
-    private StructureChangeDelta(@NonNull PropertyType propertyType, String identifier) {
-
+    private StructureChangeDelta(PropertyType propertyType, String identifier) {
         super(propertyType);
         this.identifier = identifier;
+    }
+
+    public static StructureChangeDelta of(@NonNull PropertyType propertyType, @NonNull Diffable<?> diffable) {
+        return new StructureChangeDelta(propertyType, diffable.getDeltaId());
     }
 
     public StructureChangeDelta addAdded(PropertyType propertyType, @NonNull Diffable<?> value) {

@@ -1,33 +1,37 @@
 package com.timetablegenerator.model;
 
+import com.timetablegenerator.Settings;
+import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
 
 @EqualsAndHashCode
 @Accessors(chain = true)
 public class Course implements Comparable<Course>, Diffable<Course> {
 
+    private static final String I = Settings.getIndent();
+
     // Required data.
-    private final School school;
-    @Getter private final String courseCode;
-    @Getter private final String courseName;
+    @Getter private final School school;
+    @Getter private final String code;
+    @Getter private final String name;
     @Getter private final String uniqueId;
     @Getter private final Department department;
     @Getter private final TermClassifier term;
-    @Getter private final double credits;
 
     // Optional data.
-    @Getter @Setter private String description = null;
+    @Setter private String description = null;
+    @Setter private Double credits = null;
     private final List<String> notes = new ArrayList<>();
 
     private final Set<Course> crossListings = new HashSet<>();
@@ -37,55 +41,88 @@ public class Course implements Comparable<Course>, Diffable<Course> {
 
     private final Map<String, SectionType> sectionTypes = new HashMap<>();
 
-    /**
-     * Creates a new course object representing a single course within a timetable.
-     *
-     * @param school        The school for the school's terms.
-     * @param term          The term this course is part fromSectionId.
-     * @param department    The department to which this course belongs.
-     * @param courseCode    The code of this course.
-     * @param courseName    The name of this course.
-     * @param credits       The number of credits this course is worth.
-     */
-    public Course(@Nonnull School school, @Nonnull TermClassifier term,
-                  @Nonnull Department department, @Nonnull String courseCode,
-                  @Nullable String courseName, @Nonnull Double credits) {
+    private Course(School school, TermClassifier term, Department department,
+                   String courseCode, String courseName) {
 
         // Null check most parameters to the function.
         this.school = school;
         this.term = term;
         this.department = department;
-        this.courseCode = courseCode;
-        this.courseName = courseName;
-        this.credits = credits;
+        this.code = courseCode;
+        this.name = courseName;
 
         // Generate the unique identifier for this course.
-        this.uniqueId = this.department.getCode() + this.courseCode + this.term.getId();
+        this.uniqueId = this.department.getCode() + this.code + this.term.getId();
+    }
+    /**
+     * Creates a new course object representing a single course within a timetable.
+     *
+     * @param school        The school for the school's terms.
+     * @param term          The term this course is part of.
+     * @param department    The department to which this course belongs.
+     * @param code          The code of this course.
+     * @param name          The name of this course.
+     */
+    public static Course of (@NonNull School school, @NonNull TermClassifier term,
+                  @NonNull Department department, @NonNull String code,
+                  @NonNull String name) {
+        return new Course(school, term, department, code, name);
+    }
+
+    private void checkRelationalIntegrity(Set<Course> collection, Course course){
+        if (course == this) {
+            throw new IllegalArgumentException("A course cannot be related to itself");
+        }
+        boolean ok = (collection == this.prerequisites || !this.prerequisites.contains(course)) &&
+                (collection == this.antirequisites || !this.antirequisites.contains(course)) &&
+                (collection == this.crossListings || !this.crossListings.contains(course)) &&
+                (collection == this.corequisites || !this.corequisites.contains(course));
+        if (!ok){
+            throw new IllegalArgumentException(
+                    String.format("Course %s cannot be under multiple relation categories", course.getUniqueId()));
+        }
     }
 
     public Course addPrerequisite(Course c) {
+        this.checkRelationalIntegrity(this.prerequisites, c);
         this.prerequisites.add(c);
         return this;
     }
 
     public Course addAntirequisite(Course c) {
+        this.checkRelationalIntegrity(this.antirequisites, c);
         this.antirequisites.add(c);
         return this;
     }
 
     public Course addCorequesite(Course c){
+        this.checkRelationalIntegrity(this.corequisites, c);
         this.corequisites.add(c);
         return this;
     }
 
     public Course addCrossListing(Course c) {
+        this.checkRelationalIntegrity(this.crossListings, c);
         this.crossListings.add(c);
         return this;
     }
 
-    public Course addNote(String note) {
-        this.notes.add(note);
+    public Course addNotes(@NonNull Collection<String> notes) {
+        this.notes.addAll(notes);
         return this;
+    }
+
+    public Course addNotes(@NonNull String... notes) {
+        Collections.addAll(this.notes, notes);
+        return this;
+    }
+
+    public Optional<Double> getCredits(){
+        return this.credits == null ? Optional.empty() : Optional.of(this.credits);
+    }
+
+    public Optional<String> getDescription(){
+        return this.description == null ? Optional.empty() : Optional.of(this.description);
     }
 
     public List<String> getNotes() {
@@ -108,12 +145,12 @@ public class Course implements Comparable<Course>, Diffable<Course> {
         return new HashSet<>(this.corequisites);
     }
 
-    public SectionType getSectionType(String sectionTypeId) {
-        return sectionTypes.get(sectionTypeId);
-    }
-
     public Collection<String> getSectionTypes() {
         return this.sectionTypes.keySet();
+    }
+
+    public Optional<SectionType> getSectionType(String type){
+        return this.sectionTypes.containsKey(type) ? Optional.of(this.sectionTypes.get(type)) : Optional.empty();
     }
 
     public Course addSection(String sectionTypeId, Section s) {
@@ -135,51 +172,51 @@ public class Course implements Comparable<Course>, Diffable<Course> {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("* Course\t\t: ").append(this.courseName == null ? "Unknown course name" : this.courseName)
-                .append(" [").append(this.courseCode).append("] (")
-                .append(this.credits).append(" units)\n");
+        sb.append("* Course: ").append(this.name)
+                .append(" [").append(this.code).append("]");
 
-        sb.append("* Department\t: ").append(this.department).append('\n');
-        sb.append("* Term\t\t\t: ").append(this.term.name()).append('\n');
-
-        if (!this.notes.isEmpty()) {
-
-            sb.append("* Notes:\n");
-
-            int i = 0;
-
-            for (String note : this.notes)
-                sb.append("\t[").append(++i).append("] ").append(note);
-        }
+        sb.append("\n* Department: ").append(this.department);
+        sb.append("\n* Term: ").append(this.term.name());
+        this.getCredits().ifPresent(x -> sb.append("\n* Credits: ").append(x));
 
         if (!this.crossListings.isEmpty()) {
-            sb.append("* Cross-listings: ")
+            sb.append("\n* Cross-listings: ")
                     .append(this.crossListings.stream()
-                            .map(Course::getUniqueId)
-                            .collect(Collectors.joining(", ")))
-                    .append('\n');
+                            .map(Course::getUniqueId).sorted()
+                            .collect(Collectors.joining(", ")));
         }
         if (!this.prerequisites.isEmpty()) {
-            sb.append("* Pre-requisites: ")
+            sb.append("\n* Pre-requisites: ")
                     .append(this.prerequisites.stream()
-                            .map(Course::getUniqueId)
-                            .collect(Collectors.joining(", ")))
-                    .append('\n');
+                            .map(Course::getUniqueId).sorted()
+                            .collect(Collectors.joining(", ")));
         }
         if (!this.antirequisites.isEmpty()) {
-            sb.append("* Anti-requisites: ")
+            sb.append("\n* Anti-requisites: ")
                     .append(this.antirequisites.stream()
-                            .map(Course::getUniqueId)
-                            .collect(Collectors.joining(", ")))
-                    .append('\n');
+                            .map(Course::getUniqueId).sorted()
+                            .collect(Collectors.joining(", ")));
+        }
+        if (!this.corequisites.isEmpty()) {
+            sb.append("\n* Co-requisites: ")
+                    .append(this.corequisites.stream()
+                            .map(Course::getUniqueId).sorted()
+                            .collect(Collectors.joining(", ")));
         }
 
-        sb.append("* Sections:\n");
+        if (!this.notes.isEmpty()) {
+            sb.append("\n* Notes:\n");
+            this.notes.forEach(x -> sb.append('\n').append(StringUtilities.indent(1, x)));
+            sb.append('\n');
+        }
 
-        if (this.sectionTypes.isEmpty())
-            sb.append('\t').append("NONE");
-        else {
-            this.sectionTypes.values().forEach(x -> sb.append('\n').append(x));
+        sb.append("\n* Sections:");
+
+        if (this.sectionTypes.isEmpty()) {
+            sb.append("\n\n").append(I).append("NONE");
+        } else {
+            this.sectionTypes.values().forEach(x -> sb.append("\n\n")
+                    .append(StringUtilities.indent(1, x.toString())));
         }
 
         return sb.toString();
@@ -187,32 +224,31 @@ public class Course implements Comparable<Course>, Diffable<Course> {
 
     @Override
     public int compareTo(@Nonnull Course c) {
-
         int departmentComparison = this.department.compareTo(c.department);
-
-        if (departmentComparison == 0)
-            return this.courseCode.compareTo(c.courseCode);
-
+        if (departmentComparison == 0) {
+            return this.code.compareTo(c.code);
+        }
         return departmentComparison;
     }
 
     @Override
-    public String getDeltaId(){
+    public String getDeltaId() {
         return this.uniqueId;
     }
 
     @Override
     public StructureChangeDelta findDifferences(Course that) {
 
-        if (!this.uniqueId.equals(that.uniqueId)) {
+        if (!this.uniqueId.equals(that.uniqueId) || !Objects.equals(this.school, that.school)) {
             throw new IllegalArgumentException("Courses are not related: \"" + this.uniqueId
                     + "\" and \"" + that.uniqueId + "\"");
         }
 
         final StructureChangeDelta delta = StructureChangeDelta.of(PropertyType.COURSE, this);
 
-        delta.addValueIfChanged(PropertyType.NAME, this.courseName, that.courseName);
+        delta.addValueIfChanged(PropertyType.NAME, this.name, that.name);
         delta.addValueIfChanged(PropertyType.DESCRIPTION, this.description, that.description);
+        delta.addValueIfChanged(PropertyType.CREDITS, this.credits, that.credits);
 
         // Add added notes.
         that.notes.stream()
@@ -227,6 +263,7 @@ public class Course implements Comparable<Course>, Diffable<Course> {
         recordCourseRelationDiff(delta, PropertyType.CROSS_LISTING, this.crossListings, that.crossListings);
         recordCourseRelationDiff(delta, PropertyType.PRE_REQUISITE, this.prerequisites, that.prerequisites);
         recordCourseRelationDiff(delta, PropertyType.ANTI_REQUISITE, this.antirequisites, that.antirequisites);
+        recordCourseRelationDiff(delta, PropertyType.CO_REQUISITE, this.corequisites, that.corequisites);
 
         Set<String> sectionTypeKeys = new HashSet<>(this.sectionTypes.keySet());
         sectionTypeKeys.addAll(that.sectionTypes.keySet());
@@ -250,27 +287,21 @@ public class Course implements Comparable<Course>, Diffable<Course> {
         return delta;
     }
 
-    private Set<String> shallowCourseSet(Set<Course> courses) {
+    private static Set<String> shallowCourseSet(Collection<Course> courses) {
         return courses.stream().map(Course::getUniqueId).collect(Collectors.toSet());
     }
 
     private static void recordCourseRelationDiff(StructureChangeDelta delta, PropertyType propertyType,
                                                  Collection<Course> thisListing, Collection<Course> thatListing) {
 
-        Collection<Course> removed = new HashSet<>(thisListing);
-        Collection<Course> added = new HashSet<>(thatListing);
+        Set<String> removed = shallowCourseSet(thisListing);
+        Set<String> added = shallowCourseSet(thatListing);
+        Set<String> overlap = new HashSet<>(added);
+        overlap.retainAll(removed);
 
-        for (Course i : thisListing) {
-            for (Course j : thatListing) {
-                if (i.getUniqueId().equals(j.getUniqueId())) {
-                    added.remove(i);
-                    removed.remove(j);
-                    break;
-                }
-            }
-        }
-
-        added.forEach(z -> delta.addAdded(propertyType, z));
-        removed.forEach(z -> delta.addRemoved(propertyType, z));
+        added.stream().filter(x -> !overlap.contains(x))
+                .forEach(x -> delta.addAdded(propertyType, x));
+        removed.stream().filter(x -> !overlap.contains(x))
+                .forEach(x -> delta.addRemoved(propertyType, x));
     }
 }

@@ -34,8 +34,8 @@ public class SectionTests {
     public void setUp() {
         Settings.setIndentSize(4);
         String sectionName = TestUtils.getRandomString(20);
-        this.s1 = Section.fromSectionId(sectionName);
-        this.s2 = Section.fromSectionId(sectionName);
+        this.s1 = Section.of(sectionName);
+        this.s2 = Section.of(sectionName);
     }
 
     @Test
@@ -43,7 +43,7 @@ public class SectionTests {
 
         String sectionName = "some_section";
 
-        Section section = Section.fromSectionId(sectionName);
+        Section section = Section.of(sectionName);
         assertEquals(section.getSectionId(), sectionName);
     }
 
@@ -605,14 +605,14 @@ public class SectionTests {
     public void sectionEquality(){
 
         // Same section ID.
-        Section s1 = Section.fromSectionId("testing");
-        Section s2 = Section.fromSectionId("testing");
+        Section s1 = Section.of("testing");
+        Section s2 = Section.of("testing");
         assertEquals(s1, s2);
 
         // Differing section IDs.
-        s2 = Section.fromSectionId("testing 2");
+        s2 = Section.of("testing 2");
         assertNotEquals(s1, s2);
-        s2 = Section.fromSectionId("testing");
+        s2 = Section.of("testing");
 
         // Toggle full
         s1.setFull(true);

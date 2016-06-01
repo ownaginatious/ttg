@@ -63,12 +63,13 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
 
         StringBuilder sb = new StringBuilder();
 
-        if (this.startDateTime != null && this.endDateTime != null)
+        if (this.startDateTime != null && this.endDateTime != null) {
             sb.append(this.startDateTime.format(DATETIME_FORMAT))
                     .append(" -> ")
                     .append(this.endDateTime.format(DATETIME_FORMAT));
-        else
+        } else {
             sb.append("TBA -> TBA");
+        }
 
         sb.append(" [Term: ").append(this.getTerm().toString()).append(']');
 

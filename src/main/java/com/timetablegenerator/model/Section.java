@@ -48,7 +48,7 @@ public class Section implements Diffable<Section> {
         this.sectionId = sectionId;
     }
 
-    public static Section fromSectionId(String sectionId) {
+    public static Section of(String sectionId) {
         return new Section(sectionId);
     }
 

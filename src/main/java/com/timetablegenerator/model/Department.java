@@ -3,12 +3,16 @@ package com.timetablegenerator.model;
 import lombok.*;
 import javax.annotation.Nonnull;
 
-@AllArgsConstructor(access = AccessLevel.PUBLIC)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode()
 public class Department implements Comparable<Department> {
 
-    @Getter @NonNull private final String code;
-    @Getter @NonNull private final String name;
+    @Getter private final String code;
+    @Getter private final String name;
+
+    public static Department of(@NonNull String code, @NonNull String name) {
+        return new Department(code, name);
+    }
 
     @Override
     public int compareTo(@Nonnull Department d) {

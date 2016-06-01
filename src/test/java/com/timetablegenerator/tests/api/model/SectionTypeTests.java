@@ -53,8 +53,8 @@ public class SectionTypeTests {
 
     @Test(expected = IllegalStateException.class)
     public void duplicateSections(){
-        Section s1 = Section.fromSectionId("abc");
-        Section s2 = Section.fromSectionId("abc");
+        Section s1 = Section.of("abc");
+        Section s2 = Section.of("abc");
         this.st1.addSection(s1);
         this.st1.addSection(s2);
     }
@@ -63,14 +63,14 @@ public class SectionTypeTests {
     public void keys(){
         Set<String> ids = new HashSet<>(
                 Arrays.asList("abc", "def", "hij", "lmno"));
-        ids.forEach(x -> this.st1.addSection(Section.fromSectionId(x)));
+        ids.forEach(x -> this.st1.addSection(Section.of(x)));
         assertEquals(ids, this.st1.getSectionKeys());
     }
 
     @Test
     public void getSection(){
-        Section s1 = Section.fromSectionId("abc");
-        Section s2 = Section.fromSectionId("def");
+        Section s1 = Section.of("abc");
+        Section s2 = Section.of("def");
 
         this.st1.addSection(s1);
         assertEquals(s1, this.st1.getSection("abc").orElse(null));
@@ -94,12 +94,12 @@ public class SectionTypeTests {
 
     @Test
     public void string(){
-        Section s1 = Section.fromSectionId("abc")
+        Section s1 = Section.of("abc")
                 .addNotes("Note 1", "Note 2")
                 .addPeriod(OneTimePeriod.of(TermClassifier.FALL)
                                         .setCampus("Campus x")
                                         .setRoom("Room 234"));
-        Section s2 = Section.fromSectionId("def");
+        Section s2 = Section.of("def");
         this.st1.addSection(s1).addSection(s2);
         assertEquals(
                 String.format("%s sections:\n\n%s\n\n%s",
@@ -130,11 +130,11 @@ public class SectionTypeTests {
     @Test
     public void delta(){
 
-        Section sa1 = Section.fromSectionId("a");
-        Section sa2 = Section.fromSectionId("c").setCancelled(true);
+        Section sa1 = Section.of("a");
+        Section sa2 = Section.of("c").setCancelled(true);
 
-        Section sb1 = Section.fromSectionId("d");
-        Section sb2 = Section.fromSectionId("c")
+        Section sb1 = Section.of("d");
+        Section sb2 = Section.of("c")
                 .addNotes("Note").setAlternating(true).setCancelled(false);
 
         SectionType st1 = SectionType.of(school, "A")
