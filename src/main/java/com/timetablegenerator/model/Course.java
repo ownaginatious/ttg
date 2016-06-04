@@ -154,15 +154,11 @@ public class Course implements Comparable<Course>, Diffable<Course> {
     }
 
     public Course addSection(String sectionTypeId, Section s) {
-
         SectionType st = sectionTypes.get(sectionTypeId);
-
         if (st == null) {
-
             st = SectionType.of(this.school, sectionTypeId);
             sectionTypes.put(sectionTypeId, st);
         }
-
         st.addSection(s);
         return this;
     }

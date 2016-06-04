@@ -5,12 +5,14 @@ import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 
 import javax.annotation.Nonnull;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Map;
 
+import java.util.Optional;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 @EqualsAndHashCode(exclude={"lastUpdate"})
@@ -22,35 +24,32 @@ public class TimeTable implements Comparable<TimeTable>, Diffable<TimeTable> {
 
     private final Map<String, Course> courses = new ConcurrentSkipListMap<>();
 
-    public TimeTable(@Nonnull School school, @Nonnull Term term) {
+    private TimeTable(School school, Term term, ZonedDateTime parseTime) {
 
         this.school = school;
         this.term = term;
-        this.lastUpdate = ZonedDateTime.now();
+        this.lastUpdate = parseTime;
     }
 
-    public TimeTable(@Nonnull School school, @Nonnull Term term,
-                     @Nonnull ZonedDateTime parseDate) {
-
-        this.school = school;
-        this.term = term;
-        this.lastUpdate = parseDate;
+    public static TimeTable of(@NonNull School school, @NonNull Term term) {
+        return new TimeTable(school, term, ZonedDateTime.now());
     }
 
-    public void addCourse(Course c) {
+    public static TimeTable of(@NonNull School school, @NonNull Term term,
+                               @NonNull ZonedDateTime parseTime) {
+        return new TimeTable(school, term, parseTime);
+    }
 
+    public TimeTable addCourse(Course c) {
         String id = c.getUniqueId();
-
-        if (this.courses.putIfAbsent(id, c) != null)
+        if (this.courses.putIfAbsent(id, c) != null) {
             throw new IllegalStateException("Attempted to insert multiple courses with the ID \"" + id + "\".");
+        }
+        return this;
     }
 
-    public void removeCourse(Course c) {
-        this.courses.remove(c.getUniqueId());
-    }
-
-    public Course getCourse(String id) {
-        return this.courses.get(id);
+    public Optional<Course> getCourse(String id) {
+        return this.courses.containsKey(id) ? Optional.of(this.courses.get(id)) : Optional.empty();
     }
 
     public Collection<Course> getCourses() {
