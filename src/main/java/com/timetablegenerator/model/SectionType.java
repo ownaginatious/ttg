@@ -69,8 +69,13 @@ public class SectionType implements Comparable<SectionType>, Diffable<SectionTyp
     }
 
     @Override
-    public int compareTo(@Nonnull SectionType st) {
-        return code.compareTo(st.code);
+    public int compareTo(@Nonnull SectionType that) {
+        if (!this.code.equals(that.code)){
+            return this.code.compareTo(that.code);
+        } else if (!this.name.equals(that.name)){
+            return this.name.compareTo(that.name);
+        }
+        return this.equals(that) ? 0 : -1;
     }
 
     @Override

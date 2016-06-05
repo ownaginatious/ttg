@@ -251,11 +251,13 @@ public class CourseTests {
                 "AAD", "Test2");
         Course c3 = Course.of(this.school, this.term, d2,
                 "RQI", "Test3");
+        Course c4 = Course.of(this.school, this.term, d2,
+                "RQI", "Test4");
 
-        List<Course> courses = Arrays.asList(c1, c2, c3);
+        List<Course> courses = Arrays.asList(c1, c2, c3, c4, c4);
         Collections.sort(courses);
 
-        assertEquals(Arrays.asList(c2, c1, c3), courses);
+        assertEquals(Arrays.asList(c2, c1, c3, c4, c4), courses);
     }
 
     @Test

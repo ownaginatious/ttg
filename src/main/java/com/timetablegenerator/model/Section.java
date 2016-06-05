@@ -225,19 +225,19 @@ public class Section implements Diffable<Section> {
         this.isFull().ifPresent(x -> sb.append(x ? " [FULL]" : " [AVAILABLE]"));
 
         if (this.getEnrollment().isPresent() || this.getMaxEnrollment().isPresent()) {
-            sb.append(" [enrolled: ");
-            sb.append(this.getEnrollment().map(Object::toString).orElse("?"));
-            sb.append('/');
-            sb.append(this.getMaxEnrollment().map(Object::toString).orElse("?"));
-            sb.append(']');
+            sb.append(" [enrolled: ")
+                    .append(this.getEnrollment().map(Object::toString).orElse("?"))
+                    .append('/')
+                    .append(this.getMaxEnrollment().map(Object::toString).orElse("?"))
+                    .append(']');
         }
 
         if (this.getWaiting().isPresent()) {
-            sb.append(" [waiting: ");
-            sb.append(this.getWaiting().map(Object::toString).orElse("?"));
-            sb.append('/');
-            sb.append(this.getMaxWaiting().map(Object::toString).orElse("?"));
-            sb.append(']');
+            sb.append(" [waiting: ")
+                    .append(this.getWaiting().map(Object::toString).orElse("?"))
+                    .append('/')
+                    .append(this.getMaxWaiting().map(Object::toString).orElse("?"))
+                    .append(']');
         }
 
         if (!this.notes.isEmpty()) {

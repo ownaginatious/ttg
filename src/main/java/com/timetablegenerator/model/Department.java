@@ -15,10 +15,16 @@ public class Department implements Comparable<Department> {
     }
 
     @Override
-    public int compareTo(@Nonnull Department d) {
-        return this.name.compareTo(d.name);
+    public int compareTo(@Nonnull Department that) {
+        if (!this.code.equals(that.code)) {
+            return this.code.compareTo(that.code);
+        }
+        if (!this.name.equals(that.name)) {
+            return this.name.compareTo(that.name);
+        }
+        return this.equals(that) ? 0 : -1;
     }
-    
+
     @Override
     public String toString() {
         return this.name + " (" + this.code + ")";

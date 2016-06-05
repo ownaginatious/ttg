@@ -54,22 +54,23 @@ public class Course implements Comparable<Course>, Diffable<Course> {
         // Generate the unique identifier for this course.
         this.uniqueId = this.department.getCode() + this.code + this.term.getId();
     }
+
     /**
      * Creates a new course object representing a single course within a timetable.
      *
-     * @param school        The school for the school's terms.
-     * @param term          The term this course is part of.
-     * @param department    The department to which this course belongs.
-     * @param code          The code of this course.
-     * @param name          The name of this course.
+     * @param school     The school for the school's terms.
+     * @param term       The term this course is part of.
+     * @param department The department to which this course belongs.
+     * @param code       The code of this course.
+     * @param name       The name of this course.
      */
-    public static Course of (@NonNull School school, @NonNull TermClassifier term,
-                  @NonNull Department department, @NonNull String code,
-                  @NonNull String name) {
+    public static Course of(@NonNull School school, @NonNull TermClassifier term,
+                            @NonNull Department department, @NonNull String code,
+                            @NonNull String name) {
         return new Course(school, term, department, code, name);
     }
 
-    private void checkRelationalIntegrity(Set<Course> collection, Course course){
+    private void checkRelationalIntegrity(Set<Course> collection, Course course) {
         if (course == this) {
             throw new IllegalArgumentException("A course cannot be related to itself");
         }
@@ -77,7 +78,7 @@ public class Course implements Comparable<Course>, Diffable<Course> {
                 (collection == this.antirequisites || !this.antirequisites.contains(course)) &&
                 (collection == this.crossListings || !this.crossListings.contains(course)) &&
                 (collection == this.corequisites || !this.corequisites.contains(course));
-        if (!ok){
+        if (!ok) {
             throw new IllegalArgumentException(
                     String.format("Course %s cannot be under multiple relation categories", course.getUniqueId()));
         }
@@ -95,7 +96,7 @@ public class Course implements Comparable<Course>, Diffable<Course> {
         return this;
     }
 
-    public Course addCorequesite(Course c){
+    public Course addCorequesite(Course c) {
         this.checkRelationalIntegrity(this.corequisites, c);
         this.corequisites.add(c);
         return this;
@@ -117,11 +118,11 @@ public class Course implements Comparable<Course>, Diffable<Course> {
         return this;
     }
 
-    public Optional<Double> getCredits(){
+    public Optional<Double> getCredits() {
         return this.credits == null ? Optional.empty() : Optional.of(this.credits);
     }
 
-    public Optional<String> getDescription(){
+    public Optional<String> getDescription() {
         return this.description == null ? Optional.empty() : Optional.of(this.description);
     }
 
@@ -149,7 +150,7 @@ public class Course implements Comparable<Course>, Diffable<Course> {
         return this.sectionTypes.keySet();
     }
 
-    public Optional<SectionType> getSectionType(String type){
+    public Optional<SectionType> getSectionType(String type) {
         return this.sectionTypes.containsKey(type) ? Optional.of(this.sectionTypes.get(type)) : Optional.empty();
     }
 
@@ -219,12 +220,17 @@ public class Course implements Comparable<Course>, Diffable<Course> {
     }
 
     @Override
-    public int compareTo(@Nonnull Course c) {
-        int departmentComparison = this.department.compareTo(c.department);
-        if (departmentComparison == 0) {
-            return this.code.compareTo(c.code);
+    public int compareTo(@Nonnull Course that) {
+        if (!this.department.equals(that.department)) {
+            return this.department.compareTo(that.department);
         }
-        return departmentComparison;
+        if (!this.code.equals(that.code)) {
+            return this.code.compareTo(that.code);
+        }
+        if (!this.name.equals(that.name)) {
+            return this.name.compareTo(that.name);
+        }
+        return this.equals(that) ? 0 : -1;
     }
 
     @Override

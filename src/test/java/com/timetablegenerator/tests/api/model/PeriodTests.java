@@ -221,9 +221,15 @@ public class PeriodTests {
         assertThat(rp2.compareTo(rp1), lessThan(0));
 
 
-        // Compare different times.
+        // Compare different start times.
         rp1 = RepeatingPeriod.of(TermClassifier.FALL).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
         rp2 = RepeatingPeriod.of(TermClassifier.FALL).setTime(DayOfWeek.FRIDAY, LocalTime.MAX, LocalTime.MAX);
+        assertThat(rp1.compareTo(rp2), lessThan(0));
+        assertThat(rp2.compareTo(rp1), greaterThan(0));
+
+        // Compare different end times.
+        rp1 = RepeatingPeriod.of(TermClassifier.FALL).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MIN);
+        rp2 = RepeatingPeriod.of(TermClassifier.FALL).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
         assertThat(rp1.compareTo(rp2), lessThan(0));
         assertThat(rp2.compareTo(rp1), greaterThan(0));
     }

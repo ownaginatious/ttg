@@ -105,8 +105,7 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
 
     @Override
     public int compareTo(@Nonnull OneTimePeriod that) {
-
-        if (this.getTerm() != that.getTerm()) {
+        if (!this.getTerm().equals(that.getTerm())) {
             return this.getTerm().compareTo(that.getTerm());
         } else if (this.startDateTime != null && that.startDateTime != null) {
             return this.startDateTime.compareTo(that.startDateTime);
@@ -115,8 +114,7 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
         } else if (this.startDateTime != null) {
             return 1;
         }
-
-        return 0;
+        return this.equals(that) ? 0 : -1;
     }
 
     @Override

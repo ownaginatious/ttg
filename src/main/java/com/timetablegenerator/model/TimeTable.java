@@ -8,12 +8,14 @@ import lombok.Getter;
 import lombok.NonNull;
 
 import javax.annotation.Nonnull;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Map;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.stream.Collectors;
 
 @EqualsAndHashCode(exclude={"lastUpdate"})
 public class TimeTable implements Comparable<TimeTable>, Diffable<TimeTable> {
@@ -25,14 +27,13 @@ public class TimeTable implements Comparable<TimeTable>, Diffable<TimeTable> {
     private final Map<String, Course> courses = new ConcurrentSkipListMap<>();
 
     private TimeTable(School school, Term term, ZonedDateTime parseTime) {
-
         this.school = school;
         this.term = term;
         this.lastUpdate = parseTime;
     }
 
     public static TimeTable of(@NonNull School school, @NonNull Term term) {
-        return new TimeTable(school, term, ZonedDateTime.now());
+        return new TimeTable(school, term, ZonedDateTime.now(ZoneOffset.UTC));
     }
 
     public static TimeTable of(@NonNull School school, @NonNull Term term,
@@ -58,17 +59,27 @@ public class TimeTable implements Comparable<TimeTable>, Diffable<TimeTable> {
 
     @Override
     public String toString() {
-        return "TERM: " + this.term + ", COURSE #: " + courses.size() +
-                ", LAST_UPDATE: " + lastUpdate.toString();
+        return "[school: " + this.school.getSchoolId() + ", " +
+                "term: " + this.term + ", " +
+                "departments: " + courses.values().stream()
+                .collect(Collectors.groupingBy(Course::getDepartment)).size() + ", " +
+                "courses: " + courses.size() + ", " +
+                "last_update: " + lastUpdate.toString() + "]";
     }
 
     @Override
-    public int compareTo(@Nonnull TimeTable tt) {
-        return term.compareTo(tt.term);
+    public int compareTo(@Nonnull TimeTable that) {
+        if (!this.school.equals(that.school)){
+            return this.school.compareTo(that.school);
+        }
+        if (!this.term.equals(that.term)){
+            return this.term.compareTo(that.term);
+        }
+        return this.equals(that) ? 0 : -1;
     }
 
     @Override
-    public String getDeltaId(){
+    public String getDeltaId() {
         return school.getSchoolId() + "/" + this.term.getYear() + "/" + this.term.getTermId().getId();
     }
 
@@ -76,12 +87,12 @@ public class TimeTable implements Comparable<TimeTable>, Diffable<TimeTable> {
     public StructureChangeDelta findDifferences(TimeTable that) {
 
         if (!this.term.equals(that.term)) {
-            throw new IllegalStateException("Timetables are not from the same term: \""
+            throw new IllegalArgumentException("Timetables are not from the same term: \""
                     + this.term + "\" and \"" + that.term + "\"");
         }
 
         if (this.school != that.school) {
-            throw new IllegalStateException("Timetables are not from the same school: \""
+            throw new IllegalArgumentException("Timetables are not from the same school: \""
                     + this.school.getSchoolId() + "\" and \"" + that.school.getSchoolId() + "\"");
         }
 

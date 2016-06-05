@@ -14,8 +14,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.*;
+import static org.hamcrest.Matchers.*;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class SectionTypeTests {
 
@@ -26,7 +27,7 @@ public class SectionTypeTests {
         I = Settings.getIndent();
     }
 
-    private SectionType st1, st2;
+    private SectionType st;
     private School school;
 
     @Before
@@ -37,13 +38,13 @@ public class SectionTypeTests {
                 .withSection("Section Type B", "B")
                 .withSection("Section Type C", "C")
                 .withSection("Section Type D", "D").build();
-        st1 = SectionType.of(school, "A");
+        st = SectionType.of(school, "A");
     }
 
     @Test()
     public void creation() {
-        assertEquals(this.school, this.st1.getSchool());
-        assertEquals("A", this.st1.getCode());
+        assertEquals(this.school, this.st.getSchool());
+        assertEquals("A", this.st.getCode());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -55,16 +56,16 @@ public class SectionTypeTests {
     public void duplicateSections(){
         Section s1 = Section.of("abc");
         Section s2 = Section.of("abc");
-        this.st1.addSection(s1);
-        this.st1.addSection(s2);
+        this.st.addSection(s1);
+        this.st.addSection(s2);
     }
 
     @Test
     public void keys(){
         Set<String> ids = new HashSet<>(
                 Arrays.asList("abc", "def", "hij", "lmno"));
-        ids.forEach(x -> this.st1.addSection(Section.of(x)));
-        assertEquals(ids, this.st1.getSectionKeys());
+        ids.forEach(x -> this.st.addSection(Section.of(x)));
+        assertEquals(ids, this.st.getSectionKeys());
     }
 
     @Test
@@ -72,11 +73,11 @@ public class SectionTypeTests {
         Section s1 = Section.of("abc");
         Section s2 = Section.of("def");
 
-        this.st1.addSection(s1);
-        assertEquals(s1, this.st1.getSection("abc").orElse(null));
-        this.st1.addSection(s2);
-        assertEquals(s1, this.st1.getSection("abc").orElse(null));
-        assertEquals(s2, this.st1.getSection("def").orElse(null));
+        this.st.addSection(s1);
+        assertEquals(s1, this.st.getSection("abc").orElse(null));
+        this.st.addSection(s2);
+        assertEquals(s1, this.st.getSection("abc").orElse(null));
+        assertEquals(s2, this.st.getSection("def").orElse(null));
     }
 
     @Test
@@ -90,6 +91,18 @@ public class SectionTypeTests {
         List<SectionType> sectionTypes = Arrays.asList(st1, st2, st3, st4);
         Collections.sort(sectionTypes);
         assertEquals(sectionTypes, Arrays.asList(st1, st4, st2, st3));
+
+        // Different name
+        School school1 = School.builder("test", "test")
+                .withSection("Section A", "A").build();
+        School school2 = School.builder("test", "test")
+                .withSection("Section C", "A").build();
+        st1 = SectionType.of(school1, "A");
+        st2 = SectionType.of(school2, "A");
+        assertThat(st1.compareTo(st2), lessThan(0));
+
+        // Equal
+        assertEquals(0, st1.compareTo(st1));
     }
 
     @Test
@@ -100,24 +113,24 @@ public class SectionTypeTests {
                                         .setCampus("Campus x")
                                         .setRoom("Room 234"));
         Section s2 = Section.of("def");
-        this.st1.addSection(s1).addSection(s2);
+        this.st.addSection(s1).addSection(s2);
         assertEquals(
                 String.format("%s sections:\n\n%s\n\n%s",
-                        this.st1.getName(),
+                        this.st.getName(),
                         StringUtilities.indent(1, s1.toString()),
                         StringUtilities.indent(1, s2.toString())),
-                this.st1.toString());
+                this.st.toString());
     }
 
     @Test
     public void emptySectionString(){
         assertEquals(String.format("%s sections:\n\n%s%s",
-                this.st1.getName(), I, "NONE LISTED"), this.st1.toString());
+                this.st.getName(), I, "NONE LISTED"), this.st.toString());
     }
 
     @Test
     public void deltaId(){
-        assertEquals(this.st1.getCode(), this.st1.getDeltaId());
+        assertEquals(this.st.getCode(), this.st.getDeltaId());
     }
 
     @Test(expected = IllegalArgumentException.class)

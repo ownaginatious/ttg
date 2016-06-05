@@ -48,15 +48,15 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
         return this;
     }
 
-    public Optional<DayOfWeek> getDayOfWeek(){
+    public Optional<DayOfWeek> getDayOfWeek() {
         return this.dayOfWeek == null ? Optional.empty() : Optional.of(this.dayOfWeek);
     }
 
-    public Optional<LocalTime> getStartTime(){
+    public Optional<LocalTime> getStartTime() {
         return this.startTime == null ? Optional.empty() : Optional.of(this.startTime);
     }
 
-    public Optional<LocalTime> getEndTime(){
+    public Optional<LocalTime> getEndTime() {
         return this.endTime == null ? Optional.empty() : Optional.of(this.endTime);
     }
 
@@ -94,7 +94,7 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
 
             this.getCampus().ifPresent(x -> sb.append("campus: ").append(x));
             this.getRoom().ifPresent(x -> sb.append(this.getCampus().isPresent() ? ", " : "")
-                                            .append("room: ").append(x));
+                    .append("room: ").append(x));
 
             sb.append(")");
         }
@@ -112,72 +112,72 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
         if (!notes.isEmpty()) {
             sb.append("\n\n").append(I).append("Notes:\n");
             notes.forEach(x -> sb.append('\n')
-                            .append(StringUtilities.indent(2, x)));
+                    .append(StringUtilities.indent(2, x)));
         }
 
         return sb.toString();
     }
 
     @Override
-    public int compareTo(@Nonnull RepeatingPeriod rp) {
+    public int compareTo(@Nonnull RepeatingPeriod that) {
 
-        int termCompare = this.getTerm().compareTo(rp.getTerm());
-
-        if (termCompare != 0) {
-            return termCompare;
+        if (!this.getTerm().equals(that.getTerm())) {
+            return this.getTerm().compareTo(that.getTerm());
         }
-
-        if (this.dayOfWeek == null && rp.dayOfWeek != null) {
+        if (this.dayOfWeek == null && that.dayOfWeek != null) {
             return -1;
-        } else if (this.dayOfWeek != null && rp.dayOfWeek == null) {
+        } else if (this.dayOfWeek != null && that.dayOfWeek == null) {
             return 1;
-        } else if (this.dayOfWeek == null){
-            return 0;
-        } else if (this.dayOfWeek != rp.dayOfWeek) {
-            return this.dayOfWeek.compareTo(rp.dayOfWeek);
+        } else if (this.dayOfWeek == null) {
+            return this.equals(that) ? 0 : -1;
+        } else if (this.dayOfWeek != that.dayOfWeek) {
+            return this.dayOfWeek.compareTo(that.dayOfWeek);
+        } else if (!this.startTime.equals(that.startTime)) {
+            return this.startTime.compareTo(that.startTime);
+        } else if (!this.endTime.equals(that.endTime)) {
+            return this.endTime.compareTo(that.endTime);
         }
-
-        return this.startTime.compareTo(rp.startTime);
+        return this.equals(that) ? 0 : -1;
     }
 
     @Override
-    public RepeatingPeriod addSupervisors(String... supervisors){
+    public RepeatingPeriod addSupervisors(String... supervisors) {
         super.addSupervisors(supervisors);
         return this;
     }
 
     @Override
-    public RepeatingPeriod addSupervisors(Collection<String> supervisors){
+    public RepeatingPeriod addSupervisors(Collection<String> supervisors) {
         super.addSupervisors(supervisors);
         return this;
     }
 
     @Override
-    public RepeatingPeriod addNotes(String... note){
+    public RepeatingPeriod addNotes(String... note) {
         super.addNotes(note);
         return this;
     }
 
     @Override
-    public RepeatingPeriod addNotes(Collection<String> notes){
+    public RepeatingPeriod addNotes(Collection<String> notes) {
         super.addNotes(notes);
         return this;
     }
 
     @Override
-    public RepeatingPeriod setRoom(String room){
+    public RepeatingPeriod setRoom(String room) {
         super.setRoom(room);
         return this;
     }
 
     @Override
-    public RepeatingPeriod setCampus(String campus){
+    public RepeatingPeriod setCampus(String campus) {
         super.setCampus(campus);
         return this;
     }
 
     @Override
-    public String getDeltaId(){
+    public String getDeltaId() {
         String id = this.getTerm().getId() + "/TBA/TBA/TBA";
         if (this.dayOfWeek != null) {
             id = this.getTerm().getId() + "/"
