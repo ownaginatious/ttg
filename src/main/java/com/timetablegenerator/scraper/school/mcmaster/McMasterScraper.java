@@ -686,6 +686,10 @@ public class McMasterScraper extends Scraper {
 
         mergedTerms.forEach(probableTerms::remove);
 
-        return probableTerms;
+        // Remove all 2015/2016 terms, since apparently McMaster is too dumb to do so themselves...
+        return new TreeSet<>(probableTerms.stream()
+                .filter(t -> t.getYear() > 2015)
+                .filter(t -> !(t.getTermId() == TermClassifier.SPRING && t.getYear() == 2016))
+                .collect(Collectors.toSet()));
     }
 }
