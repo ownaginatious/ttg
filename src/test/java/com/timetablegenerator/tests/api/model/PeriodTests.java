@@ -3,7 +3,6 @@ package com.timetablegenerator.tests.api.model;
 import com.timetablegenerator.Settings;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
-import com.timetablegenerator.model.TermClassifier;
 import com.timetablegenerator.model.period.OneTimePeriod;
 import com.timetablegenerator.model.period.RepeatingPeriod;
 import com.timetablegenerator.tests.api.TestUtils;

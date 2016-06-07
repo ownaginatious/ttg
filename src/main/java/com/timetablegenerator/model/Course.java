@@ -127,19 +127,19 @@ public class Course implements Comparable<Course>, Diffable<Course> {
     }
 
     public List<String> getNotes() {
-        return new ArrayList<>(this.notes);
+        return Collections.unmodifiableList(this.notes);
     }
 
     public Collection<Course> getCrossListings() {
-        return new HashSet<>(this.crossListings);
+        return Collections.unmodifiableSet(this.crossListings);
     }
 
     public Collection<Course> getPrerequisites() {
-        return new HashSet<>(this.prerequisites);
+        return Collections.unmodifiableSet(this.prerequisites);
     }
 
     public Collection<Course> getAntirequisites() {
-        return new HashSet<>(this.antirequisites);
+        return Collections.unmodifiableSet(this.antirequisites);
     }
 
     public Collection<Course> getCorequisites() {

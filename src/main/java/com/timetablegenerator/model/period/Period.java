@@ -3,7 +3,6 @@ package com.timetablegenerator.model.period;
 import com.timetablegenerator.Settings;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
-import com.timetablegenerator.model.TermClassifier;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -19,11 +18,11 @@ abstract class Period {
     protected static final String I = Settings.getIndent();
 
     @Getter private final TermClassifier term;
-    @Getter private final Set<String> supervisors = new TreeSet<>();
+    private final Set<String> supervisors = new TreeSet<>();
     @Setter private String room;
     @Setter private String campus;
 
-    @Getter private final List<String> notes = new ArrayList<>();
+    private final List<String> notes = new ArrayList<>();
 
     @Setter private Boolean online;
 
@@ -41,22 +40,27 @@ abstract class Period {
         return this;
     }
 
-    public Period addSupervisors(Collection<String> supervisors){
+    public Set<String> getSupervisors(){
+        return Collections.unmodifiableSet(this.supervisors);
+    }
 
+    public Period addSupervisors(Collection<String> supervisors){
         this.supervisors.addAll(supervisors);
         return this;
     }
 
     public Period addNotes(String... note){
-
         Collections.addAll(this.notes, note);
         return this;
     }
 
     public Period addNotes(Collection<String> notes){
-
         this.notes.addAll(notes);
         return this;
+    }
+
+    public List<String> getNotes(){
+        return Collections.unmodifiableList(this.notes);
     }
 
     public Optional<String> getRoom(){

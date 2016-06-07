@@ -4,7 +4,6 @@ import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
-import com.timetablegenerator.model.TermClassifier;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 

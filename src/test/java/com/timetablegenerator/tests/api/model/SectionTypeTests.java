@@ -7,7 +7,6 @@ import com.timetablegenerator.delta.StructureChangeDelta;
 import com.timetablegenerator.model.School;
 import com.timetablegenerator.model.Section;
 import com.timetablegenerator.model.SectionType;
-import com.timetablegenerator.model.TermClassifier;
 import com.timetablegenerator.model.period.OneTimePeriod;
 import com.timetablegenerator.tests.api.TestUtils;
 import org.junit.Before;
