@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
                 @SectionMapping(name = "Tutorial", code = "TUT")
         },
         legacy = @LegacyConfig(
-                year = 2015, term = TermClassifier.FULL_SCHOOL_YEAR,
+                year = 2016, term = TermClassifier.FULL_SCHOOL_YEAR,
                 mapping = {
                         @LegacyMapping(from = "LEC", to = CORE),
                         @LegacyMapping(from = "PRA", to = LAB),
@@ -327,7 +327,13 @@ public class UofTScarboroughScraper extends Scraper {
             if (!sectionName.isEmpty()) {
 
                 section = Section.fromName(sectionName).setOnline(sectionName.endsWith("99"));
-                course.addSection(sectionName.substring(0, 3), section);
+                SectionType sectionType = course.getSectionType(sectionName.substring(0, 3));
+
+                if (sectionType == null || !sectionType.getSectionKeys().contains(section.getId())) {
+                    course.addSection(sectionName.substring(0, 3), section);
+                } else {
+                    LOGGER.warn("Duplicate section \"" + section.getId() + "\" detected. Skipping duplicate...");
+                }
             }
 
             if (section == null)

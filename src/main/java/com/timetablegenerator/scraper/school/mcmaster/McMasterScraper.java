@@ -512,6 +512,12 @@ public class McMasterScraper extends Scraper {
 
             for (Course c : currentCourseMultiplexer.values()) {
 
+                // Skip Engineering 1D04 as a special case
+                if (c.getCode().equals("1D04") && c.getDepartment().getCode().equals("ENGINEER")){
+                    LOGGER.warn("Skipping special case in alternating search (ENGINEER 1D04)");
+                    continue;
+                }
+
                 SectionType labs = c.getSectionType("L");
                 SectionType tutorials = c.getSectionType("T");
 
