@@ -27,7 +27,7 @@ public class Course implements Comparable<Course>, Diffable<Course> {
     @Getter private final String name;
     @Getter private final String uniqueId;
     @Getter private final Department department;
-    @Getter private final TermClassifier term;
+    @Getter private final Term term;
 
     // Optional data.
     @Setter private String description = null;
@@ -41,7 +41,7 @@ public class Course implements Comparable<Course>, Diffable<Course> {
 
     private final Map<String, SectionType> sectionTypes = new HashMap<>();
 
-    private Course(School school, TermClassifier term, Department department,
+    private Course(School school, Term term, Department department,
                    String courseCode, String courseName) {
 
         // Null check most parameters to the function.
@@ -52,7 +52,7 @@ public class Course implements Comparable<Course>, Diffable<Course> {
         this.name = courseName;
 
         // Generate the unique identifier for this course.
-        this.uniqueId = this.department.getCode() + this.code + this.term.getId();
+        this.uniqueId = this.department.getCode() + this.code + this.term.getTermDefinition().getCode();
     }
 
     /**
@@ -64,7 +64,7 @@ public class Course implements Comparable<Course>, Diffable<Course> {
      * @param code       The code of this course.
      * @param name       The name of this course.
      */
-    public static Course of(@NonNull School school, @NonNull TermClassifier term,
+    public static Course of(@NonNull School school, @NonNull Term term,
                             @NonNull Department department, @NonNull String code,
                             @NonNull String name) {
         return new Course(school, term, department, code, name);
@@ -173,7 +173,7 @@ public class Course implements Comparable<Course>, Diffable<Course> {
                 .append(" [").append(this.code).append("]");
 
         sb.append("\n* Department: ").append(this.department);
-        sb.append("\n* Term: ").append(this.term.name());
+        sb.append("\n* Term: ").append(this.term.getTermDefinition().getName());
         this.getCredits().ifPresent(x -> sb.append("\n* Credits: ").append(x));
 
         if (!this.crossListings.isEmpty()) {

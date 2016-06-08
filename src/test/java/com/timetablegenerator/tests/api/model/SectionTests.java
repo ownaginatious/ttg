@@ -5,6 +5,8 @@ import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
 import com.timetablegenerator.model.Section;
+import com.timetablegenerator.model.Term;
+import com.timetablegenerator.model.TermDefinition;
 import com.timetablegenerator.model.period.OneTimePeriod;
 import com.timetablegenerator.model.period.RepeatingPeriod;
 import com.timetablegenerator.tests.api.TestUtils;
@@ -28,6 +30,12 @@ public class SectionTests {
     }
 
     private Section s1, s2;
+
+    private Term term_fall = TermDefinition.builder("fall", "Fall", 1).build().createForYear(2016);
+    private Term term_fall_first_quarter = TermDefinition.builder("fall_fq", "Fall First Quarter", 2)
+            .build().createForYear(2016);
+    private Term term_fall_second_quarter = TermDefinition.builder("fall_sq", "Fall Second Quarter", 3)
+            .build().createForYear(2016);
 
     @Before
     public void setUp() {
@@ -271,11 +279,11 @@ public class SectionTests {
     @Test
     public void periods() {
 
-        RepeatingPeriod p1 = RepeatingPeriod.of(TermClassifier.FALL)
+        RepeatingPeriod p1 = RepeatingPeriod.of(this.term_fall_first_quarter)
                 .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
-        RepeatingPeriod p2 = RepeatingPeriod.of(TermClassifier.SPRING)
+        RepeatingPeriod p2 = RepeatingPeriod.of(this.term_fall_second_quarter)
                 .setTime(DayOfWeek.TUESDAY, LocalTime.MIN, LocalTime.MAX);
-        OneTimePeriod p3 = OneTimePeriod.of(TermClassifier.SPRING)
+        OneTimePeriod p3 = OneTimePeriod.of(this.term_fall_second_quarter)
                 .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX);
 
         s1.addPeriod(p1);
@@ -387,18 +395,18 @@ public class SectionTests {
     @Test
     public void sectionStructuralPropertyPeriodsDelta() {
 
-        RepeatingPeriod p1 = RepeatingPeriod.of(TermClassifier.FALL).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
-        RepeatingPeriod p2 = RepeatingPeriod.of(TermClassifier.SPRING).setTime(DayOfWeek.TUESDAY, LocalTime.MIN, LocalTime.MAX);
-        OneTimePeriod p3 = OneTimePeriod.of(TermClassifier.SPRING).setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
+        RepeatingPeriod p1 = RepeatingPeriod.of(this.term_fall_first_quarter).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
+        RepeatingPeriod p2 = RepeatingPeriod.of(this.term_fall_second_quarter).setTime(DayOfWeek.TUESDAY, LocalTime.MIN, LocalTime.MAX);
+        OneTimePeriod p3 = OneTimePeriod.of(this.term_fall_second_quarter).setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
                 .setRoom("My Room");
 
-        OneTimePeriod p4 = OneTimePeriod.of(TermClassifier.SPRING).setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
+        OneTimePeriod p4 = OneTimePeriod.of(this.term_fall_second_quarter).setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
                 .addSupervisors("Test Supervisor 1").addSupervisors("Test Supervisor 2");
 
-        RepeatingPeriod p5 = RepeatingPeriod.of(TermClassifier.SPRING).setTime(DayOfWeek.TUESDAY, LocalTime.MIN, LocalTime.MAX)
+        RepeatingPeriod p5 = RepeatingPeriod.of(this.term_fall_second_quarter).setTime(DayOfWeek.TUESDAY, LocalTime.MIN, LocalTime.MAX)
                 .setCampus("Test Campus").addNotes("Note 1", "Note 2", "Note 3");
 
-        OneTimePeriod p6 = OneTimePeriod.of(TermClassifier.FULL_SUMMER).setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
+        OneTimePeriod p6 = OneTimePeriod.of(this.term_fall).setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
                 .addSupervisors("Test Supervisor 1");
 
         s2.addPeriod(p1);
@@ -539,13 +547,13 @@ public class SectionTests {
         s1.setMaximumWaiting(100);
 
         // Add one-time and unique periods.
-        OneTimePeriod p1 = OneTimePeriod.of(TermClassifier.FALL)
+        OneTimePeriod p1 = OneTimePeriod.of(this.term_fall_first_quarter)
                 .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
                 .addNotes("Test 1", "Test 2", "Test 3");
-        RepeatingPeriod p2 = RepeatingPeriod.of(TermClassifier.FALL)
+        RepeatingPeriod p2 = RepeatingPeriod.of(this.term_fall_first_quarter)
                 .setTime(DayOfWeek.MONDAY, LocalTime.MIN, LocalTime.MAX)
                 .addNotes("Test 1", "Test 2", "Test 3").addSupervisors("A Test", "B Test");
-        RepeatingPeriod p3 = RepeatingPeriod.of(TermClassifier.FALL)
+        RepeatingPeriod p3 = RepeatingPeriod.of(this.term_fall_first_quarter)
                 .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX)
                 .addNotes("Test 1", "Test 2", "Test 3").addSupervisors("A Test");
 
@@ -572,13 +580,13 @@ public class SectionTests {
         s1.setMaximumWaiting(100);
 
         // Add one-time and unique periods.
-        OneTimePeriod p1 = OneTimePeriod.of(TermClassifier.FALL)
+        OneTimePeriod p1 = OneTimePeriod.of(this.term_fall_first_quarter)
                 .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
                 .addNotes("Test 1", "Test 2", "Test 3");
-        RepeatingPeriod p2 = RepeatingPeriod.of(TermClassifier.FALL)
+        RepeatingPeriod p2 = RepeatingPeriod.of(this.term_fall_first_quarter)
                 .setTime(DayOfWeek.MONDAY, LocalTime.MIN, LocalTime.MAX)
                 .addNotes("Test 1", "Test 2", "Test 3").addSupervisors("A Test", "B Test");
-        RepeatingPeriod p3 = RepeatingPeriod.of(TermClassifier.FALL)
+        RepeatingPeriod p3 = RepeatingPeriod.of(this.term_fall_first_quarter)
                 .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX)
                 .addNotes("Test 1", "Test 2", "Test 3").addSupervisors("A Test");
 
@@ -676,14 +684,14 @@ public class SectionTests {
         assertEquals(s1, s2);
 
         // Modify one-time periods
-        OneTimePeriod p1 = OneTimePeriod.of(TermClassifier.FALL);
+        OneTimePeriod p1 = OneTimePeriod.of(this.term_fall_first_quarter);
         s1.addPeriod(p1);
         assertNotEquals(s1, s2);
         s2.addPeriod(p1);
         assertEquals(s1, s2);
 
         // Modify repeating periods
-        RepeatingPeriod rp1 = RepeatingPeriod.of(TermClassifier.SUMMER_ONE)
+        RepeatingPeriod rp1 = RepeatingPeriod.of(this.term_fall)
                 .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
         s1.addPeriod(rp1);
         assertNotEquals(s1, s2);

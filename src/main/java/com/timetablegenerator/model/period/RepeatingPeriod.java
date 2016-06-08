@@ -4,6 +4,7 @@ import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
+import com.timetablegenerator.model.Term;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
@@ -25,11 +26,11 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
     private LocalTime startTime;
     private LocalTime endTime;
 
-    private RepeatingPeriod(TermClassifier term) {
+    private RepeatingPeriod(Term term) {
         super(term);
     }
 
-    public static RepeatingPeriod of(TermClassifier term) {
+    public static RepeatingPeriod of(Term term) {
         return new RepeatingPeriod(term);
     }
 
@@ -177,9 +178,9 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
 
     @Override
     public String getDeltaId() {
-        String id = this.getTerm().getId() + "/TBA/TBA/TBA";
+        String id = this.getTerm() + "/TBA/TBA/TBA";
         if (this.dayOfWeek != null) {
-            id = this.getTerm().getId() + "/"
+            id = this.getTerm() + "/"
                     + this.dayOfWeek.name() + "/"
                     + this.startTime.format(TIME_FORMAT) + "/"
                     + this.endTime.format(TIME_FORMAT);

@@ -29,7 +29,9 @@ public class CourseTests {
     }
 
     private School school;
-    private TermClassifier term = TermClassifier.FALL;
+    private Term term = TermDefinition.builder("fall", "Fall", 1).build().createForYear(2016);
+    private Term term_fq = TermDefinition.builder("fall_fq", "Fall First Quarter", 1).build().createForYear(2016);
+    private Term term_sq = TermDefinition.builder("fall_sq", "Fall Second Quarter", 1).build().createForYear(2016);
     private Department department =
             Department.of(TestUtils.getRandomString(5),
                     TestUtils.getRandomString(20));
@@ -67,7 +69,7 @@ public class CourseTests {
         assertEquals(this.department, c.getDepartment());
         assertEquals(courseCode, c.getCode());
         assertEquals(courseName, c.getName());
-        assertEquals(this.department.getCode() + courseCode + this.term.getId(),
+        assertEquals(this.department.getCode() + courseCode + this.term.getTermDefinition().getCode(),
                      c.getUniqueId());
     }
 
@@ -388,17 +390,17 @@ public class CourseTests {
                 .addCorequesite(c4).addCorequesite(c6);
 
         Section s1 = Section.of("A01")
-                .addPeriod(OneTimePeriod.of(TermClassifier.FALL_FIRST_QUARTER)
+                .addPeriod(OneTimePeriod.of(this.term_fq)
                         .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
                         .setCampus("Campus B").setRoom("987")
                         .addNotes("Some note", "Some note 2"));
         Section s2 = Section.of("A02")
-                .addPeriod(RepeatingPeriod.of(TermClassifier.FALL_SECOND_QUARTER)
+                .addPeriod(RepeatingPeriod.of(this.term_sq)
                         .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX)
                         .setCampus("Campus B").setRoom("997"));
         c.addSection("A", s1).addSection("A", s2);
         Section s3 = Section.of("B01")
-                .addPeriod(RepeatingPeriod.of(TermClassifier.FALL_FIRST_QUARTER)
+                .addPeriod(RepeatingPeriod.of(this.term_fq)
                         .setTime(DayOfWeek.THURSDAY, LocalTime.MIN, LocalTime.MAX)
                         .setCampus("Campus A").setRoom("123"));
         c.addSection("B", s3);

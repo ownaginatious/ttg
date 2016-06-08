@@ -59,7 +59,7 @@ public class TimeTable implements Comparable<TimeTable>, Diffable<TimeTable> {
 
     @Override
     public String toString() {
-        return "[school: " + this.school.getSchoolId() + ", " +
+        return "[school: " + this.school.getId() + ", " +
                 "term: " + this.term + ", " +
                 "departments: " + courses.values().stream()
                 .collect(Collectors.groupingBy(Course::getDepartment)).size() + ", " +
@@ -80,7 +80,7 @@ public class TimeTable implements Comparable<TimeTable>, Diffable<TimeTable> {
 
     @Override
     public String getDeltaId() {
-        return school.getSchoolId() + "/" + this.term.getYear() + "/" + this.term.getTermId().getId();
+        return school.getId() + "/" + this.term.getYear() + "/" + this.term.getTermDefinition().getCode();
     }
 
     @Override
@@ -93,7 +93,7 @@ public class TimeTable implements Comparable<TimeTable>, Diffable<TimeTable> {
 
         if (this.school != that.school) {
             throw new IllegalArgumentException("Timetables are not from the same school: \""
-                    + this.school.getSchoolId() + "\" and \"" + that.school.getSchoolId() + "\"");
+                    + this.school.getId() + "\" and \"" + that.school.getId() + "\"");
         }
 
         final StructureChangeDelta delta = StructureChangeDelta.of(PropertyType.TIMETABLE, this);

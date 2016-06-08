@@ -4,9 +4,7 @@ import com.timetablegenerator.Settings;
 import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
-import com.timetablegenerator.model.School;
-import com.timetablegenerator.model.Section;
-import com.timetablegenerator.model.SectionType;
+import com.timetablegenerator.model.*;
 import com.timetablegenerator.model.period.OneTimePeriod;
 import com.timetablegenerator.tests.api.TestUtils;
 import org.junit.Before;
@@ -28,6 +26,8 @@ public class SectionTypeTests {
 
     private SectionType st;
     private School school;
+
+    private Term term_fall = TermDefinition.builder("fall", "Fall", 1).build().createForYear(2016);
 
     @Before
     public void setUp() {
@@ -108,7 +108,7 @@ public class SectionTypeTests {
     public void string(){
         Section s1 = Section.of("abc")
                 .addNotes("Note 1", "Note 2")
-                .addPeriod(OneTimePeriod.of(TermClassifier.FALL)
+                .addPeriod(OneTimePeriod.of(this.term_fall)
                                         .setCampus("Campus x")
                                         .setRoom("Room 234"));
         Section s2 = Section.of("def");

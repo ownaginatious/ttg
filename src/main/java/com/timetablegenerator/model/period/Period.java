@@ -3,6 +3,7 @@ package com.timetablegenerator.model.period;
 import com.timetablegenerator.Settings;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
+import com.timetablegenerator.model.Term;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -17,7 +18,7 @@ abstract class Period {
 
     protected static final String I = Settings.getIndent();
 
-    @Getter private final TermClassifier term;
+    @Getter private final Term term;
     private final Set<String> supervisors = new TreeSet<>();
     @Setter private String room;
     @Setter private String campus;
@@ -26,7 +27,7 @@ abstract class Period {
 
     @Setter private Boolean online;
 
-    Period(@NonNull TermClassifier term) {
+    Period(@NonNull Term term) {
         this.term = term;
     }
 
@@ -73,7 +74,7 @@ abstract class Period {
 
     public abstract boolean isScheduled();
 
-    protected void savePeriodDifferences(StructureChangeDelta delta, Period that) {
+    void savePeriodDifferences(StructureChangeDelta delta, Period that) {
 
         delta.addValueIfChanged(PropertyType.ROOM, this.room, that.room);
         delta.addValueIfChanged(PropertyType.CAMPUS, this.campus, that.campus);

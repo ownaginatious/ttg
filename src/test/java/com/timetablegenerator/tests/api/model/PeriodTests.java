@@ -3,6 +3,8 @@ package com.timetablegenerator.tests.api.model;
 import com.timetablegenerator.Settings;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
+import com.timetablegenerator.model.Term;
+import com.timetablegenerator.model.TermDefinition;
 import com.timetablegenerator.model.period.OneTimePeriod;
 import com.timetablegenerator.model.period.RepeatingPeriod;
 import com.timetablegenerator.tests.api.TestUtils;
@@ -27,19 +29,26 @@ public class PeriodTests {
     private OneTimePeriod otp1;
     private OneTimePeriod otp2;
 
+    private Term term_fall = TermDefinition.builder("fall", "Fall", 1).build().createForYear(2016);
+    private Term term_fall_first_quarter = TermDefinition.builder("fall_fq", "Fall First Quarter", 2)
+            .build().createForYear(2016);
+    private Term term_fall_second_quarter = TermDefinition.builder("fall_sq", "Fall Second Quarter", 3)
+            .build().createForYear(2016);
+
+    private Term[] terms = {term_fall, term_fall_first_quarter, term_fall_second_quarter};
+
     @Before
     public void setUp(){
         Settings.setIndentSize(4);
-        TermClassifier t = TermClassifier.FALL;
-        this.rp1 = RepeatingPeriod.of(t);
-        this.rp2 = RepeatingPeriod.of(t);
-        this.otp1 = OneTimePeriod.of(t);
-        this.otp2 = OneTimePeriod.of(t);
+        this.rp1 = RepeatingPeriod.of(this.term_fall);
+        this.rp2 = RepeatingPeriod.of(this.term_fall);
+        this.otp1 = OneTimePeriod.of(this.term_fall);
+        this.otp2 = OneTimePeriod.of(this.term_fall);
     }
 
     @Test
     public void createRepeating() {
-        for (TermClassifier t: TermClassifier.values()) {
+        for (Term t : this.terms) {
             RepeatingPeriod rp = RepeatingPeriod.of(t);
             assertEquals(t, rp.getTerm());
         }
@@ -47,7 +56,7 @@ public class PeriodTests {
 
     @Test
     public void createOneTime() {
-        for (TermClassifier t: TermClassifier.values()) {
+        for (Term t : this.terms) {
             OneTimePeriod otp = OneTimePeriod.of(t);
             assertEquals(t, otp.getTerm());
         }
@@ -178,19 +187,19 @@ public class PeriodTests {
         assertEquals(0, otp1.compareTo(otp2));
 
         // Try one term greater than the other.
-        otp1 = OneTimePeriod.of(TermClassifier.FALL);
-        otp2 = OneTimePeriod.of(TermClassifier.SPRING);
+        otp1 = OneTimePeriod.of(this.term_fall_first_quarter);
+        otp2 = OneTimePeriod.of(this.term_fall_second_quarter);
         assertThat(otp1.compareTo(otp2), lessThan(0));
         assertThat(otp2.compareTo(otp1), greaterThan(0));
 
         // Compare different times.
-        otp1 = OneTimePeriod.of(TermClassifier.FALL).setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX);
-        otp2 = OneTimePeriod.of(TermClassifier.FALL).setDateTimes(LocalDateTime.MAX, LocalDateTime.MAX);
+        otp1 = OneTimePeriod.of(this.term_fall).setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX);
+        otp2 = OneTimePeriod.of(this.term_fall).setDateTimes(LocalDateTime.MAX, LocalDateTime.MAX);
         assertThat(otp1.compareTo(otp2), lessThan(0));
         assertThat(otp2.compareTo(otp1), greaterThan(0));
 
         // Compare set to non-set.
-        otp1 = OneTimePeriod.of(TermClassifier.FALL);
+        otp1 = OneTimePeriod.of(this.term_fall);
         assertThat(otp1.compareTo(otp2), lessThan(0));
         assertThat(otp2.compareTo(otp1), greaterThan(0));
     }
@@ -202,33 +211,33 @@ public class PeriodTests {
         assertEquals(0, rp1.compareTo(rp2));
 
         // Try one term greater than the other.
-        rp1 = RepeatingPeriod.of(TermClassifier.FALL);
-        rp2 = RepeatingPeriod.of(TermClassifier.SPRING);
+        rp1 = RepeatingPeriod.of(this.term_fall_first_quarter);
+        rp2 = RepeatingPeriod.of(this.term_fall_second_quarter);
         assertThat(rp1.compareTo(rp2), lessThan(0));
         assertThat(rp2.compareTo(rp1), greaterThan(0));
 
         // Compare different days of the week.
-        rp1 = RepeatingPeriod.of(TermClassifier.FALL).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
-        rp2 = RepeatingPeriod.of(TermClassifier.FALL).setTime(DayOfWeek.SATURDAY, LocalTime.MIN, LocalTime.MAX);
+        rp1 = RepeatingPeriod.of(this.term_fall).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
+        rp2 = RepeatingPeriod.of(this.term_fall).setTime(DayOfWeek.SATURDAY, LocalTime.MIN, LocalTime.MAX);
         assertThat(rp1.compareTo(rp2), lessThan(0));
         assertThat(rp2.compareTo(rp1), greaterThan(0));
 
         // Compare set to unset day of week.
-        rp1 = RepeatingPeriod.of(TermClassifier.FALL).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
-        rp2 = RepeatingPeriod.of(TermClassifier.FALL);
+        rp1 = RepeatingPeriod.of(this.term_fall).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
+        rp2 = RepeatingPeriod.of(this.term_fall);
         assertThat(rp1.compareTo(rp2), greaterThan(0));
         assertThat(rp2.compareTo(rp1), lessThan(0));
 
 
         // Compare different start times.
-        rp1 = RepeatingPeriod.of(TermClassifier.FALL).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
-        rp2 = RepeatingPeriod.of(TermClassifier.FALL).setTime(DayOfWeek.FRIDAY, LocalTime.MAX, LocalTime.MAX);
+        rp1 = RepeatingPeriod.of(this.term_fall).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
+        rp2 = RepeatingPeriod.of(this.term_fall).setTime(DayOfWeek.FRIDAY, LocalTime.MAX, LocalTime.MAX);
         assertThat(rp1.compareTo(rp2), lessThan(0));
         assertThat(rp2.compareTo(rp1), greaterThan(0));
 
         // Compare different end times.
-        rp1 = RepeatingPeriod.of(TermClassifier.FALL).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MIN);
-        rp2 = RepeatingPeriod.of(TermClassifier.FALL).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
+        rp1 = RepeatingPeriod.of(this.term_fall).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MIN);
+        rp2 = RepeatingPeriod.of(this.term_fall).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
         assertThat(rp1.compareTo(rp2), lessThan(0));
         assertThat(rp2.compareTo(rp1), greaterThan(0));
     }
@@ -239,26 +248,26 @@ public class PeriodTests {
         assertEquals(rp1, rp2);
 
         // Different term.
-        rp2 = RepeatingPeriod.of(TermClassifier.SPRING);
+        rp2 = RepeatingPeriod.of(this.term_fall_second_quarter);
         assertNotEquals(rp1, rp2);
 
         // Add a supervisor.
-        rp1 = RepeatingPeriod.of(TermClassifier.FALL);
+        rp1 = RepeatingPeriod.of(this.term_fall_first_quarter);
         rp2.addSupervisors("Test");
         assertNotEquals(rp1, rp2);
 
         // Add a note.
-        rp2 = RepeatingPeriod.of(TermClassifier.FALL);
+        rp2 = RepeatingPeriod.of(this.term_fall_first_quarter);
         rp2.addNotes("123");
         assertNotEquals(rp1, rp2);
 
         // Set the room.
-        rp2 = RepeatingPeriod.of(TermClassifier.FALL);
+        rp2 = RepeatingPeriod.of(this.term_fall_first_quarter);
         rp2.setRoom("123");
         assertNotEquals(rp1, rp2);
 
         // Set online.
-        rp2 = RepeatingPeriod.of(TermClassifier.FALL);
+        rp2 = RepeatingPeriod.of(this.term_fall_first_quarter);
         rp2.setOnline(true);
         assertNotEquals(rp1, rp2);
         rp2.setOnline(false);
@@ -279,16 +288,16 @@ public class PeriodTests {
         assertNotEquals(rp1, rp2);
 
         // Different start time.
-        rp1 = RepeatingPeriod.of(TermClassifier.FALL)
+        rp1 = RepeatingPeriod.of(this.term_fall)
                 .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
-        rp2 = RepeatingPeriod.of(TermClassifier.FALL)
+        rp2 = RepeatingPeriod.of(this.term_fall)
                 .setTime(DayOfWeek.FRIDAY, LocalTime.MAX, LocalTime.MAX);
         assertNotEquals(rp1, rp2);
 
         // Different end time.
-        rp1 = RepeatingPeriod.of(TermClassifier.FALL)
+        rp1 = RepeatingPeriod.of(this.term_fall)
                 .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MIN);
-        rp2 = RepeatingPeriod.of(TermClassifier.FALL)
+        rp2 = RepeatingPeriod.of(this.term_fall)
                 .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
         assertNotEquals(rp1, rp2);
     }
@@ -303,16 +312,16 @@ public class PeriodTests {
         assertNotEquals(otp1, otp2);
 
         // Different start date time.
-        otp1 = OneTimePeriod.of(TermClassifier.FALL)
+        otp1 = OneTimePeriod.of(this.term_fall)
                 .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX);
-        otp2 = OneTimePeriod.of(TermClassifier.FALL)
+        otp2 = OneTimePeriod.of(this.term_fall)
                 .setDateTimes(LocalDateTime.MAX, LocalDateTime.MAX);
         assertNotEquals(otp1, otp2);
 
         // Different end date time.
-        otp1 = OneTimePeriod.of(TermClassifier.FALL)
+        otp1 = OneTimePeriod.of(this.term_fall)
                 .setDateTimes(LocalDateTime.MIN, LocalDateTime.MIN);
-        otp2 = OneTimePeriod.of(TermClassifier.FALL)
+        otp2 = OneTimePeriod.of(this.term_fall)
                 .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX);
         assertNotEquals(otp1, otp2);
     }

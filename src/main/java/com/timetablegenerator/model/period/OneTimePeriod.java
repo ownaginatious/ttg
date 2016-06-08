@@ -4,6 +4,7 @@ import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureChangeDelta;
+import com.timetablegenerator.model.Term;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
@@ -23,11 +24,11 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
 
-    private OneTimePeriod(TermClassifier term) {
+    private OneTimePeriod(Term term) {
         super(term);
     }
 
-    public static OneTimePeriod of(TermClassifier term) {
+    public static OneTimePeriod of(Term term) {
         return new OneTimePeriod(term);
     }
 
@@ -118,9 +119,9 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
 
     @Override
     public String getDeltaId(){
-        String id = this.getTerm().getId() + "/TBA/TBA/TBA";
+        String id = this.getTerm() + "/TBA/TBA/TBA";
         if (this.startDateTime != null) {
-            id = this.getTerm().getId() + "/" + this.startDateTime.format(DATETIME_FORMAT) + "/"
+            id = this.getTerm() + "/" + this.startDateTime.format(DATETIME_FORMAT) + "/"
                     + this.endDateTime.format(DATETIME_FORMAT);
         }
         return id;

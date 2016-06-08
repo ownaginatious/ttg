@@ -20,6 +20,8 @@ public class Term implements Comparable<Term> {
     @Setter private String key;
     @Setter private LocalDate startDate;
     @Setter private LocalDate endDate;
+    @Setter private LocalDate examStartDate;
+    @Setter private LocalDate examEndDate;
 
     Term(TermDefinition termDefinition, int year){
         this.termDefinition = termDefinition;
@@ -32,6 +34,14 @@ public class Term implements Comparable<Term> {
 
     public Optional<LocalDate> getEndDate(){
         return this.endDate != null ? Optional.of(this.endDate) : Optional.empty();
+    }
+
+    public Optional<LocalDate> getExamStartDate(){
+        return this.examStartDate != null ? Optional.of(this.examStartDate) : Optional.empty();
+    }
+
+    public Optional<LocalDate> getExamEndDate(){
+        return this.examEndDate != null ? Optional.of(this.examEndDate) : Optional.empty();
     }
 
     public Optional<String> getKey(){

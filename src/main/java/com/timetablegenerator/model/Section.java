@@ -101,13 +101,12 @@ public class Section implements Diffable<Section> {
     }
 
     public Section setWaiting(int waiting) {
-
-        if (waiting < 0)
-            throw new IllegalStateException("Waiting number must be greater than or equal to 0 (" + waiting + ")");
-        else if (this.maxWaiting >= 0 && waiting > this.maxWaiting)
-            throw new IllegalStateException("Waiting number must be less than the maximum ("
+        if (waiting < 0) {
+            throw new IllegalArgumentException("Waiting number must be greater than or equal to 0 (" + waiting + ")");
+        } else if (this.maxWaiting >= 0 && waiting > this.maxWaiting) {
+            throw new IllegalArgumentException("Waiting number must be less than the maximum ("
                     + waiting + "/" + this.maxWaiting + ")");
-
+        }
         this.waiting = waiting;
         this.waitingList = true;
         return this;
@@ -118,14 +117,13 @@ public class Section implements Diffable<Section> {
     }
 
     public Section setMaximumWaiting(int maxWaiting) {
-
-        if (maxWaiting < 0)
-            throw new IllegalStateException("Maximum number of people waiting must be greater than or equal to 0 ("
+        if (maxWaiting < 0) {
+            throw new IllegalArgumentException("Maximum number of people waiting must be greater than or equal to 0 ("
                     + maxWaiting + ")");
-        else if (this.waiting >= 0 && this.waiting > maxWaiting)
-            throw new IllegalStateException("Number of people waiting must be less than or equal to the maximum ("
+        } else if (this.waiting >= 0 && this.waiting > maxWaiting) {
+            throw new IllegalArgumentException("Number of people waiting must be less than or equal to the maximum ("
                     + this.waiting + "/" + maxWaiting + ")");
-
+        }
         this.maxWaiting = maxWaiting;
         return this;
     }
@@ -157,9 +155,9 @@ public class Section implements Diffable<Section> {
     public Section setEnrollment(int enrollment) {
 
         if (enrollment < 0) {
-            throw new IllegalStateException("Enrollment must be greater than or equal to 0 (" + enrollment + ")");
+            throw new IllegalArgumentException("Enrollment must be greater than or equal to 0 (" + enrollment + ")");
         } else if (this.maxEnrollment >= 0 && enrollment > this.maxEnrollment) {
-            throw new IllegalStateException("Number of people enrolled must be less than the maximum ("
+            throw new IllegalArgumentException("Number of people enrolled must be less than the maximum ("
                     + enrollment + "/" + this.maxEnrollment + ")");
         }
         this.enrollment = enrollment;
@@ -177,10 +175,10 @@ public class Section implements Diffable<Section> {
     public Section setMaximumEnrollment(int maxEnrollment) {
 
         if (maxEnrollment < 0) {
-            throw new IllegalStateException("Maximum number of people enrolled must be greater than or equal to 0 ("
+            throw new IllegalArgumentException("Maximum number of people enrolled must be greater than or equal to 0 ("
                     + maxWaiting + ")");
         } else if (this.enrollment >= 0 && this.enrollment > maxEnrollment) {
-            throw new IllegalStateException("Number of people enrolled must be less than the maximum ("
+            throw new IllegalArgumentException("Number of people enrolled must be less than the maximum ("
                     + this.enrollment + "/" + maxEnrollment + ")");
         }
 

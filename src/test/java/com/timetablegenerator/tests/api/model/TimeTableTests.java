@@ -25,8 +25,13 @@ import static org.junit.Assert.assertTrue;
 
 public class TimeTableTests {
 
+    private Term term_fall = TermDefinition.builder("fall", "Fall", 1).build().createForYear(2016);
+    private Term term_fall_first_quarter = TermDefinition.builder("fall_fq", "Fall First Quarter", 2)
+            .build().createForYear(2016);
+    private Term term_fall_second_quarter = TermDefinition.builder("fall_sq", "Fall Second Quarter", 3)
+            .build().createForYear(2016);
+    
     private School school;
-    private Term term = new Term(TermClassifier.FALL, 2016);
     private TimeTable tt;
 
     @Before
@@ -36,7 +41,7 @@ public class TimeTableTests {
                 .withSection("Section Type B", "B")
                 .withSection("Section Type C", "C")
                 .withSection("Section Type D", "D").build();
-        tt = TimeTable.of(this.school, this.term);
+        tt = TimeTable.of(this.school, this.term_fall);
     }
 
     @Test
@@ -44,18 +49,18 @@ public class TimeTableTests {
         assertTrue(tt.getCourses().isEmpty());
         assertThat(tt.getLastUpdate().until(ZonedDateTime.now(ZoneOffset.UTC), ChronoUnit.SECONDS),
                 lessThan(1L));
-        assertEquals(term, tt.getTerm());
+        assertEquals(this.term_fall, tt.getTerm());
         assertEquals(this.school, tt.getSchool());
         ZonedDateTime zdt = ZonedDateTime.now();
-        tt = TimeTable.of(this.school, term, zdt);
+        tt = TimeTable.of(this.school, this.term_fall, zdt);
         assertEquals(tt.getLastUpdate(), zdt);
     }
 
     @Test
     public void courseAddition() {
         Department d = Department.of("ABC", "Testing 123");
-        Course c = Course.of(this.school, TermClassifier.FALL, d, "Code", "Name");
-        Course c2 = Course.of(this.school, TermClassifier.FALL, d, "Code2", "Name");
+        Course c = Course.of(this.school, this.term_fall, d, "Code", "Name");
+        Course c2 = Course.of(this.school, this.term_fall, d, "Code2", "Name");
         tt.addCourse(c).addCourse(c2);
         assertEquals(
                 new HashSet<>(Arrays.asList(c, c2)),
@@ -70,8 +75,8 @@ public class TimeTableTests {
     @Test(expected = IllegalStateException.class)
     public void duplicateCourseAddition() {
         Department d = Department.of("ABC", "Testing 123");
-        Course c = Course.of(this.school, TermClassifier.FALL, d, "Code", "Name");
-        Course c2 = Course.of(this.school, TermClassifier.FALL, d, "Code", "Name");
+        Course c = Course.of(this.school, this.term_fall, d, "Code", "Name");
+        Course c2 = Course.of(this.school, this.term_fall, d, "Code", "Name");
         tt.addCourse(c).addCourse(c2);
     }
 
@@ -79,10 +84,8 @@ public class TimeTableTests {
     public void compare() {
 
         // By school.
-        TimeTable tta = TimeTable.of(School.builder("a", "a").build(),
-                this.term);
-        TimeTable ttb = TimeTable.of(School.builder("b", "b").build(),
-                this.term);
+        TimeTable tta = TimeTable.of(School.builder("a", "a").build(), this.term_fall);
+        TimeTable ttb = TimeTable.of(School.builder("b", "b").build(), this.term_fall);
         assertThat(tta.compareTo(ttb), lessThan(0));
 
         // By term
@@ -103,10 +106,10 @@ public class TimeTableTests {
     @Test
     public void noDiff() {
         Department d = Department.of("ABC", "Testing 123");
-        Course c = Course.of(this.school, TermClassifier.FALL, d, "Code", "Name");
-        Course c2 = Course.of(this.school, TermClassifier.FALL, d, "Code", "Name");
-        TimeTable tt1 = TimeTable.of(this.school, this.term).addCourse(c);
-        TimeTable tt2 = TimeTable.of(this.school, this.term).addCourse(c2);
+        Course c = Course.of(this.school, this.term_fall, d, "Code", "Name");
+        Course c2 = Course.of(this.school, this.term_fall, d, "Code", "Name");
+        TimeTable tt1 = TimeTable.of(this.school, this.term_fall).addCourse(c);
+        TimeTable tt2 = TimeTable.of(this.school, this.term_fall).addCourse(c2);
         assertFalse(tt1.findDifferences(tt2).hasChanges());
     }
 
@@ -121,8 +124,8 @@ public class TimeTableTests {
     public void differentSchoolDiff() {
         School s1 = School.builder("School A", "A").build();
         School s2 = School.builder("School B", "B").build();
-        TimeTable tt1 = TimeTable.of(s1, this.term);
-        TimeTable tt2 = TimeTable.of(s2, this.term);
+        TimeTable tt1 = TimeTable.of(s1, this.term_fall);
+        TimeTable tt2 = TimeTable.of(s2, this.term_fall);
         tt1.findDifferences(tt2);
     }
 
