@@ -69,7 +69,7 @@ public enum McMasterDepartmentScraper implements SupportingScraper {
         rr = rr.nextPost("https://csprd.mcmaster.ca/psc/prcsprd/EMPLOYEE/HRMS_LS/c/SA_LEARNER_SERVICES.CLASS_SEARCH.GBL")
                 .setFormParameter("ICAction", "CLASS_SRCH_WRK2_SSR_PB_SUBJ_SRCH$0").run();
 
-        Collection<Department> departments = new TreeSet<>();
+        List<Department> departments = new ArrayList<>();
 
         String sectionPrefixes = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
@@ -106,6 +106,7 @@ public enum McMasterDepartmentScraper implements SupportingScraper {
 
         // TODO: Figure out how to parse the grad course departments.
         departments.removeIf(x -> x.getCode().equals("CHILDLS"));
+        Collections.sort(departments);
         return departments;
     }
 
