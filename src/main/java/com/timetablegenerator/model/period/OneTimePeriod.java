@@ -71,7 +71,7 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
             sb.append("TBA -> TBA");
         }
 
-        sb.append(" [Term: ").append(this.getTerm().toString()).append(']');
+        sb.append(" [Term: ").append(this.getTerm()).append(']');
 
         if (this.getCampus().isPresent() || this.getRoom().isPresent()) {
 

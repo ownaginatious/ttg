@@ -37,10 +37,10 @@ public class TimeTableTests {
     @Before
     public void setUp() {
         school = School.builder("test_name", "test_id")
-                .withSection("Section Type A", "A")
-                .withSection("Section Type B", "B")
-                .withSection("Section Type C", "C")
-                .withSection("Section Type D", "D").build();
+                .withSection("A", "Section Type A")
+                .withSection("B", "Section Type B")
+                .withSection("C", "Section Type C")
+                .withSection("D", "Section Type D").build();
         tt = TimeTable.of(this.school, this.term_fall);
     }
 
@@ -89,12 +89,9 @@ public class TimeTableTests {
         assertThat(tta.compareTo(ttb), lessThan(0));
 
         // By term
-        TimeTable tt1 = TimeTable.of(this.school,
-                new Term(TermClassifier.FALL, 2015));
-        TimeTable tt2 = TimeTable.of(this.school,
-                new Term(TermClassifier.FULL_SUMMER, 2016));
-        TimeTable tt3 = TimeTable.of(this.school,
-                new Term(TermClassifier.FALL_FIRST_QUARTER, 2015));
+        TimeTable tt1 = TimeTable.of(this.school, this.term_fall_first_quarter);
+        TimeTable tt2 = TimeTable.of(this.school, this.term_fall_second_quarter);
+        TimeTable tt3 = TimeTable.of(this.school, this.term_fall);
         List<TimeTable> timetables = Arrays.asList(tt1, tt2, tt3);
         Collections.sort(timetables);
         assertEquals(Arrays.asList(tt3, tt1, tt2), timetables);
@@ -115,8 +112,8 @@ public class TimeTableTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void differentTermDiff() {
-        TimeTable tt1 = TimeTable.of(this.school, new Term(TermClassifier.FALL, 2016));
-        TimeTable tt2 = TimeTable.of(this.school, new Term(TermClassifier.FALL, 2017));
+        TimeTable tt1 = TimeTable.of(this.school, this.term_fall_first_quarter);
+        TimeTable tt2 = TimeTable.of(this.school, this.term_fall_second_quarter);
         tt1.findDifferences(tt2);
     }
 
@@ -137,40 +134,38 @@ public class TimeTableTests {
         Department d3 = Department.of("DC", "Department C");
 
         Section s1a = Section.of("SA")
-                .addPeriod(RepeatingPeriod.of(TermClassifier.FALL_FIRST_QUARTER)
+                .addPeriod(RepeatingPeriod.of(this.term_fall_first_quarter)
                         .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX))
-                .addPeriod(OneTimePeriod.of(TermClassifier.FALL_SECOND_QUARTER)
+                .addPeriod(OneTimePeriod.of(this.term_fall_second_quarter)
                         .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX));
         Section s2a = Section.of("SB")
-                .addPeriod(RepeatingPeriod.of(TermClassifier.FALL_FIRST_QUARTER)
+                .addPeriod(RepeatingPeriod.of(this.term_fall_first_quarter)
                         .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX)
                         .setCampus("Campus").setRoom("Room"));
         Section s3a = Section.of("SC")
-                .addPeriod(OneTimePeriod.of(TermClassifier.FALL_SECOND_QUARTER)
+                .addPeriod(OneTimePeriod.of(this.term_fall_second_quarter)
                         .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX));
 
-        Term term = new Term(TermClassifier.FULL_YEAR, 2016);
-
-        TimeTable tt1 = TimeTable.of(this.school, term);
-        TimeTable tt2 = TimeTable.of(this.school, term);
+        TimeTable tt1 = TimeTable.of(this.school, this.term_fall);
+        TimeTable tt2 = TimeTable.of(this.school, this.term_fall);
 
         Section s1b = Section.of("SA")
-                .addPeriod(RepeatingPeriod.of(TermClassifier.FALL_FIRST_QUARTER)
+                .addPeriod(RepeatingPeriod.of(this.term_fall_first_quarter)
                         .setTime(DayOfWeek.THURSDAY, LocalTime.MIN, LocalTime.MAX))
-                .addPeriod(OneTimePeriod.of(TermClassifier.FALL_SECOND_QUARTER)
+                .addPeriod(OneTimePeriod.of(this.term_fall_second_quarter)
                         .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX).setRoom("123"));
         Section s2b = Section.of("SB")
-                .addPeriod(RepeatingPeriod.of(TermClassifier.FALL_FIRST_QUARTER)
+                .addPeriod(RepeatingPeriod.of(this.term_fall_first_quarter)
                         .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX)
                         .setCampus("New Campus").setRoom("Room"));
 
-        Course c2a = Course.of(this.school, TermClassifier.FULL_SUMMER, d2, "CB", "Course B");
-        Course c3a = Course.of(this.school, TermClassifier.FALL, d3, "CC", "Course C")
+        Course c2a = Course.of(this.school, this.term_fall_first_quarter, d2, "CB", "Course B");
+        Course c3a = Course.of(this.school, this.term_fall_second_quarter, d3, "CC", "Course C")
                 .addSection("A", s1a).addSection("B", s2a).addSection("C", s3a);
         tt1.addCourse(c2a).addCourse(c3a);
 
-        Course c1b = Course.of(this.school, TermClassifier.FULL_SUMMER, d1, "CA", "Course A");
-        Course c3b = Course.of(this.school, TermClassifier.FALL, d3, "CC", "Course C")
+        Course c1b = Course.of(this.school, this.term_fall_first_quarter, d1, "CA", "Course A");
+        Course c3b = Course.of(this.school, this.term_fall_second_quarter, d3, "CC", "Course C")
                 .addSection("A", s1b).addSection("B", s2b);
         tt2.addCourse(c1b).addCourse(c3b);
 
@@ -187,9 +182,9 @@ public class TimeTableTests {
     public void string() {
         ZonedDateTime zdt =
                 ZonedDateTime.of(2016, 12, 12, 12, 12,12, 12, ZoneOffset.UTC);
-        TimeTable tt = TimeTable.of(this.school, this.term, zdt);
+        TimeTable tt = TimeTable.of(this.school, this.term_fall, zdt);
         assertEquals(
-                "[school: test_id, term: FALL 2016, " +
+                "[school: test_id, term: Fall (fall) 2016, " +
                         "departments: 0, courses: 0, last_update: " +
                         zdt.toString() + "]", tt.toString());
     }

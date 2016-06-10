@@ -115,14 +115,14 @@ public class SectionTests {
         assertEquals(s1.getEnrollment().orElse(-1), s1.getMaxEnrollment().orElse(-1));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void enrollmentOverflow() {
 
         s1.setMaximumEnrollment(100);
         s1.setEnrollment(101);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void enrollmentUnderflow() {
 
         s1.setMaximumEnrollment(100);
@@ -130,12 +130,12 @@ public class SectionTests {
         s1.setMaximumEnrollment(98);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void negativeMaxEnrollment() {
         s1.setMaximumEnrollment(-1);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void negativeEnrollment() {
         s1.setEnrollment(-1);
     }
@@ -180,14 +180,14 @@ public class SectionTests {
         assertThat(s1.getMaxWaiting().orElse(-1), greaterThan(s1.getWaiting().orElse(-1)));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void waitingListOverflow() {
 
         s1.setMaximumWaiting(100);
         s1.setWaiting(101);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void waitingListUnderflow() {
 
         s1.setMaximumWaiting(100);
@@ -195,12 +195,12 @@ public class SectionTests {
         s1.setMaximumWaiting(98);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void negativeWaiting() {
         s1.setMaximumWaiting(-1);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void negativeMaxWaiting() {
         s1.setWaiting(-1);
     }

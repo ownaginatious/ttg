@@ -73,10 +73,11 @@ public class School implements Comparable<School>{
     }
 
     public String getSectionTypeNameByCode(String code) {
-        if (this.sectionsTypes.containsKey(code)) {
+        if (!this.sectionsTypes.containsKey(code)) {
             throw new IllegalArgumentException("No section name associated with the code \"" + code + "\"");
+        } else {
+            return this.sectionsTypes.get(code);
         }
-        return this.sectionsTypes.get(code);
     }
 
     @Override

@@ -329,48 +329,48 @@ public class PeriodTests {
     @Test
     public void repeatingPeriodString(){
 
-        assertEquals("TBA TBA -> TBA [Term: FALL]", rp1.toString());
+        assertEquals("TBA TBA -> TBA [Term: Fall (fall) 2016]", rp1.toString());
 
         // With a campus.
         rp1.setCampus("Test Campus");
-        assertEquals("TBA TBA -> TBA [Term: FALL] (campus: Test Campus)", rp1.toString());
+        assertEquals("TBA TBA -> TBA [Term: Fall (fall) 2016] (campus: Test Campus)", rp1.toString());
 
         // With a room.
         setUp();
         rp1.setRoom("Test Room");
-        assertEquals("TBA TBA -> TBA [Term: FALL] (room: Test Room)", rp1.toString());
+        assertEquals("TBA TBA -> TBA [Term: Fall (fall) 2016] (room: Test Room)", rp1.toString());
 
         // With a campus and room.
         rp1.setCampus("Test Campus");
-        assertEquals("TBA TBA -> TBA [Term: FALL] " +
+        assertEquals("TBA TBA -> TBA [Term: Fall (fall) 2016] " +
                 "(campus: Test Campus, room: Test Room)", rp1.toString());
 
         // With a day, start time, end time, and day of week.
         setUp();
         rp1.setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
-        assertEquals("FRIDAY 00:00 -> 23:59 [Term: FALL]", rp1.toString());
+        assertEquals("FRIDAY 00:00 -> 23:59 [Term: Fall (fall) 2016]", rp1.toString());
 
         // With campus and room.
         rp1.setRoom("Test Room");
         rp1.setCampus("Test Campus");
-        assertEquals("FRIDAY 00:00 -> 23:59 [Term: FALL] " +
+        assertEquals("FRIDAY 00:00 -> 23:59 [Term: Fall (fall) 2016] " +
                 "(campus: Test Campus, room: Test Room)", rp1.toString());
 
         // With supervisors.
         rp1.addSupervisors("Billy", "Joe");
-        assertEquals("FRIDAY 00:00 -> 23:59 [Term: FALL] " +
+        assertEquals("FRIDAY 00:00 -> 23:59 [Term: Fall (fall) 2016] " +
                 "(campus: Test Campus, room: Test Room) " +
                 "[Instructors: 'Billy', 'Joe']", rp1.toString());
 
         // Set online.
         rp1.setOnline(true);
-        assertEquals("FRIDAY 00:00 -> 23:59 [Term: FALL] " +
+        assertEquals("FRIDAY 00:00 -> 23:59 [Term: Fall (fall) 2016] " +
                 "(campus: Test Campus, room: Test Room) " +
                 "(online) [Instructors: 'Billy', 'Joe']", rp1.toString());
 
         // As definite offline.
         rp1.setOnline(false);
-        assertEquals("FRIDAY 00:00 -> 23:59 [Term: FALL] " +
+        assertEquals("FRIDAY 00:00 -> 23:59 [Term: Fall (fall) 2016] " +
                 "(campus: Test Campus, room: Test Room) " +
                 "(not online) [Instructors: 'Billy', 'Joe']", rp1.toString());
     }
@@ -378,49 +378,49 @@ public class PeriodTests {
     @Test
     public void oneTimePeriodString(){
 
-        assertEquals("TBA -> TBA [Term: FALL]", otp1.toString());
+        assertEquals("TBA -> TBA [Term: Fall (fall) 2016]", otp1.toString());
 
         // With a campus.
         otp1.setCampus("Test Campus");
-        assertEquals("TBA -> TBA [Term: FALL] (campus: Test Campus)", otp1.toString());
+        assertEquals("TBA -> TBA [Term: Fall (fall) 2016] (campus: Test Campus)", otp1.toString());
 
         // With a room.
         setUp();
         otp1.setRoom("Test Room");
-        assertEquals("TBA -> TBA [Term: FALL] (room: Test Room)", otp1.toString());
+        assertEquals("TBA -> TBA [Term: Fall (fall) 2016] (room: Test Room)", otp1.toString());
 
         // With a campus and room.
         otp1.setCampus("Test Campus");
-        assertEquals("TBA -> TBA [Term: FALL] " +
+        assertEquals("TBA -> TBA [Term: Fall (fall) 2016] " +
                 "(campus: Test Campus, room: Test Room)", otp1.toString());
 
         // With a day, start time, end time, and day of week.
         setUp();
         otp1.setDateTimes(LocalDateTime.of(2015, 11, 25, 11, 23),
                          LocalDateTime.of(2015, 11, 25, 12, 23));
-        assertEquals("2015-11-25T11:23 -> 2015-11-25T12:23 [Term: FALL]", otp1.toString());
+        assertEquals("2015-11-25T11:23 -> 2015-11-25T12:23 [Term: Fall (fall) 2016]", otp1.toString());
 
         // With campus and room.
         otp1.setRoom("Test Room");
         otp1.setCampus("Test Campus");
-        assertEquals("2015-11-25T11:23 -> 2015-11-25T12:23 [Term: FALL] " +
+        assertEquals("2015-11-25T11:23 -> 2015-11-25T12:23 [Term: Fall (fall) 2016] " +
                 "(campus: Test Campus, room: Test Room)", otp1.toString());
 
         // With supervisors.
         otp1.addSupervisors("Billy", "Joe");
-        assertEquals("2015-11-25T11:23 -> 2015-11-25T12:23 [Term: FALL] " +
+        assertEquals("2015-11-25T11:23 -> 2015-11-25T12:23 [Term: Fall (fall) 2016] " +
                 "(campus: Test Campus, room: Test Room) " +
                 "[Instructors: 'Billy', 'Joe']", otp1.toString());
 
         // As online.
         otp1.setOnline(true);
-        assertEquals("2015-11-25T11:23 -> 2015-11-25T12:23 [Term: FALL] " +
+        assertEquals("2015-11-25T11:23 -> 2015-11-25T12:23 [Term: Fall (fall) 2016] " +
                 "(campus: Test Campus, room: Test Room) " +
                 "(online) [Instructors: 'Billy', 'Joe']", otp1.toString());
 
         // As definite offline.
         otp1.setOnline(false);
-        assertEquals("2015-11-25T11:23 -> 2015-11-25T12:23 [Term: FALL] " +
+        assertEquals("2015-11-25T11:23 -> 2015-11-25T12:23 [Term: Fall (fall) 2016] " +
                 "(campus: Test Campus, room: Test Room) " +
                 "(not online) [Instructors: 'Billy', 'Joe']", otp1.toString());
     }

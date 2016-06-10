@@ -173,7 +173,7 @@ public class Course implements Comparable<Course>, Diffable<Course> {
                 .append(" [").append(this.code).append("]");
 
         sb.append("\n* Department: ").append(this.department);
-        sb.append("\n* Term: ").append(this.term.getTermDefinition().getName());
+        sb.append("\n* Term: ").append(this.term);
         this.getCredits().ifPresent(x -> sb.append("\n* Credits: ").append(x));
 
         if (!this.crossListings.isEmpty()) {

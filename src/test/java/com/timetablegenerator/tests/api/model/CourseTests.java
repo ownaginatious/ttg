@@ -47,12 +47,12 @@ public class CourseTests {
 
     @Before
     public void setUp() {
-        school = School.builder(TestUtils.getRandomString(20),
+        this.school = School.builder(TestUtils.getRandomString(20),
                 TestUtils.getRandomString(10))
-                .withSection("Section Type A", "A")
-                .withSection("Section Type B", "B")
-                .withSection("Section Type C", "C")
-                .withSection("Section Type D", "D").build();
+                .withSection("A", "Section Type A")
+                .withSection("B", "Section Type B")
+                .withSection("C", "Section Type C")
+                .withSection("D", "Section Type D").build();
     }
 
     @Test

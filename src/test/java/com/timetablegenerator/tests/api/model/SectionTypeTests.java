@@ -33,10 +33,10 @@ public class SectionTypeTests {
     public void setUp() {
         school = School.builder(TestUtils.getRandomString(20),
                                 TestUtils.getRandomString(10))
-                .withSection("Section Type A", "A")
-                .withSection("Section Type B", "B")
-                .withSection("Section Type C", "C")
-                .withSection("Section Type D", "D").build();
+                .withSection("A", "Section Type A")
+                .withSection("B", "Section Type B")
+                .withSection("C", "Section Type C")
+                .withSection("D", "Section Type D").build();
         st = SectionType.of(school, "A");
     }
 
@@ -93,9 +93,9 @@ public class SectionTypeTests {
 
         // Different name
         School school1 = School.builder("test", "test")
-                .withSection("Section A", "A").build();
+                .withSection("A", "Section A").build();
         School school2 = School.builder("test", "test")
-                .withSection("Section C", "A").build();
+                .withSection("A", "Section C").build();
         st1 = SectionType.of(school1, "A");
         st2 = SectionType.of(school2, "A");
         assertThat(st1.compareTo(st2), lessThan(0));
