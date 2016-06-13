@@ -18,7 +18,7 @@ public class TermDefinition implements Comparable<TermDefinition> {
     @Getter private final String name;
     @Getter private final int yearOffset;
     private final int orderingKey;
-    private final Map<String, TermDefinition> immediateSubterms;
+    private final Set<String> immediateSubtermCodes;
     private final Map<String, TermDefinition> allSubterms;
 
     private TermDefinition(Builder builder) {
@@ -26,7 +26,7 @@ public class TermDefinition implements Comparable<TermDefinition> {
         this.name = builder.name;
         this.yearOffset = builder.yearOffset;
         this.orderingKey = builder.orderingKey;
-        this.immediateSubterms = Collections.unmodifiableMap(builder.immediateSubterms);
+        this.immediateSubtermCodes = Collections.unmodifiableSet(builder.immediateSubtermCodes);
         this.allSubterms = builder.allSubterms;
     }
 
@@ -36,7 +36,7 @@ public class TermDefinition implements Comparable<TermDefinition> {
         private final String name;
         private final int orderingKey;
         private int yearOffset = 0;
-        private Map<String, TermDefinition> immediateSubterms = new HashMap<>();
+        private Set<String> immediateSubtermCodes = new HashSet<>();
         private Map<String, TermDefinition> allSubterms = new HashMap<>();
 
         private Builder(String code, String name, int orderingKey){
@@ -57,7 +57,7 @@ public class TermDefinition implements Comparable<TermDefinition> {
                         format("Subterm has the same code as term [%s]", this.code)
                 );
             }
-            if (immediateSubterms.putIfAbsent(subterm.code, subterm) != null){
+            if (!immediateSubtermCodes.add(subterm.code)){
                 throw new IllegalArgumentException(
                         format("Multiple definitions for subterm \"%s\" under term \"%s\"", subterm.code, this.code));
             }
@@ -85,7 +85,7 @@ public class TermDefinition implements Comparable<TermDefinition> {
     }
 
     public Set<String> getSubterms(){
-        return this.immediateSubterms.keySet();
+        return this.immediateSubtermCodes;
     }
 
     public Set<String> getAllSubterms(){
@@ -98,12 +98,12 @@ public class TermDefinition implements Comparable<TermDefinition> {
     }
 
     public TermDefinition getSubterm(String code){
-        if (!this.immediateSubterms.containsKey(code)) {
+        if (!this.allSubterms.containsKey(code)) {
             throw new IllegalArgumentException(
                     format("No subterm with code \"%s\" immediately under term \"%s\"", code, this.code)
             );
         }
-        return this.immediateSubterms.get(this.code);
+        return this.allSubterms.get(code);
     }
 
     public Term createForYear(int year){

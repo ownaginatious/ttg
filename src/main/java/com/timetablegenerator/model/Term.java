@@ -8,6 +8,9 @@ import lombok.experimental.Accessors;
 
 import javax.annotation.Nonnull;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @EqualsAndHashCode
@@ -22,13 +25,21 @@ public class Term implements Comparable<Term> {
     private LocalDate examStartDate;
     private LocalDate examEndDate;
 
+    private Map<String, Term> prebuiltTerms = new HashMap<>();
+
     Term(TermDefinition termDefinition, int year) {
         this.termDefinition = termDefinition;
         this.year = year;
+        for (String termCode : this.termDefinition.getSubterms()) {
+            TermDefinition subtermDefinition = this.termDefinition.getSubterm(termCode);
+            Term subterm = subtermDefinition.createForYear(year + subtermDefinition.getYearOffset());
+            this.prebuiltTerms.putAll(subterm.prebuiltTerms);
+            this.prebuiltTerms.put(subtermDefinition.getCode(), subterm);
+        }
     }
 
-    public Term setDates(@NonNull LocalDate start, @NonNull LocalDate end){
-        if (start.isAfter(end)){
+    public Term setDates(@NonNull LocalDate start, @NonNull LocalDate end) {
+        if (start.isAfter(end)) {
             throw new IllegalArgumentException(
                     String.format("start (%s) is after end (%s)", start, end)
             );
@@ -38,8 +49,8 @@ public class Term implements Comparable<Term> {
         return this;
     }
 
-    public Term setExamDates(@NonNull LocalDate start, @NonNull LocalDate end){
-        if (start.isAfter(end)){
+    public Term setExamDates(@NonNull LocalDate start, @NonNull LocalDate end) {
+        if (start.isAfter(end)) {
             throw new IllegalArgumentException(
                     String.format("start (%s) is after end (%s)", start, end)
             );
@@ -70,8 +81,9 @@ public class Term implements Comparable<Term> {
     }
 
     public Term getSubterm(String code) {
-        TermDefinition td = this.termDefinition.getSubterm(code);
-        return new Term(td, this.year + td.getYearOffset());
+        // Try to get the term from the definition to verify it exists.
+        this.termDefinition.getSubterm(code);
+        return this.prebuiltTerms.get(code);
     }
 
     @Override
@@ -89,7 +101,12 @@ public class Term implements Comparable<Term> {
             return this.termDefinition.compareTo(that.termDefinition);
         } else if (this.year != that.year) {
             return Integer.valueOf(this.year).compareTo(that.year);
-        } else if (!this.key.equals(that.key)) {
+        } else if (!Objects.equals(this.key, that.key)) {
+            if (this.key == null){
+                return -1;
+            } else if (that.key == null){
+                return 1;
+            }
             return this.key.compareTo(that.key);
         }
         return this.equals(that) ? 0 : -1;
