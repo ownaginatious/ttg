@@ -1,30 +1,32 @@
 package com.timetablegenerator.delta;
 
 import lombok.EqualsAndHashCode;
-
-import javax.annotation.Nonnull;
+import lombok.Getter;
+import lombok.NonNull;
 
 @EqualsAndHashCode(callSuper = true)
 public class ValueRemovalDelta extends Delta {
 
-    private final Object oldValue;
+    @Getter private final Object oldValue;
 
-    public ValueRemovalDelta(@Nonnull PropertyType propertyType, @Nonnull String oldValue) {
+    private ValueRemovalDelta(PropertyType propertyType, Object oldValue) {
         super(propertyType);
         this.oldValue = oldValue;
     }
 
-    public ValueRemovalDelta(@Nonnull PropertyType propertyType, @Nonnull Boolean oldValue) {
-        super(propertyType);
-        this.oldValue = oldValue;
+    public static ValueRemovalDelta of(@NonNull PropertyType propertyType, @NonNull Boolean oldValue) {
+        return new ValueRemovalDelta(propertyType, oldValue);
     }
 
-    public ValueRemovalDelta(@Nonnull PropertyType propertyType, @Nonnull Number oldValue) {
-        super(propertyType);
-        this.oldValue = oldValue;
+    public static ValueRemovalDelta of(@NonNull PropertyType propertyType, @NonNull String oldValue) {
+        return new ValueRemovalDelta(propertyType, oldValue);
+    }
+
+    public static ValueRemovalDelta of(@NonNull PropertyType propertyType, @NonNull Number oldValue) {
+        return new ValueRemovalDelta(propertyType, oldValue);
     }
 
     public String toString() {
-        return "REMOVED [" + this.getPropertyType().name() + "] (value = " + this.oldValue + ")";
+        return "REMOVED [" + this.getPropertyType().getFieldName() + "] (value = " + this.oldValue + ")";
     }
 }

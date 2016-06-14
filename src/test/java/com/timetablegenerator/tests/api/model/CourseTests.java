@@ -47,8 +47,8 @@ public class CourseTests {
 
     @Before
     public void setUp() {
-        this.school = School.builder(TestUtils.getRandomString(20),
-                TestUtils.getRandomString(10))
+        this.school = School.builder(TestUtils.getRandomString(10),
+                TestUtils.getRandomString(20))
                 .withSection("A", "Section Type A")
                 .withSection("B", "Section Type B")
                 .withSection("C", "Section Type C")

@@ -119,12 +119,15 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
 
     @Override
     public String getDeltaId(){
-        String id = this.getTerm() + "/TBA/TBA/TBA";
+        String id = this.getTerm().getTermDefinition().getCode() + "/"
+                + this.getTerm().getYear();
         if (this.startDateTime != null) {
-            id = this.getTerm() + "/" + this.startDateTime.format(DATETIME_FORMAT) + "/"
+            return id + "/"
+                    + this.startDateTime.format(DATETIME_FORMAT) + "/"
                     + this.endDateTime.format(DATETIME_FORMAT);
+        } else {
+            return id + "/TBA/TBA";
         }
-        return id;
     }
 
     @Override

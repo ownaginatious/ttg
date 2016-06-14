@@ -178,14 +178,16 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
 
     @Override
     public String getDeltaId() {
-        String id = this.getTerm() + "/TBA/TBA/TBA";
+        String id = this.getTerm().getTermDefinition().getCode()+ "/"
+                + this.getTerm().getYear();
         if (this.dayOfWeek != null) {
-            id = this.getTerm() + "/"
+            return id + "/"
                     + this.dayOfWeek.name() + "/"
                     + this.startTime.format(TIME_FORMAT) + "/"
                     + this.endTime.format(TIME_FORMAT);
+        } else {
+            return id + "/TBA/TBA/TBA";
         }
-        return id;
     }
 
     public StructureChangeDelta findDifferences(RepeatingPeriod that) {

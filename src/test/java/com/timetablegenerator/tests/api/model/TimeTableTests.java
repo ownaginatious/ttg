@@ -36,7 +36,7 @@ public class TimeTableTests {
 
     @Before
     public void setUp() {
-        school = School.builder("test_name", "test_id")
+        school = School.builder("test_id", "test_name")
                 .withSection("A", "Section Type A")
                 .withSection("B", "Section Type B")
                 .withSection("C", "Section Type C")
@@ -119,8 +119,8 @@ public class TimeTableTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void differentSchoolDiff() {
-        School s1 = School.builder("School A", "A").build();
-        School s2 = School.builder("School B", "B").build();
+        School s1 = School.builder("A", "School A").build();
+        School s2 = School.builder("B", "School B").build();
         TimeTable tt1 = TimeTable.of(s1, this.term_fall);
         TimeTable tt2 = TimeTable.of(s2, this.term_fall);
         tt1.findDifferences(tt2);

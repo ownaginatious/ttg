@@ -51,93 +51,84 @@ public class StructureChangeDelta extends Delta {
     }
 
     public StructureChangeDelta addAdded(PropertyType propertyType, @NonNull Diffable<?> value) {
-        this.propertyChangeDeltas.add(new StructureAdditionDelta(propertyType, value));
+        this.propertyChangeDeltas.add(StructureAdditionDelta.of(propertyType, value));
         return this;
     }
 
     public StructureChangeDelta addAdded(PropertyType propertyType, @NonNull Boolean value) {
-        this.propertyChangeDeltas.add(new ValueAdditionDelta(propertyType, value));
+        this.propertyChangeDeltas.add(ValueAdditionDelta.of(propertyType, value));
         return this;
     }
 
     public StructureChangeDelta addAdded(PropertyType propertyType, @NonNull Number value) {
-        this.propertyChangeDeltas.add(new ValueAdditionDelta(propertyType, value));
+        this.propertyChangeDeltas.add(ValueAdditionDelta.of(propertyType, value));
         return this;
     }
 
     public StructureChangeDelta addAdded(PropertyType propertyType, @NonNull String value) {
-        this.propertyChangeDeltas.add(new ValueAdditionDelta(propertyType, value));
+        this.propertyChangeDeltas.add(ValueAdditionDelta.of(propertyType, value));
         return this;
     }
 
     public StructureChangeDelta addRemoved(PropertyType propertyType, @NonNull Diffable<?> value) {
-        this.propertyChangeDeltas.add(new StructureRemovalDelta(propertyType, value));
+        this.propertyChangeDeltas.add(StructureRemovalDelta.of(propertyType, value));
         return this;
     }
 
     public StructureChangeDelta addRemoved(PropertyType propertyType, @NonNull Boolean value) {
-        this.propertyChangeDeltas.add(new ValueRemovalDelta(propertyType, value));
+        this.propertyChangeDeltas.add(ValueRemovalDelta.of(propertyType, value));
         return this;
     }
 
     public StructureChangeDelta addRemoved(PropertyType propertyType, @NonNull Number value) {
-        this.propertyChangeDeltas.add(new ValueRemovalDelta(propertyType, value));
+        this.propertyChangeDeltas.add(ValueRemovalDelta.of(propertyType, value));
         return this;
     }
 
     public StructureChangeDelta addRemoved(PropertyType propertyType, @NonNull String value) {
-        this.propertyChangeDeltas.add(new ValueRemovalDelta(propertyType, value));
+        this.propertyChangeDeltas.add(ValueRemovalDelta.of(propertyType, value));
         return this;
     }
 
     public StructureChangeDelta addValueIfChanged(PropertyType propertyType,
                                                  Boolean oldValue, Boolean newValue) {
-        if (Objects.equals(newValue, oldValue)) {
-            return this;
+        if (!Objects.equals(oldValue, newValue)) {
+            if (newValue == null) {
+                this.propertyChangeDeltas.add(ValueRemovalDelta.of(propertyType, oldValue));
+            } else if (oldValue == null) {
+                this.propertyChangeDeltas.add(ValueAdditionDelta.of(propertyType, newValue));
+            } else {
+                this.propertyChangeDeltas.add(ValueChangeDelta.of(propertyType, newValue, oldValue));
+            }
         }
-
-        if (newValue == null) {
-            this.propertyChangeDeltas.add(new ValueRemovalDelta(propertyType, oldValue));
-        } else if (oldValue == null) {
-            this.propertyChangeDeltas.add(new ValueAdditionDelta(propertyType, newValue));
-        } else {
-            this.propertyChangeDeltas.add(new ValueChangeDelta(propertyType, newValue, oldValue));
-        }
-
         return this;
     }
 
     public StructureChangeDelta addValueIfChanged(PropertyType propertyType,
                                                   Number oldValue, Number newValue) {
-        if (Objects.equals(newValue, oldValue)) {
-            return this;
+        if (!Objects.equals(newValue, oldValue)) {
+            if (newValue == null) {
+                this.propertyChangeDeltas.add(ValueRemovalDelta.of(propertyType, oldValue));
+            } else if (oldValue == null) {
+                this.propertyChangeDeltas.add(ValueAdditionDelta.of(propertyType, newValue));
+            } else {
+                this.propertyChangeDeltas.add(ValueChangeDelta.of(propertyType, newValue, oldValue));
+            }
         }
-
-        if (newValue == null) {
-            this.propertyChangeDeltas.add(new ValueRemovalDelta(propertyType, oldValue));
-        } else if (oldValue == null) {
-            this.propertyChangeDeltas.add(new ValueAdditionDelta(propertyType, newValue));
-        } else {
-            this.propertyChangeDeltas.add(new ValueChangeDelta(propertyType, newValue, oldValue));
-        }
-
         return this;
     }
 
     public StructureChangeDelta addValueIfChanged(PropertyType propertyType,
                                                   String oldValue, String newValue) {
         if (Objects.equals(newValue, oldValue)) {
-            return this;
+            if (newValue == null) {
+                this.propertyChangeDeltas.add(ValueRemovalDelta.of(propertyType, oldValue));
+            } else if (oldValue == null) {
+                this.propertyChangeDeltas.add(ValueAdditionDelta.of(propertyType, newValue));
+            } else {
+                this.propertyChangeDeltas.add(ValueChangeDelta.of(propertyType, newValue, oldValue));
+            }
         }
-
-        if (newValue == null) {
-            this.propertyChangeDeltas.add(new ValueRemovalDelta(propertyType, oldValue));
-        } else if (oldValue == null) {
-            this.propertyChangeDeltas.add(new ValueAdditionDelta(propertyType, newValue));
-        } else {
-            this.propertyChangeDeltas.add(new ValueChangeDelta(propertyType, newValue, oldValue));
-        }
-
         return this;
     }
 
@@ -177,7 +168,7 @@ public class StructureChangeDelta extends Delta {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("MODIFIED [").append(this.getPropertyType().name()).append(']');
+        sb.append("MODIFIED [").append(this.getPropertyType().getFieldName()).append(']');
         sb.append(" (id = ").append(this.identifier).append(")");
 
         int[] i = {0};

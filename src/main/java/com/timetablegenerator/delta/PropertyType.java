@@ -10,7 +10,7 @@ public enum PropertyType {
     MAX_ENROLLED, IS_CANCELLED, IS_ONLINE, IS_ALTERNATING,
     SUPERVISOR;
 
-    public String getFieldName(){
+    public String getFieldName() {
         return this.name();
     }
 }

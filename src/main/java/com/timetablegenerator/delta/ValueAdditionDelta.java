@@ -1,30 +1,32 @@
 package com.timetablegenerator.delta;
 
 import lombok.EqualsAndHashCode;
-
-import javax.annotation.Nonnull;
+import lombok.Getter;
+import lombok.NonNull;
 
 @EqualsAndHashCode(callSuper = true)
 public class ValueAdditionDelta extends Delta {
 
-    private final Object newValue;
+    @Getter private final Object newValue;
 
-    public ValueAdditionDelta(@Nonnull PropertyType propertyType, @Nonnull String newValue) {
+    private ValueAdditionDelta(PropertyType propertyType, Object newValue) {
         super(propertyType);
         this.newValue = newValue;
     }
 
-    public ValueAdditionDelta(@Nonnull PropertyType propertyType, @Nonnull Boolean newValue) {
-        super(propertyType);
-        this.newValue = newValue;
+    public static ValueAdditionDelta of(@NonNull PropertyType propertyType, @NonNull String newValue) {
+        return new ValueAdditionDelta(propertyType, newValue);
     }
 
-    public ValueAdditionDelta(@Nonnull PropertyType propertyType, @Nonnull Number newValue) {
-        super(propertyType);
-        this.newValue = newValue;
+    public static ValueAdditionDelta of(@NonNull PropertyType propertyType, @NonNull Boolean newValue) {
+        return new ValueAdditionDelta(propertyType, newValue);
+    }
+
+    public static ValueAdditionDelta of(@NonNull PropertyType propertyType, @NonNull Number newValue) {
+        return new ValueAdditionDelta(propertyType, newValue);
     }
 
     public String toString() {
-        return "ADDED [" + this.getPropertyType().name() + "] (value = " +  this.newValue.toString() + ")";
+        return "ADDED [" + this.getPropertyType().getFieldName() + "] (value = " +  this.newValue.toString() + ")";
     }
 }

@@ -11,7 +11,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class TermTests {
 
@@ -105,20 +106,20 @@ public class TermTests {
     @Test
     public void allSubterms() {
         assertEquals(new HashSet<>(Arrays.asList("SEM1", "SEM2", "SEM1Q1", "SEM1Q2",
-                                                 "SEM2Q1", "SEM2Q2", "SEM1Q2Q1")),
+                "SEM2Q1", "SEM2Q2", "SEM1Q2Q1")),
                 this.td.getAllSubterms());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void recursivelyDuplicateSubterm() {
         TermDefinition.builder("TERM_CODE", "TERM_NAME", 0)
-            .withSubterm(TermDefinition.builder("SUBTERM_A_CODE", "SUBTERM_A_NAME", 1).build())
-            .withSubterm(
-                    TermDefinition.builder("SUBTERM_B_CODE", "SUBTERM_B_NAME", 2)
-                            .withSubterm(
-                                    TermDefinition.builder("SUBTERM_A_CODE", "SUBTERM_C_NAME", 3).build()
-                            ).build()
-            ).build();
+                .withSubterm(TermDefinition.builder("SUBTERM_A_CODE", "SUBTERM_A_NAME", 1).build())
+                .withSubterm(
+                        TermDefinition.builder("SUBTERM_B_CODE", "SUBTERM_B_NAME", 2)
+                                .withSubterm(
+                                        TermDefinition.builder("SUBTERM_A_CODE", "SUBTERM_C_NAME", 3).build()
+                                ).build()
+                ).build();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -171,5 +172,21 @@ public class TermTests {
         terms = Arrays.asList(t4, t1, t2, t3, t4);
         Collections.sort(terms);
         assertEquals(Arrays.asList(t4, t4, t2, t3, t1), terms);
+    }
+
+    @Test
+    public void compareDefinition() {
+        TermDefinition td1 = TermDefinition.builder("ABC", "EFG", 0).build();
+        TermDefinition td2 = TermDefinition.builder("ABC1", "EFG1", 0).build();
+        TermDefinition td3 = TermDefinition.builder("ABC", "EFG1", 0).build();
+
+        List<TermDefinition> termDefinitions = Arrays.asList(td3, td1, td2, td3);
+        Collections.sort(termDefinitions);
+        assertEquals(Arrays.asList(td1, td3, td3, td2), termDefinitions);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void badSubterm() {
+        this.td.getSubterm("Not a real code");
     }
 }

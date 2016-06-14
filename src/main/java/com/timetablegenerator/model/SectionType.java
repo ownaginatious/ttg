@@ -26,12 +26,12 @@ public class SectionType implements Comparable<SectionType>, Diffable<SectionTyp
     private SectionType(@NonNull School school, @NonNull String type) {
         this.school = school;
         this.code = type;
-        this.name = school.getSectionTypeNameByCode(this.code);
+        this.name = school.getSectionTypeName(this.code);
     }
 
     public static SectionType of(@NonNull School school, @NonNull String type){
         // Force check to ensure the code exists.
-        school.getSectionTypeNameByCode(type);
+        school.getSectionTypeName(type);
         return new SectionType(school, type);
     }
 

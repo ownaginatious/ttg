@@ -1,23 +1,27 @@
 package com.timetablegenerator.delta;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
 
 import javax.annotation.Nonnull;
 
 @EqualsAndHashCode(callSuper = true)
 public class StructureRemovalDelta extends Delta {
 
-    private final Diffable<?> oldValue;
+    @Getter private final Diffable<?> oldValue;
 
-    public StructureRemovalDelta(@Nonnull PropertyType propertyType, @Nonnull Diffable<?> oldValue) {
-
+    private StructureRemovalDelta(PropertyType propertyType, Diffable<?> oldValue) {
         super(propertyType);
         this.oldValue = oldValue;
     }
 
-    public String toString() {
+    public static StructureRemovalDelta of(@NonNull PropertyType propertyType, @NonNull Diffable<?> oldValue){
+        return new StructureRemovalDelta(propertyType, oldValue);
+    }
 
-        return "REMOVED [" + this.getPropertyType().name() + "] (id = "
+    public String toString() {
+        return "REMOVED [" + this.getPropertyType().getFieldName() + "] (id = "
                 + this.oldValue.getDeltaId() + ")";
     }
 }

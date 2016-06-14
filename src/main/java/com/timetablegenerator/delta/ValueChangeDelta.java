@@ -2,38 +2,37 @@ package com.timetablegenerator.delta;
 
 import com.timetablegenerator.Settings;
 import lombok.EqualsAndHashCode;
-
-import javax.annotation.Nonnull;
+import lombok.Getter;
+import lombok.NonNull;
 
 @EqualsAndHashCode(callSuper = true)
 public class ValueChangeDelta extends Delta {
 
     private static final String I = Settings.getIndent();
 
-    private final Object oldValue;
-    private final Object newValue;
+    @Getter private final Object oldValue;
+    @Getter private final Object newValue;
 
-    ValueChangeDelta(PropertyType propertyType, @Nonnull Boolean newValue, @Nonnull Boolean oldValue) {
+    private ValueChangeDelta(PropertyType propertyType, Object oldValue, Object newValue) {
         super(propertyType);
         this.oldValue = oldValue;
         this.newValue = newValue;
     }
 
-    ValueChangeDelta(PropertyType propertyType, @Nonnull Number newValue, @Nonnull Number oldValue) {
-        super(propertyType);
-        this.oldValue = oldValue;
-        this.newValue = newValue;
+    public static ValueChangeDelta of(PropertyType propertyType, @NonNull Boolean oldValue, @NonNull Boolean newValue){
+        return new ValueChangeDelta(propertyType, oldValue, newValue);
     }
 
-    ValueChangeDelta(PropertyType propertyType, @Nonnull String newValue, @Nonnull String oldValue) {
-        super(propertyType);
-        this.oldValue = oldValue;
-        this.newValue = newValue;
+    public static ValueChangeDelta of(PropertyType propertyType, @NonNull String oldValue, @NonNull String newValue){
+        return new ValueChangeDelta(propertyType, oldValue, newValue);
+    }
+
+    public static ValueChangeDelta of(PropertyType propertyType, @NonNull Number oldValue, @NonNull Number newValue){
+        return new ValueChangeDelta(propertyType, oldValue, newValue);
     }
 
     public String toString() {
-
-        return "MODIFIED [" + this.getPropertyType().name() + "]\n"
+        return "MODIFIED [" + this.getPropertyType().getFieldName() + "]\n"
                   + I + "Old value : \"" + oldValue + "\"\n"
                   + I + "New value : \"" + newValue + "\"";
     }
