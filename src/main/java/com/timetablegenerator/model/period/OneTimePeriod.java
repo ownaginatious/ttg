@@ -3,7 +3,7 @@ package com.timetablegenerator.model.period;
 import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
-import com.timetablegenerator.delta.StructureChangeDelta;
+import com.timetablegenerator.delta.StructureDelta;
 import com.timetablegenerator.model.Term;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -119,8 +119,8 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
 
     @Override
     public String getDeltaId(){
-        String id = this.getTerm().getTermDefinition().getCode() + "/"
-                + this.getTerm().getYear();
+        String id = this.getTerm().getYear() + "/" +
+                this.getTerm().getTermDefinition().getCode();
         if (this.startDateTime != null) {
             return id + "/"
                     + this.startDateTime.format(DATETIME_FORMAT) + "/"
@@ -166,7 +166,7 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
         return this;
     }
 
-    public StructureChangeDelta findDifferences(OneTimePeriod that) {
+    public StructureDelta findDifferences(OneTimePeriod that) {
 
         if (this.getTerm() != that.getTerm() || !Objects.equals(this.startDateTime, that.startDateTime) ||
                 !Objects.equals(this.endDateTime, that.endDateTime)) {
@@ -175,7 +175,7 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
                             this.getDeltaId(), that.getDeltaId()));
         }
 
-        StructureChangeDelta delta = StructureChangeDelta.of(PropertyType.ONE_TIME_PERIOD, this);
+        StructureDelta delta = StructureDelta.of(PropertyType.ONE_TIME_PERIOD, this);
         this.savePeriodDifferences(delta, that);
 
         return delta;

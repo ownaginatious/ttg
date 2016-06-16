@@ -3,7 +3,7 @@ package com.timetablegenerator.tests.api.model;
 import com.timetablegenerator.Settings;
 import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.PropertyType;
-import com.timetablegenerator.delta.StructureChangeDelta;
+import com.timetablegenerator.delta.StructureDelta;
 import com.timetablegenerator.model.*;
 import com.timetablegenerator.model.period.OneTimePeriod;
 import com.timetablegenerator.tests.api.TestUtils;
@@ -155,10 +155,10 @@ public class SectionTypeTests {
                 .addSection(sb1).addSection(sb2);
 
         assertEquals(
-                StructureChangeDelta.of(PropertyType.SECTION_TYPE, st1)
+                StructureDelta.of(PropertyType.SECTION_TYPE, st1)
                     .addAdded(PropertyType.SECTION, sb1)
                     .addRemoved(PropertyType.SECTION, sa1)
-                    .addChange(StructureChangeDelta.of(PropertyType.SECTION, sa2)
+                    .addSubstructureChange(StructureDelta.of(PropertyType.SECTION, sa2)
                                 .addAdded(PropertyType.NOTE, "Note")
                                 .addAdded(PropertyType.IS_ALTERNATING, true)
                                 .addValueIfChanged(PropertyType.IS_CANCELLED, true, false)),

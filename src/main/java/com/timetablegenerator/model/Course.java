@@ -4,7 +4,7 @@ import com.timetablegenerator.Settings;
 import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
-import com.timetablegenerator.delta.StructureChangeDelta;
+import com.timetablegenerator.delta.StructureDelta;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -239,14 +239,14 @@ public class Course implements Comparable<Course>, Diffable<Course> {
     }
 
     @Override
-    public StructureChangeDelta findDifferences(Course that) {
+    public StructureDelta findDifferences(Course that) {
 
         if (!this.uniqueId.equals(that.uniqueId) || !Objects.equals(this.school, that.school)) {
             throw new IllegalArgumentException("Courses are not related: \"" + this.uniqueId
                     + "\" and \"" + that.uniqueId + "\"");
         }
 
-        final StructureChangeDelta delta = StructureChangeDelta.of(PropertyType.COURSE, this);
+        final StructureDelta delta = StructureDelta.of(PropertyType.COURSE, this);
 
         delta.addValueIfChanged(PropertyType.NAME, this.name, that.name);
         delta.addValueIfChanged(PropertyType.DESCRIPTION, this.description, that.description);
@@ -284,7 +284,7 @@ public class Course implements Comparable<Course>, Diffable<Course> {
         sectionTypeKeys.stream()
                 .filter(x -> this.sectionTypes.containsKey(x) && that.sectionTypes.containsKey(x))
                 .filter(x -> !this.sectionTypes.get(x).equals(that.sectionTypes.get(x)))
-                .forEach(x -> delta.addChange(this.sectionTypes.get(x).findDifferences(that.sectionTypes.get(x))));
+                .forEach(x -> delta.addSubstructureChange(this.sectionTypes.get(x).findDifferences(that.sectionTypes.get(x))));
 
         return delta;
     }
@@ -293,7 +293,7 @@ public class Course implements Comparable<Course>, Diffable<Course> {
         return courses.stream().map(Course::getUniqueId).collect(Collectors.toSet());
     }
 
-    private static void recordCourseRelationDiff(StructureChangeDelta delta, PropertyType propertyType,
+    private static void recordCourseRelationDiff(StructureDelta delta, PropertyType propertyType,
                                                  Collection<Course> thisListing, Collection<Course> thatListing) {
 
         Set<String> removed = shallowCourseSet(thisListing);

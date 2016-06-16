@@ -3,7 +3,7 @@ package com.timetablegenerator.model.period;
 import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
-import com.timetablegenerator.delta.StructureChangeDelta;
+import com.timetablegenerator.delta.StructureDelta;
 import com.timetablegenerator.model.Term;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -178,8 +178,8 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
 
     @Override
     public String getDeltaId() {
-        String id = this.getTerm().getTermDefinition().getCode()+ "/"
-                + this.getTerm().getYear();
+        String id = this.getTerm().getYear() + "/" +
+                this.getTerm().getTermDefinition().getCode();
         if (this.dayOfWeek != null) {
             return id + "/"
                     + this.dayOfWeek.name() + "/"
@@ -190,7 +190,7 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
         }
     }
 
-    public StructureChangeDelta findDifferences(RepeatingPeriod that) {
+    public StructureDelta findDifferences(RepeatingPeriod that) {
 
         if (this.getTerm() != that.getTerm() || !Objects.equals(this.startTime, that.startTime)
                 || !Objects.equals(this.endTime, that.endTime)) {
@@ -199,7 +199,7 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
                             this.getDeltaId(), that.getDeltaId()));
         }
 
-        StructureChangeDelta delta = StructureChangeDelta.of(PropertyType.REPEATING_PERIOD, this);
+        StructureDelta delta = StructureDelta.of(PropertyType.REPEATING_PERIOD, this);
         this.savePeriodDifferences(delta, that);
 
         return delta;

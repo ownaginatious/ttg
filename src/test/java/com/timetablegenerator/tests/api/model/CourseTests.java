@@ -3,7 +3,7 @@ package com.timetablegenerator.tests.api.model;
 import com.timetablegenerator.Settings;
 import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.PropertyType;
-import com.timetablegenerator.delta.StructureChangeDelta;
+import com.timetablegenerator.delta.StructureDelta;
 import com.timetablegenerator.model.*;
 import static org.junit.Assert.*;
 
@@ -293,7 +293,7 @@ public class CourseTests {
                 courseCode, courseName).setCredits(2.0);
 
         assertEquals(
-                StructureChangeDelta.of(PropertyType.COURSE, c1)
+                StructureDelta.of(PropertyType.COURSE, c1)
                         .addValueIfChanged(PropertyType.CREDITS, 1.0, 2.0),
                 c1.findDifferences(c2)
         );
@@ -302,7 +302,7 @@ public class CourseTests {
         c2.setCredits(1.0).setDescription(description);
 
         assertEquals(
-                StructureChangeDelta.of(PropertyType.COURSE, c1)
+                StructureDelta.of(PropertyType.COURSE, c1)
                         .addAdded(PropertyType.DESCRIPTION, description),
                 c1.findDifferences(c2)
         );
@@ -316,7 +316,7 @@ public class CourseTests {
         c2.addCrossListing(c5);
 
         assertEquals(
-                StructureChangeDelta.of(PropertyType.COURSE, c1)
+                StructureDelta.of(PropertyType.COURSE, c1)
                         .addRemoved(PropertyType.ANTI_REQUISITE, c3.getUniqueId())
                         .addAdded(PropertyType.PRE_REQUISITE, c4.getUniqueId())
                         .addAdded(PropertyType.CROSS_LISTING, c5.getUniqueId()),
@@ -331,7 +331,7 @@ public class CourseTests {
         c2.addNotes("a", "testing");
 
         assertEquals(
-                StructureChangeDelta.of(PropertyType.COURSE, c1)
+                StructureDelta.of(PropertyType.COURSE, c1)
                         .addAdded(PropertyType.NOTE, "testing")
                         .addRemoved(PropertyType.NOTE, "test!")
                         .addRemoved(PropertyType.NOTE, "It's"),
@@ -363,9 +363,9 @@ public class CourseTests {
                 .addSection("B", s3).addSection("B", s4).addSection("B", s5);
 
         assertEquals(
-                StructureChangeDelta.of(PropertyType.COURSE, c1)
+                StructureDelta.of(PropertyType.COURSE, c1)
                         .addAdded(PropertyType.SECTION_TYPE, c2.getSectionType("B").orElse(null))
-                        .addChange(c1.getSectionType("A").orElse(null)
+                        .addSubstructureChange(c1.getSectionType("A").orElse(null)
                                 .findDifferences(c2.getSectionType("A").orElse(null))
                         ).addValueIfChanged(PropertyType.CREDITS,
                             c1.getCredits().orElse(null), c2.getCredits().orElse(null)

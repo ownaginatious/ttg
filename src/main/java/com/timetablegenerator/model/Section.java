@@ -4,7 +4,7 @@ import com.timetablegenerator.Settings;
 import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.Diffable;
-import com.timetablegenerator.delta.StructureChangeDelta;
+import com.timetablegenerator.delta.StructureDelta;
 import com.timetablegenerator.model.period.RepeatingPeriod;
 import com.timetablegenerator.model.period.OneTimePeriod;
 import lombok.EqualsAndHashCode;
@@ -265,14 +265,14 @@ public class Section implements Diffable<Section> {
     }
 
     @Override
-    public StructureChangeDelta findDifferences(Section that) {
+    public StructureDelta findDifferences(Section that) {
 
         if (!this.sectionId.equals(that.sectionId)) {
             throw new IllegalArgumentException("Sections are not related: \"" + this.sectionId
                     + "\" and \"" + that.sectionId + "\"");
         }
 
-        final StructureChangeDelta delta = StructureChangeDelta.of(PropertyType.SECTION, this);
+        final StructureDelta delta = StructureDelta.of(PropertyType.SECTION, this);
 
         delta.addValueIfChanged(PropertyType.SERIAL_NUMBER, this.serialNumber, that.serialNumber);
 
@@ -331,7 +331,7 @@ public class Section implements Diffable<Section> {
                         Objects.equals(thisOtp.getEndDateTime(), thatOtp.getEndDateTime());
                 if (cond) {
                     if (!thisOtp.equals(thatOtp))
-                        delta.addChange(thisOtp.findDifferences(thatOtp));
+                        delta.addSubstructureChange(thisOtp.findDifferences(thatOtp));
                     break;
                 }
             }
@@ -368,7 +368,7 @@ public class Section implements Diffable<Section> {
                         && thisRp.getDayOfWeek().equals(thatRp.getDayOfWeek());
                 if (cond) {
                     if (!thisRp.equals(thatRp))
-                        delta.addChange(thisRp.findDifferences(thatRp));
+                        delta.addSubstructureChange(thisRp.findDifferences(thatRp));
                     break;
                 }
             }

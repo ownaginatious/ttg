@@ -3,7 +3,7 @@ package com.timetablegenerator.tests.api.model;
 import com.timetablegenerator.Settings;
 import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.PropertyType;
-import com.timetablegenerator.delta.StructureChangeDelta;
+import com.timetablegenerator.delta.StructureDelta;
 import com.timetablegenerator.model.Section;
 import com.timetablegenerator.model.Term;
 import com.timetablegenerator.model.TermDefinition;
@@ -311,9 +311,9 @@ public class SectionTests {
         s1.setSerialNumber("123");
         s2.setSerialNumber("456");
 
-        StructureChangeDelta expected = StructureChangeDelta.of(PropertyType.SECTION, s1)
+        StructureDelta expected = StructureDelta.of(PropertyType.SECTION, s1)
                 .addValueIfChanged(PropertyType.SERIAL_NUMBER, "123", "456");
-        StructureChangeDelta invertExpected = StructureChangeDelta.of(PropertyType.SECTION, s2)
+        StructureDelta invertExpected = StructureDelta.of(PropertyType.SECTION, s2)
                 .addValueIfChanged(PropertyType.SERIAL_NUMBER, "456", "123");
 
         assertEquals(expected, s1.findDifferences(s2));
@@ -378,12 +378,12 @@ public class SectionTests {
         s1.addNotes("test1", "test 2", "test 3");
         s2.addNotes("test 4", "test 2", "test 7", "test 8");
 
-        StructureChangeDelta expected = StructureChangeDelta.of(PropertyType.SECTION, s1)
+        StructureDelta expected = StructureDelta.of(PropertyType.SECTION, s1)
                 .addRemoved(PropertyType.NOTE, "test1").addAdded(PropertyType.NOTE, "test 4")
                 .addRemoved(PropertyType.NOTE, "test 3").addAdded(PropertyType.NOTE, "test 7")
                 .addAdded(PropertyType.NOTE, "test 8");
 
-        StructureChangeDelta invertExpected = StructureChangeDelta.of(PropertyType.SECTION, s2)
+        StructureDelta invertExpected = StructureDelta.of(PropertyType.SECTION, s2)
                 .addRemoved(PropertyType.NOTE, "test 4").addAdded(PropertyType.NOTE, "test1")
                 .addRemoved(PropertyType.NOTE, "test 7").addAdded(PropertyType.NOTE, "test 3")
                 .addRemoved(PropertyType.NOTE, "test 8");
@@ -417,28 +417,28 @@ public class SectionTests {
         s1.addPeriod(p4);
         s1.addPeriod(p5);
 
-        StructureChangeDelta expected = StructureChangeDelta.of(PropertyType.SECTION, s1)
+        StructureDelta expected = StructureDelta.of(PropertyType.SECTION, s1)
                 .addAdded(PropertyType.REPEATING_PERIOD, p1)
                 .addAdded(PropertyType.ONE_TIME_PERIOD, p6)
-                .addChange(StructureChangeDelta.of(PropertyType.REPEATING_PERIOD, p5)
+                .addSubstructureChange(StructureDelta.of(PropertyType.REPEATING_PERIOD, p5)
                         .addRemoved(PropertyType.CAMPUS, "Test Campus")
                         .addRemoved(PropertyType.NOTE, "Note 1")
                         .addRemoved(PropertyType.NOTE, "Note 2")
                         .addRemoved(PropertyType.NOTE, "Note 3"))
-                .addChange(StructureChangeDelta.of(PropertyType.ONE_TIME_PERIOD, p4)
+                .addSubstructureChange(StructureDelta.of(PropertyType.ONE_TIME_PERIOD, p4)
                         .addRemoved(PropertyType.SUPERVISOR, "Test Supervisor 1")
                         .addRemoved(PropertyType.SUPERVISOR, "Test Supervisor 2")
                         .addAdded(PropertyType.ROOM, "My Room"));
 
-        StructureChangeDelta invertExpected = StructureChangeDelta.of(PropertyType.SECTION, s2)
+        StructureDelta invertExpected = StructureDelta.of(PropertyType.SECTION, s2)
                 .addRemoved(PropertyType.REPEATING_PERIOD, p1)
                 .addRemoved(PropertyType.ONE_TIME_PERIOD, p6)
-                .addChange(StructureChangeDelta.of(PropertyType.REPEATING_PERIOD, p2)
+                .addSubstructureChange(StructureDelta.of(PropertyType.REPEATING_PERIOD, p2)
                         .addAdded(PropertyType.CAMPUS, "Test Campus")
                         .addAdded(PropertyType.NOTE, "Note 1")
                         .addAdded(PropertyType.NOTE, "Note 2")
                         .addAdded(PropertyType.NOTE, "Note 3"))
-                .addChange(StructureChangeDelta.of(PropertyType.ONE_TIME_PERIOD, p3)
+                .addSubstructureChange(StructureDelta.of(PropertyType.ONE_TIME_PERIOD, p3)
                         .addAdded(PropertyType.SUPERVISOR, "Test Supervisor 1")
                         .addAdded(PropertyType.SUPERVISOR, "Test Supervisor 2")
                         .addRemoved(PropertyType.ROOM, "My Room"));

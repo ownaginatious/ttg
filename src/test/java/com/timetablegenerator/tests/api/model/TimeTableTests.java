@@ -1,7 +1,7 @@
 package com.timetablegenerator.tests.api.model;
 
 import com.timetablegenerator.delta.PropertyType;
-import com.timetablegenerator.delta.StructureChangeDelta;
+import com.timetablegenerator.delta.StructureDelta;
 import com.timetablegenerator.model.*;
 import com.timetablegenerator.model.period.OneTimePeriod;
 import com.timetablegenerator.model.period.RepeatingPeriod;
@@ -171,10 +171,10 @@ public class TimeTableTests {
 
 
         assertEquals(
-                StructureChangeDelta.of(PropertyType.TIMETABLE, tt1)
+                StructureDelta.of(PropertyType.TIMETABLE, tt1)
                         .addRemoved(PropertyType.COURSE, c2a)
                         .addAdded(PropertyType.COURSE, c1b)
-                        .addChange(c3a.findDifferences(c3b)),
+                        .addSubstructureChange(c3a.findDifferences(c3b)),
                 tt1.findDifferences(tt2));
     }
 

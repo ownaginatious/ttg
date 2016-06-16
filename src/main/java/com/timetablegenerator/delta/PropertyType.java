@@ -1,14 +1,39 @@
 package com.timetablegenerator.delta;
 
+import com.timetablegenerator.model.*;
+import com.timetablegenerator.model.period.OneTimePeriod;
+import com.timetablegenerator.model.period.RepeatingPeriod;
+import lombok.NonNull;
+
 public enum PropertyType {
 
-    TERM, CAMPUS, ROOM, NAME, SERIAL_NUMBER, CREDITS,
-    SECTION_TYPE, SECTION, REPEATING_PERIOD, ONE_TIME_PERIOD,
-    TIMETABLE, COURSE, CROSS_LISTING, PRE_REQUISITE,
-    ANTI_REQUISITE, CO_REQUISITE, DESCRIPTION, NOTE, WAITING_LIST,
-    NUM_WAITING, MAX_WAITING, IS_FULL, NUM_ENROLLED,
-    MAX_ENROLLED, IS_CANCELLED, IS_ONLINE, IS_ALTERNATING,
-    SUPERVISOR;
+    TERM(TermDefinition.class),
+    CAMPUS(String.class), ROOM(String.class), NAME(String.class),
+    SERIAL_NUMBER(String.class), CREDITS(Double.class),
+    SECTION_TYPE(SectionType.class), SECTION(Section.class),
+    REPEATING_PERIOD(RepeatingPeriod.class), ONE_TIME_PERIOD(OneTimePeriod.class),
+    TIMETABLE(TimeTable.class), COURSE(Course.class),
+    CROSS_LISTING(Course.class), PRE_REQUISITE(Course.class),
+    ANTI_REQUISITE(Course.class), CO_REQUISITE(Course.class),
+    DESCRIPTION(String.class), NOTE(String.class), WAITING_LIST(Boolean.class),
+    NUM_WAITING(Integer.class), MAX_WAITING(Integer.class), IS_FULL(Boolean.class),
+    NUM_ENROLLED(Integer.class), MAX_ENROLLED(Integer.class),
+    IS_CANCELLED(Boolean.class), IS_ONLINE(Boolean.class),
+    IS_ALTERNATING(Boolean.class), SUPERVISOR(String.class);
+
+    private final Class<?> expectedType;
+
+    PropertyType(@NonNull Class<?> expectedType){
+        this.expectedType = expectedType;
+    }
+
+    public void validateType(Class<?> type){
+        if(!this.expectedType.isAssignableFrom(type)){
+            throw new IllegalArgumentException("Type " + type.getName() +
+                    " is not assignable from expected type " + expectedType.getName() +
+                    " for property type [" + this.getFieldName() + "]");
+        }
+    }
 
     public String getFieldName() {
         return this.name();

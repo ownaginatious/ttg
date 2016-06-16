@@ -2,7 +2,7 @@ package com.timetablegenerator.model;
 
 import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
-import com.timetablegenerator.delta.StructureChangeDelta;
+import com.timetablegenerator.delta.StructureDelta;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -84,7 +84,7 @@ public class TimeTable implements Comparable<TimeTable>, Diffable<TimeTable> {
     }
 
     @Override
-    public StructureChangeDelta findDifferences(TimeTable that) {
+    public StructureDelta findDifferences(TimeTable that) {
 
         if (!this.term.equals(that.term)) {
             throw new IllegalArgumentException("Timetables are not from the same term: \""
@@ -96,7 +96,7 @@ public class TimeTable implements Comparable<TimeTable>, Diffable<TimeTable> {
                     + this.school.getId() + "\" and \"" + that.school.getId() + "\"");
         }
 
-        final StructureChangeDelta delta = StructureChangeDelta.of(PropertyType.TIMETABLE, this);
+        final StructureDelta delta = StructureDelta.of(PropertyType.TIMETABLE, this);
 
         // Record courses that were added.
         that.courses.values().stream()
@@ -113,7 +113,7 @@ public class TimeTable implements Comparable<TimeTable>, Diffable<TimeTable> {
                 .map(Course::getUniqueId)
                 .filter(x -> that.courses.keySet().contains(x))
                 .filter(x -> !this.courses.get(x).equals(that.courses.get(x)))
-                .forEach(x -> delta.addChange(this.courses.get(x).findDifferences(that.courses.get(x))));
+                .forEach(x -> delta.addSubstructureChange(this.courses.get(x).findDifferences(that.courses.get(x))));
 
         return delta;
     }

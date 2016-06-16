@@ -4,7 +4,7 @@ import com.timetablegenerator.Settings;
 import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
-import com.timetablegenerator.delta.StructureChangeDelta;
+import com.timetablegenerator.delta.StructureDelta;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -84,14 +84,14 @@ public class SectionType implements Comparable<SectionType>, Diffable<SectionTyp
     }
 
     @Override
-    public StructureChangeDelta findDifferences(SectionType that) {
+    public StructureDelta findDifferences(SectionType that) {
 
         if (!this.code.equals(that.code)) {
             throw new IllegalArgumentException("Section types are not related: \"" + this.code
                     + "\" and \"" + that.code + "\"");
         }
 
-        final StructureChangeDelta delta = StructureChangeDelta.of(PropertyType.SECTION_TYPE, this);
+        final StructureDelta delta = StructureDelta.of(PropertyType.SECTION_TYPE, this);
 
         Set<String> sectionKeys = new HashSet<>(this.sections.keySet());
         sectionKeys.addAll(that.sections.keySet());
@@ -110,7 +110,7 @@ public class SectionType implements Comparable<SectionType>, Diffable<SectionTyp
         sectionKeys.stream()
                 .filter(x -> that.sections.containsKey(x) && this.sections.containsKey(x))
                 .filter(x -> !that.sections.get(x).equals(this.sections.get(x)))
-                .forEach(x -> delta.addChange(this.sections.get(x).findDifferences(that.sections.get(x))));
+                .forEach(x -> delta.addSubstructureChange(this.sections.get(x).findDifferences(that.sections.get(x))));
 
         return delta;
     }

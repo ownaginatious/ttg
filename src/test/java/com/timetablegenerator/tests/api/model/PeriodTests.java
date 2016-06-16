@@ -2,7 +2,7 @@ package com.timetablegenerator.tests.api.model;
 
 import com.timetablegenerator.Settings;
 import com.timetablegenerator.delta.PropertyType;
-import com.timetablegenerator.delta.StructureChangeDelta;
+import com.timetablegenerator.delta.StructureDelta;
 import com.timetablegenerator.model.Term;
 import com.timetablegenerator.model.TermDefinition;
 import com.timetablegenerator.model.period.OneTimePeriod;
@@ -455,9 +455,9 @@ public class PeriodTests {
 
         // Room change
         rp1.setRoom("Test room");
-        StructureChangeDelta expected = StructureChangeDelta.of(PropertyType.REPEATING_PERIOD,  rp2)
+        StructureDelta expected = StructureDelta.of(PropertyType.REPEATING_PERIOD,  rp2)
                 .addAdded(PropertyType.ROOM, "Test room");
-        StructureChangeDelta invertExpected = StructureChangeDelta.of(PropertyType.REPEATING_PERIOD,  rp1)
+        StructureDelta invertExpected = StructureDelta.of(PropertyType.REPEATING_PERIOD,  rp1)
                 .addRemoved(PropertyType.ROOM, "Test room");
 
         assertEquals(expected, rp2.findDifferences(rp1));
@@ -487,12 +487,12 @@ public class PeriodTests {
         otp1.addSupervisors(Arrays.asList("test1", "test 2", "test 3"));
         otp2.addSupervisors("test 4", "test 2", "test 7", "test 8");
 
-        StructureChangeDelta expected = StructureChangeDelta.of(PropertyType.ONE_TIME_PERIOD, otp1)
+        StructureDelta expected = StructureDelta.of(PropertyType.ONE_TIME_PERIOD, otp1)
                 .addRemoved(PropertyType.SUPERVISOR, "test1").addAdded(PropertyType.SUPERVISOR, "test 4")
                 .addRemoved(PropertyType.SUPERVISOR, "test 3").addAdded(PropertyType.SUPERVISOR, "test 7")
                 .addAdded(PropertyType.SUPERVISOR, "test 8");
 
-        StructureChangeDelta invertExpected = StructureChangeDelta.of(PropertyType.ONE_TIME_PERIOD, otp2)
+        StructureDelta invertExpected = StructureDelta.of(PropertyType.ONE_TIME_PERIOD, otp2)
                 .addRemoved(PropertyType.SUPERVISOR, "test 4").addAdded(PropertyType.SUPERVISOR, "test1")
                 .addRemoved(PropertyType.SUPERVISOR, "test 7").addAdded(PropertyType.SUPERVISOR, "test 3")
                 .addRemoved(PropertyType.SUPERVISOR, "test 8");
@@ -507,12 +507,12 @@ public class PeriodTests {
         otp1.addNotes(Arrays.asList("test1", "test 2", "test 3"));
         otp2.addNotes("test 4", "test 2", "test 7", "test 8");
 
-        StructureChangeDelta expected = StructureChangeDelta.of(PropertyType.ONE_TIME_PERIOD, otp1)
+        StructureDelta expected = StructureDelta.of(PropertyType.ONE_TIME_PERIOD, otp1)
                 .addRemoved(PropertyType.NOTE, "test1").addAdded(PropertyType.NOTE, "test 4")
                 .addRemoved(PropertyType.NOTE, "test 3").addAdded(PropertyType.NOTE, "test 7")
                 .addAdded(PropertyType.NOTE, "test 8");
 
-        StructureChangeDelta invertExpected = StructureChangeDelta.of(PropertyType.ONE_TIME_PERIOD, otp2)
+        StructureDelta invertExpected = StructureDelta.of(PropertyType.ONE_TIME_PERIOD, otp2)
                 .addRemoved(PropertyType.NOTE, "test 4").addAdded(PropertyType.NOTE, "test1")
                 .addRemoved(PropertyType.NOTE, "test 7").addAdded(PropertyType.NOTE, "test 3")
                 .addRemoved(PropertyType.NOTE, "test 8");

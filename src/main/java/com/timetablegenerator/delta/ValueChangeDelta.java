@@ -13,21 +13,23 @@ public class ValueChangeDelta extends Delta {
     @Getter private final Object oldValue;
     @Getter private final Object newValue;
 
-    private ValueChangeDelta(PropertyType propertyType, Object oldValue, Object newValue) {
+    ValueChangeDelta(@NonNull PropertyType propertyType, @NonNull Object oldValue, @NonNull Object newValue) {
         super(propertyType);
+        propertyType.validateType(oldValue.getClass());
+        propertyType.validateType(newValue.getClass());
         this.oldValue = oldValue;
         this.newValue = newValue;
     }
 
-    public static ValueChangeDelta of(PropertyType propertyType, @NonNull Boolean oldValue, @NonNull Boolean newValue){
+    public static ValueChangeDelta of(PropertyType propertyType, Boolean oldValue, Boolean newValue){
         return new ValueChangeDelta(propertyType, oldValue, newValue);
     }
 
-    public static ValueChangeDelta of(PropertyType propertyType, @NonNull String oldValue, @NonNull String newValue){
+    public static ValueChangeDelta of(PropertyType propertyType, String oldValue, String newValue){
         return new ValueChangeDelta(propertyType, oldValue, newValue);
     }
 
-    public static ValueChangeDelta of(PropertyType propertyType, @NonNull Number oldValue, @NonNull Number newValue){
+    public static ValueChangeDelta of(PropertyType propertyType, Number oldValue, Number newValue){
         return new ValueChangeDelta(propertyType, oldValue, newValue);
     }
 

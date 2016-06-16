@@ -8,7 +8,7 @@ public interface Diffable<T> {
      * @param d The instance being mapped to.
      * @return A structural mapping from this instance to the argument instance.
      */
-    StructureChangeDelta findDifferences(T d);
+    StructureDelta findDifferences(Diffable<T> d);
 
     /**
      * Returns the ID used to identify this particular resource instance in a diff set.

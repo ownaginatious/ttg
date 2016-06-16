@@ -2,7 +2,7 @@ package com.timetablegenerator.model.period;
 
 import com.timetablegenerator.Settings;
 import com.timetablegenerator.delta.PropertyType;
-import com.timetablegenerator.delta.StructureChangeDelta;
+import com.timetablegenerator.delta.StructureDelta;
 import com.timetablegenerator.model.Term;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -74,7 +74,7 @@ abstract class Period {
 
     public abstract boolean isScheduled();
 
-    void savePeriodDifferences(StructureChangeDelta delta, Period that) {
+    void savePeriodDifferences(StructureDelta delta, Period that) {
 
         delta.addValueIfChanged(PropertyType.ROOM, this.room, that.room);
         delta.addValueIfChanged(PropertyType.CAMPUS, this.campus, that.campus);

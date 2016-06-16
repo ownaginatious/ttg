@@ -2,9 +2,9 @@ package com.timetablegenerator.tests.api.diff;
 
 import com.timetablegenerator.Settings;
 import com.timetablegenerator.delta.PropertyType;
-import com.timetablegenerator.delta.ValueAdditionDelta;
+import com.timetablegenerator.delta.AdditionDelta;
 import com.timetablegenerator.delta.ValueChangeDelta;
-import com.timetablegenerator.delta.ValueRemovalDelta;
+import com.timetablegenerator.delta.RemovalDelta;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -15,31 +15,31 @@ public class ValueDelta {
 
     @Test
     public void addition() {
-        ValueAdditionDelta vad = ValueAdditionDelta.of(PropertyType.CAMPUS, "Hello");
+        AdditionDelta vad = AdditionDelta.of(PropertyType.CAMPUS, "Hello");
         assertEquals("Hello", vad.getNewValue());
         assertEquals(PropertyType.CAMPUS, vad.getPropertyType());
 
-        vad = ValueAdditionDelta.of(PropertyType.CREDITS, 1.234);
+        vad = AdditionDelta.of(PropertyType.CREDITS, 1.234);
         assertEquals(1.234, vad.getNewValue());
         assertEquals(PropertyType.CREDITS, vad.getPropertyType());
 
-        vad = ValueAdditionDelta.of(PropertyType.IS_ALTERNATING, true);
+        vad = AdditionDelta.of(PropertyType.IS_ALTERNATING, true);
         assertEquals(true, vad.getNewValue());
         assertEquals(PropertyType.IS_ALTERNATING, vad.getPropertyType());
     }
 
     @Test
     public void additionString() {
-        ValueAdditionDelta vad = ValueAdditionDelta.of(PropertyType.CAMPUS, "Hello");
+        AdditionDelta vad = AdditionDelta.of(PropertyType.CAMPUS, "Hello");
         assertEquals("ADDED [CAMPUS] (value = Hello)", vad.toString());
     }
 
     @Test
     public void additionEquality() {
-        ValueAdditionDelta vad1 = ValueAdditionDelta.of(PropertyType.CAMPUS, "Hello");
-        ValueAdditionDelta vad2 = ValueAdditionDelta.of(PropertyType.NOTE, "Hello");
-        ValueAdditionDelta vad3 = ValueAdditionDelta.of(PropertyType.CAMPUS, "Hellow");
-        ValueAdditionDelta vad4 = ValueAdditionDelta.of(PropertyType.CAMPUS, "Hello");
+        AdditionDelta vad1 = AdditionDelta.of(PropertyType.CAMPUS, "Hello");
+        AdditionDelta vad2 = AdditionDelta.of(PropertyType.NOTE, "Hello");
+        AdditionDelta vad3 = AdditionDelta.of(PropertyType.CAMPUS, "Hellow");
+        AdditionDelta vad4 = AdditionDelta.of(PropertyType.CAMPUS, "Hello");
 
         assertEquals(vad1, vad4);
         assertNotEquals(vad1, vad2);
@@ -47,38 +47,48 @@ public class ValueDelta {
         assertNotEquals(vad1, vad3);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void badAdditionType() {
+        AdditionDelta.of(PropertyType.ONE_TIME_PERIOD, 1);
+    }
+
     @Test
     public void removal() {
-        ValueRemovalDelta vrd = ValueRemovalDelta.of(PropertyType.CAMPUS, "Hello");
+        RemovalDelta vrd = RemovalDelta.of(PropertyType.CAMPUS, "Hello");
         assertEquals("Hello", vrd.getOldValue());
         assertEquals(PropertyType.CAMPUS, vrd.getPropertyType());
 
-        vrd = ValueRemovalDelta.of(PropertyType.CREDITS, 1.234);
+        vrd = RemovalDelta.of(PropertyType.CREDITS, 1.234);
         assertEquals(1.234, vrd.getOldValue());
         assertEquals(PropertyType.CREDITS, vrd.getPropertyType());
 
-        vrd = ValueRemovalDelta.of(PropertyType.IS_ALTERNATING, true);
+        vrd = RemovalDelta.of(PropertyType.IS_ALTERNATING, true);
         assertEquals(true, vrd.getOldValue());
         assertEquals(PropertyType.IS_ALTERNATING, vrd.getPropertyType());
     }
 
     @Test
     public void removalString() {
-        ValueRemovalDelta vrd = ValueRemovalDelta.of(PropertyType.CAMPUS, "Hello");
+        RemovalDelta vrd = RemovalDelta.of(PropertyType.CAMPUS, "Hello");
         assertEquals("REMOVED [CAMPUS] (value = Hello)", vrd.toString());
     }
 
     @Test
     public void removalEquality() {
-        ValueRemovalDelta vrd1 = ValueRemovalDelta.of(PropertyType.CAMPUS, "Hello");
-        ValueRemovalDelta vrd2 = ValueRemovalDelta.of(PropertyType.NOTE, "Hello");
-        ValueRemovalDelta vrd3 = ValueRemovalDelta.of(PropertyType.CAMPUS, "Hellow");
-        ValueRemovalDelta vrd4 = ValueRemovalDelta.of(PropertyType.CAMPUS, "Hello");
+        RemovalDelta vrd1 = RemovalDelta.of(PropertyType.CAMPUS, "Hello");
+        RemovalDelta vrd2 = RemovalDelta.of(PropertyType.NOTE, "Hello");
+        RemovalDelta vrd3 = RemovalDelta.of(PropertyType.CAMPUS, "Hellow");
+        RemovalDelta vrd4 = RemovalDelta.of(PropertyType.CAMPUS, "Hello");
 
         assertEquals(vrd1, vrd4);
         assertNotEquals(vrd1, vrd2);
         assertNotEquals(vrd1, vrd2);
         assertNotEquals(vrd1, vrd3);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void badRemovalType() {
+        RemovalDelta.of(PropertyType.ONE_TIME_PERIOD, 1);
     }
 
     @Test
@@ -118,5 +128,10 @@ public class ValueDelta {
         assertNotEquals(vcd1, vcd2);
         assertNotEquals(vcd1, vcd2);
         assertNotEquals(vcd1, vcd3);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void badChangeType() {
+        ValueChangeDelta.of(PropertyType.ONE_TIME_PERIOD, 1, 2);
     }
 }
