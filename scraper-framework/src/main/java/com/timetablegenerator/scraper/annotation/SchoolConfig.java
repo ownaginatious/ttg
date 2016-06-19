@@ -12,8 +12,6 @@ public @interface SchoolConfig {
     String name();
     String id();
 
-    boolean useDepartmentPrefixes() default false;
-
     SectionMapping[] sections() default {};
 
     LegacyConfig[] legacy() default {};

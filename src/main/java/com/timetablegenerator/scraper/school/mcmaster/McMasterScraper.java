@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 
 @SchoolConfig(
         name = "McMaster University", id = "mcmaster",
-        useDepartmentPrefixes = true,
         sections = {
                 @SectionMapping(name = "Core", code = "C"),
                 @SectionMapping(name = "Lab", code = "L"),
@@ -49,7 +48,7 @@ public class McMasterScraper extends Scraper {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final Pattern COURSE_INFO_PATTERN = Pattern.compile(
-            "^[A-Z]+\\s+(?<code>[1-9][A-Z]{1,2}(?<credits>[0-9]{1,2})[A-Z]?) - (?<name>.+)$");
+            "^(?<code>[A-Z]+\\s+[1-9][A-Z]{1,2}(?<credits>[0-9]{1,2})[A-Z]?) - (?<name>.+)$");
 
     private static final Pattern SECTION_CODE_PATTERN = Pattern.compile(
             "^(?<name>[A-Z0-9]+)-(?<type>[A-Z]+)\\((?<serial>[0-9]+)\\)$");

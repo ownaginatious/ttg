@@ -259,8 +259,7 @@ public class ScraperProcessor extends AbstractProcessor {
                     .addStatement("sb = $T.builder($S, $S)",
                             School.class,
                             v.name(), v.id()
-                    )
-                    .addStatement("sb.usesDepartmentPrefixes($L)", v.useDepartmentPrefixes());
+                    );
 
             for (SectionMapping sm : v.sections()) {
                 cbb.addStatement("sb.withSection($S, $S)", sm.name(), sm.code());

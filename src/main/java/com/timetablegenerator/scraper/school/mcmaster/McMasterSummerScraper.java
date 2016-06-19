@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 
 @SchoolConfig(
         name = "McMaster University", id = "mcmaster_summer",
-        useDepartmentPrefixes = true,
         sections = {
                 @SectionMapping(name = "Core", code = "C"),
                 @SectionMapping(name = "Lab", code = "L"),

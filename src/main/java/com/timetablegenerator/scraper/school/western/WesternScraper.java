@@ -31,7 +31,6 @@ import java.util.regex.Pattern;
 
 @SchoolConfig(
         name = "University of Western Ontario", id = "western",
-        useDepartmentPrefixes = true,
         sections = {
 
                 @SectionMapping(code = "LEC", name = "Lecture"),
@@ -59,7 +58,7 @@ public class WesternScraper extends Scraper {
             Pattern.compile("^(?<hour>[0-9]{1,2}):(?<minute>[0-9]{2}) (?<tod>[AP])M$");
 
     private final Pattern COURSE_PATTERN =
-            Pattern.compile("(?<department>^[A-Z-]+) (?<code>[0-9]+(?<term>[A-Z]?)) - (?<name>.+)$");
+            Pattern.compile("^(?<code>(?<department>[A-Z-]+) [0-9]+(?<term>[A-Z]?)) - (?<name>.+)$");
 
     // Credit signifiers.
     private static final String QUARTER_CREDITS = "QRST";

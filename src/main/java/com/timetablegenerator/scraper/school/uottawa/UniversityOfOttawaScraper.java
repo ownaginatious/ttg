@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 
 @SchoolConfig(
         name = "University of Ottawa", id = "uottawa",
-        useDepartmentPrefixes = false,
         sections = {
                 @SectionMapping(name = "Lecture", code = "LEC"),
                 @SectionMapping(name = "Course has on-line/classroom activities", code = "HYB"),

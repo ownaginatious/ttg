@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 
 @SchoolConfig(
         name = "University of Toronto Scarborough", id = "utsc",
-        useDepartmentPrefixes = false,
         sections = {
                 @SectionMapping(name = "Lecture", code = "LEC"),
                 @SectionMapping(name = "Practical", code = "PRA"),
