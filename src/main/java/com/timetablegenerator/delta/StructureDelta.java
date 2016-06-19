@@ -39,7 +39,12 @@ public class StructureDelta extends Delta {
         return this;
     }
 
-    public StructureDelta addAdded(PropertyType propertyType, @NonNull Number value) {
+    public StructureDelta addAdded(PropertyType propertyType, @NonNull Double value) {
+        this.valueDeltas.add(AdditionDelta.of(propertyType, value));
+        return this;
+    }
+
+    public StructureDelta addAdded(PropertyType propertyType, @NonNull Integer value) {
         this.valueDeltas.add(AdditionDelta.of(propertyType, value));
         return this;
     }
@@ -54,7 +59,12 @@ public class StructureDelta extends Delta {
         return this;
     }
 
-    public StructureDelta addRemoved(PropertyType propertyType, @NonNull Number value) {
+    public StructureDelta addRemoved(PropertyType propertyType, @NonNull Double value) {
+        this.valueDeltas.add(RemovalDelta.of(propertyType, value));
+        return this;
+    }
+
+    public StructureDelta addRemoved(PropertyType propertyType, @NonNull Integer value) {
         this.valueDeltas.add(RemovalDelta.of(propertyType, value));
         return this;
     }
@@ -69,8 +79,8 @@ public class StructureDelta extends Delta {
         return this;
     }
 
-    private StructureDelta addValueIfChanged(PropertyType propertyType,
-                                             Object oldValue, Object newValue) {
+    private <T> StructureDelta addValueIfChangedInternal(PropertyType propertyType,
+                                             Comparable<T> oldValue, Comparable<T> newValue) {
         if (!Objects.equals(oldValue, newValue)) {
             if (newValue == null) {
                 this.valueDeltas.add(new RemovalDelta(propertyType, oldValue));
@@ -87,35 +97,26 @@ public class StructureDelta extends Delta {
 
     public StructureDelta addValueIfChanged(PropertyType propertyType,
                                             Boolean oldValue, Boolean newValue) {
-        return this.addValueIfChanged(propertyType, (Object) oldValue, newValue);
+        return this.addValueIfChangedInternal(propertyType, oldValue, newValue);
     }
 
     public StructureDelta addValueIfChanged(PropertyType propertyType,
-                                            Number oldValue, Number newValue) {
-        return this.addValueIfChanged(propertyType, (Object) oldValue, newValue);
+                                            Integer oldValue, Integer newValue) {
+        return this.addValueIfChangedInternal(propertyType, oldValue, newValue);
+    }
+
+    public StructureDelta addValueIfChanged(PropertyType propertyType,
+                                            Double oldValue, Double newValue) {
+        return this.addValueIfChangedInternal(propertyType, oldValue, newValue);
     }
 
     public StructureDelta addValueIfChanged(PropertyType propertyType,
                                             String oldValue, String newValue) {
-        return this.addValueIfChanged(propertyType, (Object) oldValue, newValue);
+        return this.addValueIfChangedInternal(propertyType, oldValue, newValue);
     }
 
-    public <T> StructureDelta addValueIfChanged(PropertyType propertyType,
-                                            Diffable<T> oldValue, Diffable<T> newValue) {
-        if (oldValue != null && newValue == null) {
-            this.valueDeltas.add(new RemovalDelta(propertyType, oldValue));
-        } else if (oldValue == null && newValue != null) {
-            this.valueDeltas.add(new AdditionDelta(propertyType, newValue));
-        } else if (oldValue != null) {
-
-            propertyType.validateType(oldValue.getClass());
-            propertyType.validateType(newValue.getClass());
-
-            StructureDelta delta = oldValue.findDifferences(newValue);
-            if (delta.hasChanges()) {
-                this.substructureDeltas.add(delta);
-            }
-        }
+    public StructureDelta addSubstructureChange(@NonNull StructureDelta delta){
+        this.substructureDeltas.add(delta);
         return this;
     }
 

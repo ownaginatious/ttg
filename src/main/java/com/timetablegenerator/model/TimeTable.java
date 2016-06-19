@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
 
 @EqualsAndHashCode(exclude={"lastUpdate"})
-public class TimeTable implements Comparable<TimeTable>, Diffable<TimeTable> {
+public class TimeTable implements Diffable<TimeTable> {
 
     @Getter private final School school;
     @Getter private final Term term;

@@ -27,64 +27,52 @@ public class StructuralDelta {
 
     @Test
     public void addition() {
-        StructureAdditionDelta sad =
-                StructureAdditionDelta.of(PropertyType.REPEATING_PERIOD, this.rp1);
-        assertEquals(PropertyType.REPEATING_PERIOD, sad.getPropertyType());
-        assertEquals(this.rp1, sad.getNewValue());
+        AdditionDelta ad = AdditionDelta.of(PropertyType.REPEATING_PERIOD, this.rp1);
+        assertEquals(PropertyType.REPEATING_PERIOD, ad.getPropertyType());
+        assertEquals(this.rp1, ad.getNewValue());
     }
 
     @Test
     public void additionString() {
-        StructureAdditionDelta sad =
-                StructureAdditionDelta.of(PropertyType.REPEATING_PERIOD, this.rp1);
-        assertEquals("ADDED [REPEATING_PERIOD] (id = 2016/SEM1/TBA/TBA/TBA)", sad.toString());
+        AdditionDelta ad = AdditionDelta.of(PropertyType.REPEATING_PERIOD, this.rp1);
+        assertEquals("ADDED [REPEATING_PERIOD] (id = 2016/SEM1/TBA/TBA/TBA)", ad.toString());
     }
 
     @Test
     public void additionEquality(){
-        StructureAdditionDelta sad =
-                StructureAdditionDelta.of(PropertyType.REPEATING_PERIOD, this.rp1);
-        StructureAdditionDelta sad1 =
-                StructureAdditionDelta.of(PropertyType.ONE_TIME_PERIOD, OneTimePeriod.of(this.term));
-        StructureAdditionDelta sad2 =
-                StructureAdditionDelta.of(PropertyType.REPEATING_PERIOD, this.rp2);
-        StructureAdditionDelta sad3 =
-                StructureAdditionDelta.of(PropertyType.REPEATING_PERIOD, this.rp1);
+        AdditionDelta ad = AdditionDelta.of(PropertyType.REPEATING_PERIOD, this.rp1);
+        AdditionDelta ad1 = AdditionDelta.of(PropertyType.ONE_TIME_PERIOD, OneTimePeriod.of(this.term));
+        AdditionDelta ad2 = AdditionDelta.of(PropertyType.REPEATING_PERIOD, this.rp2);
+        AdditionDelta ad3 = AdditionDelta.of(PropertyType.REPEATING_PERIOD, this.rp1);
 
-        assertEquals(sad, sad3);
-        assertNotEquals(sad, sad1);
-        assertNotEquals(sad, sad2);
+        assertEquals(ad, ad3);
+        assertNotEquals(ad, ad1);
+        assertNotEquals(ad, ad2);
     }
 
     @Test
     public void removal() {
-        StructureRemovalDelta srd =
-                StructureRemovalDelta.of(PropertyType.REPEATING_PERIOD, this.rp1);
-        assertEquals(PropertyType.REPEATING_PERIOD, srd.getPropertyType());
-        assertEquals(this.rp1, srd.getOldValue());
+        RemovalDelta rd = RemovalDelta.of(PropertyType.REPEATING_PERIOD, this.rp1);
+        assertEquals(PropertyType.REPEATING_PERIOD, rd.getPropertyType());
+        assertEquals(this.rp1, rd.getOldValue());
     }
 
     @Test
     public void removalString() {
-        StructureRemovalDelta srd =
-                StructureRemovalDelta.of(PropertyType.REPEATING_PERIOD, this.rp1);
-        assertEquals("REMOVED [REPEATING_PERIOD] (id = 2016/SEM1/TBA/TBA/TBA)", srd.toString());
+        RemovalDelta rd = RemovalDelta.of(PropertyType.REPEATING_PERIOD, this.rp1);
+        assertEquals("REMOVED [REPEATING_PERIOD] (id = 2016/SEM1/TBA/TBA/TBA)", rd.toString());
     }
 
     @Test
     public void removalEquality(){
-        StructureRemovalDelta srd =
-                StructureRemovalDelta.of(PropertyType.REPEATING_PERIOD, this.rp1);
-        StructureRemovalDelta srd1 =
-                StructureRemovalDelta.of(PropertyType.ONE_TIME_PERIOD, OneTimePeriod.of(this.term));
-        StructureRemovalDelta srd2 =
-                StructureRemovalDelta.of(PropertyType.REPEATING_PERIOD, this.rp2);
-        StructureRemovalDelta srd3 =
-                StructureRemovalDelta.of(PropertyType.REPEATING_PERIOD, this.rp1);
+        RemovalDelta rd = RemovalDelta.of(PropertyType.REPEATING_PERIOD, this.rp1);
+        RemovalDelta rd1 = RemovalDelta.of(PropertyType.ONE_TIME_PERIOD, OneTimePeriod.of(this.term));
+        RemovalDelta rd2 = RemovalDelta.of(PropertyType.REPEATING_PERIOD, this.rp2);
+        RemovalDelta rd3 = RemovalDelta.of(PropertyType.REPEATING_PERIOD, this.rp1);
 
-        assertEquals(srd, srd3);
-        assertNotEquals(srd, srd1);
-        assertNotEquals(srd, srd2);
+        assertEquals(rd, rd3);
+        assertNotEquals(rd, rd1);
+        assertNotEquals(rd, rd2);
     }
 
     @Test
@@ -202,8 +190,8 @@ public class StructuralDelta {
                     .findFirst().orElse(null);
         assertEquals(1.234, delta.getNewValue());
 
-        StructureAdditionDelta structureDelta =
-                (StructureAdditionDelta) this.scd.getValueChanges().stream()
+        AdditionDelta structureDelta =
+                (AdditionDelta) this.scd.getValueChanges().stream()
                         .filter(x -> x.getPropertyType() == PropertyType.REPEATING_PERIOD)
                         .findFirst().orElse(null);
         assertEquals(this.rp1, structureDelta.getNewValue());
@@ -232,8 +220,8 @@ public class StructuralDelta {
                 .findFirst().orElse(null);
         assertEquals(1.234, delta.getOldValue());
 
-        StructureRemovalDelta structureDelta =
-                (StructureRemovalDelta) this.scd.getValueChanges().stream()
+        RemovalDelta structureDelta =
+                (RemovalDelta) this.scd.getValueChanges().stream()
                         .filter(x -> x.getPropertyType() == PropertyType.REPEATING_PERIOD)
                         .findFirst().orElse(null);
         assertEquals(this.rp1, structureDelta.getOldValue());
@@ -246,17 +234,6 @@ public class StructuralDelta {
                 this.scd.getSubstructureChanges().stream()
                         .findFirst().orElse(null).getIdentifier()
         );
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void recursiveSubstructureChange(){
-        this.scd.addSubstructureChange(this.scd);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void duplicateSubstructureChange() {
-        this.scd.addSubstructureChange(StructureDelta.of(PropertyType.REPEATING_PERIOD, this.rp1));
-        this.scd.addSubstructureChange(StructureDelta.of(PropertyType.REPEATING_PERIOD, this.rp1));
     }
 
     @Test
@@ -289,7 +266,10 @@ public class StructuralDelta {
         this.scd.addValueIfChanged(PropertyType.NOTE, "My Note", null);
         this.scd.addValueIfChanged(PropertyType.NOTE, null, "My Note 2");
         this.scd.addValueIfChanged(PropertyType.CREDITS, 2.32, 4.343);
-        this.scd.addSubstructureChange(StructureDelta.of(PropertyType.SECTION, Section.of("ID")));
+        this.scd.addSubstructureChange(
+                StructureDelta.of(PropertyType.SECTION, Section.of("ID"))
+                    .addRemoved(PropertyType.NOTE, "Hello")
+        );
 
         assertEquals("", this.scd.toString());
     }

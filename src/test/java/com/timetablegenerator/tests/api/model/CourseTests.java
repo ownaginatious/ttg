@@ -101,11 +101,14 @@ public class CourseTests {
         Course c3 = getRandomCourse();
 
         c1.addPrerequisite(c2);
-        assertEquals(new HashSet<>(Collections.singletonList(c2)), c1.getPrerequisites());
+        Map<String, Course> expected = new HashMap<>();
+        expected.put(c2.getUniqueId(), c2);
+        assertEquals(expected, c1.getPrerequisites());
         c1.addPrerequisite(c3);
-        assertEquals(new HashSet<>(Arrays.asList(c2, c3)), c1.getPrerequisites());
+        expected.put(c3.getUniqueId(), c3);
+        assertEquals(expected, c1.getPrerequisites());
         c1.addPrerequisite(c2);
-        assertEquals(new HashSet<>(Arrays.asList(c2, c3)), c1.getPrerequisites());
+        assertEquals(expected, c1.getPrerequisites());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -122,11 +125,14 @@ public class CourseTests {
         Course c3 = getRandomCourse();
 
         c1.addAntirequisite(c2);
-        assertEquals(new HashSet<>(Collections.singletonList(c2)), c1.getAntirequisites());
+        Map<String, Course> expected = new HashMap<>();
+        expected.put(c2.getUniqueId(), c2);
+        assertEquals(expected, c1.getAntirequisites());
         c1.addAntirequisite(c3);
-        assertEquals(new HashSet<>(Arrays.asList(c2, c3)), c1.getAntirequisites());
+        expected.put(c3.getUniqueId(), c3);
+        assertEquals(expected, c1.getAntirequisites());
         c1.addAntirequisite(c2);
-        assertEquals(new HashSet<>(Arrays.asList(c2, c3)), c1.getAntirequisites());
+        assertEquals(expected, c1.getAntirequisites());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -143,11 +149,14 @@ public class CourseTests {
         Course c3 = getRandomCourse();
 
         c1.addCrossListing(c2);
-        assertEquals(new HashSet<>(Collections.singletonList(c2)), c1.getCrossListings());
+        Map<String, Course> expected = new HashMap<>();
+        expected.put(c2.getUniqueId(), c2);
+        assertEquals(expected, c1.getCrossListings());
         c1.addCrossListing(c3);
-        assertEquals(new HashSet<>(Arrays.asList(c2, c3)), c1.getCrossListings());
+        expected.put(c3.getUniqueId(), c3);
+        assertEquals(expected, c1.getCrossListings());
         c1.addCrossListing(c2);
-        assertEquals(new HashSet<>(Arrays.asList(c2, c3)), c1.getCrossListings());
+        assertEquals(expected, c1.getCrossListings());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -164,11 +173,14 @@ public class CourseTests {
         Course c3 = getRandomCourse();
 
         c1.addCorequesite(c2);
-        assertEquals(new HashSet<>(Collections.singletonList(c2)), c1.getCorequisites());
+        Map<String, Course> expected = new HashMap<>();
+        expected.put(c2.getUniqueId(), c2);
+        assertEquals(expected, c1.getCorequisites());
         c1.addCorequesite(c3);
-        assertEquals(new HashSet<>(Arrays.asList(c2, c3)), c1.getCorequisites());
+        expected.put(c3.getUniqueId(), c3);
+        assertEquals(expected, c1.getCorequisites());
         c1.addCorequesite(c2);
-        assertEquals(new HashSet<>(Arrays.asList(c2, c3)), c1.getCorequisites());
+        assertEquals(expected, c1.getCorequisites());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -317,9 +329,9 @@ public class CourseTests {
 
         assertEquals(
                 StructureDelta.of(PropertyType.COURSE, c1)
-                        .addRemoved(PropertyType.ANTI_REQUISITE, c3.getUniqueId())
-                        .addAdded(PropertyType.PRE_REQUISITE, c4.getUniqueId())
-                        .addAdded(PropertyType.CROSS_LISTING, c5.getUniqueId()),
+                        .addRemoved(PropertyType.ANTI_REQUISITE, c3)
+                        .addAdded(PropertyType.PRE_REQUISITE, c4)
+                        .addAdded(PropertyType.CROSS_LISTING, c5),
                 c1.findDifferences(c2)
         );
 

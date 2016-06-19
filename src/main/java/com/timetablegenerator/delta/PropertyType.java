@@ -21,9 +21,9 @@ public enum PropertyType {
     IS_CANCELLED(Boolean.class), IS_ONLINE(Boolean.class),
     IS_ALTERNATING(Boolean.class), SUPERVISOR(String.class);
 
-    private final Class<?> expectedType;
+    private final Class<? extends Comparable> expectedType;
 
-    PropertyType(@NonNull Class<?> expectedType){
+    PropertyType(@NonNull Class<? extends Comparable> expectedType){
         this.expectedType = expectedType;
     }
 
@@ -33,6 +33,10 @@ public enum PropertyType {
                     " is not assignable from expected type " + expectedType.getName() +
                     " for property type [" + this.getFieldName() + "]");
         }
+    }
+
+    public Class<?> getExpectedType(){
+        return this.expectedType;
     }
 
     public String getFieldName() {

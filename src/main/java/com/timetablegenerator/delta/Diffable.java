@@ -1,6 +1,6 @@
 package com.timetablegenerator.delta;
 
-public interface Diffable<T> {
+public interface Diffable<T> extends Comparable<T>{
 
     /**
      * Returns a structural mapping from the implementing instance to the argument instance.
@@ -8,7 +8,7 @@ public interface Diffable<T> {
      * @param d The instance being mapped to.
      * @return A structural mapping from this instance to the argument instance.
      */
-    StructureDelta findDifferences(Diffable<T> d);
+    StructureDelta findDifferences(T d);
 
     /**
      * Returns the ID used to identify this particular resource instance in a diff set.

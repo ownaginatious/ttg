@@ -5,6 +5,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 
+import javax.annotation.Nonnull;
+
 @EqualsAndHashCode(callSuper = true)
 public class ValueChangeDelta extends Delta {
 
@@ -37,5 +39,23 @@ public class ValueChangeDelta extends Delta {
         return "MODIFIED [" + this.getPropertyType().getFieldName() + "]\n"
                   + I + "Old value : \"" + oldValue + "\"\n"
                   + I + "New value : \"" + newValue + "\"";
+    }
+
+    @Override
+    public int compareTo(@Nonnull Delta that) {
+        if (that instanceof RemovalDelta || that instanceof AdditionDelta) {
+            return 1;
+        }
+        if (this.getPropertyType() != that.getPropertyType()) {
+            return this.getPropertyType().compareTo(that.getPropertyType());
+        }
+        // Only way to ensure a stable reproducible ordering.
+        int thisOldHash = this.oldValue.hashCode();
+        int thatOldHash = ((ValueChangeDelta) that).oldValue.hashCode();
+
+        if (thisOldHash != thatOldHash){
+            return thisOldHash - thatOldHash;
+        }
+        return this.newValue.hashCode() - ((ValueChangeDelta) that).newValue.hashCode();
     }
 }

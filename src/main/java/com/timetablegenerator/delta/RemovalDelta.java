@@ -4,6 +4,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 
+import javax.annotation.Nonnull;
+
 @EqualsAndHashCode(callSuper = true)
 public class RemovalDelta extends Delta {
 
@@ -23,7 +25,11 @@ public class RemovalDelta extends Delta {
         return new RemovalDelta(propertyType, oldValue);
     }
 
-    public static RemovalDelta of(PropertyType propertyType, Number oldValue) {
+    public static RemovalDelta of(PropertyType propertyType, Double oldValue) {
+        return new RemovalDelta(propertyType, oldValue);
+    }
+
+    public static RemovalDelta of(PropertyType propertyType, Integer oldValue) {
         return new RemovalDelta(propertyType, oldValue);
     }
 
@@ -33,7 +39,20 @@ public class RemovalDelta extends Delta {
 
     public String toString() {
         String s = this.oldValue instanceof Diffable ?
-                ((Diffable) this.oldValue).getDeltaId() : this.oldValue.toString();
-        return "REMOVED [" + this.getPropertyType().getFieldName() + "] (value = " +  s + ")";
+                "id = " + ((Diffable) this.oldValue).getDeltaId() :
+                "value = " + this.oldValue.toString();
+        return "REMOVED [" + this.getPropertyType().getFieldName() + "] (" + s + ")";
+    }
+
+    @Override
+    public int compareTo(@Nonnull Delta that) {
+        if (that instanceof AdditionDelta) {
+            return 1;
+        }
+        if (this.getPropertyType() != that.getPropertyType()) {
+            return this.getPropertyType().compareTo(that.getPropertyType());
+        }
+        // Only way to ensure a stable reproducible ordering.
+        return this.oldValue.hashCode() - ((RemovalDelta) that).oldValue.hashCode();
     }
 }

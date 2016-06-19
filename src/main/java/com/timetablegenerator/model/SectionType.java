@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
 import java.util.*;
 
 @EqualsAndHashCode
-public class SectionType implements Comparable<SectionType>, Diffable<SectionType> {
+public class SectionType implements Diffable<SectionType> {
 
     private static final String I = Settings.getIndent();
 

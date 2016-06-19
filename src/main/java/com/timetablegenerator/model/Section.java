@@ -13,6 +13,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 
 @EqualsAndHashCode()
@@ -374,5 +375,13 @@ public class Section implements Diffable<Section> {
             }
 
         return delta;
+    }
+
+    @Override
+    public int compareTo(@Nonnull Section that) {
+        if (this.sectionId.equals(that.sectionId)){
+            return this.sectionId.compareTo(that.sectionId);
+        }
+        return this.equals(that) ? 0 : -1;
     }
 }

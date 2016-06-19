@@ -17,7 +17,7 @@ import java.util.*;
 
 @EqualsAndHashCode
 @Accessors(chain = true)
-public class Course implements Comparable<Course>, Diffable<Course> {
+public class Course implements Diffable<Course> {
 
     private static final String I = Settings.getIndent();
 
@@ -34,10 +34,10 @@ public class Course implements Comparable<Course>, Diffable<Course> {
     @Setter private Double credits = null;
     private final List<String> notes = new ArrayList<>();
 
-    private final Set<Course> crossListings = new HashSet<>();
-    private final Set<Course> prerequisites = new HashSet<>();
-    private final Set<Course> antirequisites = new HashSet<>();
-    private final Set<Course> corequisites = new HashSet<>();
+    private final Map<String, Course> crossListings = new HashMap<>();
+    private final Map<String, Course> prerequisites = new HashMap<>();
+    private final Map<String, Course> antirequisites = new HashMap<>();
+    private final Map<String, Course> corequisites = new HashMap<>();
 
     private final Map<String, SectionType> sectionTypes = new HashMap<>();
 
@@ -70,14 +70,15 @@ public class Course implements Comparable<Course>, Diffable<Course> {
         return new Course(school, term, department, code, name);
     }
 
-    private void checkRelationalIntegrity(Set<Course> collection, Course course) {
+    private void checkRelationalIntegrity(Map<String, Course> collection, Course course) {
         if (course == this) {
             throw new IllegalArgumentException("A course cannot be related to itself");
         }
-        boolean ok = (collection == this.prerequisites || !this.prerequisites.contains(course)) &&
-                (collection == this.antirequisites || !this.antirequisites.contains(course)) &&
-                (collection == this.crossListings || !this.crossListings.contains(course)) &&
-                (collection == this.corequisites || !this.corequisites.contains(course));
+        String courseId = course.uniqueId;
+        boolean ok = (collection == this.prerequisites || !this.prerequisites.keySet().contains(courseId)) &&
+                (collection == this.antirequisites || !this.antirequisites.keySet().contains(courseId)) &&
+                (collection == this.crossListings || !this.crossListings.keySet().contains(courseId)) &&
+                (collection == this.corequisites || !this.corequisites.keySet().contains(courseId));
         if (!ok) {
             throw new IllegalArgumentException(
                     String.format("Course %s cannot be under multiple relation categories", course.getUniqueId()));
@@ -86,25 +87,25 @@ public class Course implements Comparable<Course>, Diffable<Course> {
 
     public Course addPrerequisite(Course c) {
         this.checkRelationalIntegrity(this.prerequisites, c);
-        this.prerequisites.add(c);
+        this.prerequisites.put(c.getUniqueId(), c);
         return this;
     }
 
     public Course addAntirequisite(Course c) {
         this.checkRelationalIntegrity(this.antirequisites, c);
-        this.antirequisites.add(c);
+        this.antirequisites.put(c.getUniqueId(), c);
         return this;
     }
 
     public Course addCorequesite(Course c) {
         this.checkRelationalIntegrity(this.corequisites, c);
-        this.corequisites.add(c);
+        this.corequisites.put(c.getUniqueId(), c);
         return this;
     }
 
     public Course addCrossListing(Course c) {
         this.checkRelationalIntegrity(this.crossListings, c);
-        this.crossListings.add(c);
+        this.crossListings.put(c.getUniqueId(), c);
         return this;
     }
 
@@ -130,20 +131,20 @@ public class Course implements Comparable<Course>, Diffable<Course> {
         return Collections.unmodifiableList(this.notes);
     }
 
-    public Collection<Course> getCrossListings() {
-        return Collections.unmodifiableSet(this.crossListings);
+    public Map<String, Course> getCrossListings() {
+        return Collections.unmodifiableMap(this.crossListings);
     }
 
-    public Collection<Course> getPrerequisites() {
-        return Collections.unmodifiableSet(this.prerequisites);
+    public Map<String, Course> getPrerequisites() {
+        return Collections.unmodifiableMap(this.prerequisites);
     }
 
-    public Collection<Course> getAntirequisites() {
-        return Collections.unmodifiableSet(this.antirequisites);
+    public Map<String, Course> getAntirequisites() {
+        return Collections.unmodifiableMap(this.antirequisites);
     }
 
-    public Collection<Course> getCorequisites() {
-        return new HashSet<>(this.corequisites);
+    public Map<String, Course> getCorequisites() {
+        return Collections.unmodifiableMap(this.corequisites);
     }
 
     public Collection<String> getSectionTypes() {
@@ -178,27 +179,23 @@ public class Course implements Comparable<Course>, Diffable<Course> {
 
         if (!this.crossListings.isEmpty()) {
             sb.append("\n* Cross-listings: ")
-                    .append(this.crossListings.stream()
-                            .map(Course::getUniqueId).sorted()
-                            .collect(Collectors.joining(", ")));
+                    .append(this.crossListings.keySet().stream()
+                            .sorted().collect(Collectors.joining(", ")));
         }
         if (!this.prerequisites.isEmpty()) {
             sb.append("\n* Pre-requisites: ")
-                    .append(this.prerequisites.stream()
-                            .map(Course::getUniqueId).sorted()
-                            .collect(Collectors.joining(", ")));
+                    .append(this.prerequisites.keySet().stream()
+                            .sorted().collect(Collectors.joining(", ")));
         }
         if (!this.antirequisites.isEmpty()) {
             sb.append("\n* Anti-requisites: ")
-                    .append(this.antirequisites.stream()
-                            .map(Course::getUniqueId).sorted()
-                            .collect(Collectors.joining(", ")));
+                    .append(this.antirequisites.keySet().stream()
+                            .sorted().collect(Collectors.joining(", ")));
         }
         if (!this.corequisites.isEmpty()) {
             sb.append("\n* Co-requisites: ")
-                    .append(this.corequisites.stream()
-                            .map(Course::getUniqueId).sorted()
-                            .collect(Collectors.joining(", ")));
+                    .append(this.corequisites.keySet().stream()
+                            .sorted().collect(Collectors.joining(", ")));
         }
 
         if (!this.notes.isEmpty()) {
@@ -289,21 +286,18 @@ public class Course implements Comparable<Course>, Diffable<Course> {
         return delta;
     }
 
-    private static Set<String> shallowCourseSet(Collection<Course> courses) {
-        return courses.stream().map(Course::getUniqueId).collect(Collectors.toSet());
-    }
-
     private static void recordCourseRelationDiff(StructureDelta delta, PropertyType propertyType,
-                                                 Collection<Course> thisListing, Collection<Course> thatListing) {
+                                                 Map<String, Course> thisListing,
+                                                 Map<String, Course> thatListing) {
 
-        Set<String> removed = shallowCourseSet(thisListing);
-        Set<String> added = shallowCourseSet(thatListing);
+        Set<String> removed = thisListing.keySet();
+        Set<String> added = thatListing.keySet();
         Set<String> overlap = new HashSet<>(added);
         overlap.retainAll(removed);
 
         added.stream().filter(x -> !overlap.contains(x))
-                .forEach(x -> delta.addAdded(propertyType, x));
+                .forEach(x -> delta.addAdded(propertyType, thatListing.get(x)));
         removed.stream().filter(x -> !overlap.contains(x))
-                .forEach(x -> delta.addRemoved(propertyType, x));
+                .forEach(x -> delta.addRemoved(propertyType, thisListing.get(x)));
     }
 }
