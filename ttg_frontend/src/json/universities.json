@@ -24,7 +24,7 @@
             "show_term": false,
             "uses_serials": true,
             "eow_word": "",
-            "uses_depheaders": true,
+            "uses_depheaders": false,
             "school_unit_names": {
                 "t": "Tutorial",
                 "c": "Lecture",
@@ -44,7 +44,7 @@
             "show_term": true,
             "uses_serials": false,
             "eow_word": "EOW",
-            "uses_depheaders": true,
+            "uses_depheaders": false,
             "school_unit_names": {
                 "t": "Tutorial",
                 "c": "Core",
@@ -64,7 +64,7 @@
             "show_term": true,
             "uses_serials": false,
             "eow_word": "EOW",
-            "uses_depheaders": true,
+            "uses_depheaders": false,
             "school_unit_names": {
                 "t": "Tutorial",
                 "c": "Core",
