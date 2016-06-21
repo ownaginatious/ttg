@@ -17,11 +17,10 @@ var DataLoader = {
         var days = ['mo', 'tu', 'we', 'th', 'fr', 'sa'];
 
         for (var term = 1; term < 3; term++) {
-            for (var day = 0; x < days.length; x++) {
+            for (var day = 0; day < days.length; day++) {
 
                 var last_hour = 0;
                 var last_minute = 0;
-
                 var hour = 8;
                 var minute = 0;
 
@@ -108,10 +107,12 @@ var DataLoader = {
 
         for (var active = 0; active < BoxManager.activeSelectors.length; active++) {
 
-            var id = "_select_" + BoxManager.activeSelectors[active] +
-                     " option:selected";
+            var id = BoxManager.activeSelectors[active];
 
             if ($("#advance_button_" + id).attr("disabled") === "disabled") {
+
+                id = "_select_" + BoxManager.activeSelectors[active] +
+                     " option:selected";
 
                 var selection_array = [];
 
@@ -248,20 +249,17 @@ var TimeTabler = {
 
     sameCourse : function(schoolUnitA, schoolUnitB) {
 
-        if (schoolUnitA.tod !== schoolUnitB.tod) {
-            return false;
-        }
-        if (schoolUnitA.t !== schoolUnitB.t) {
+        if (schoolUnitA.term !== schoolUnitB.term) {
             if (!schoolUnitA.termThree || !schoolUnitB.termThree) {
                 return false;
             }
         }
 
-        if (schoolUnitA.n !== schoolUnitB.n) {
+        if (schoolUnitA.name !== schoolUnitB.name) {
             return false;
         }
 
-        if (schoolUnitA.cod !== schoolUnitB.cod) {
+        if (schoolUnitA.code !== schoolUnitB.code) {
             return false;
         }
 
@@ -274,8 +272,9 @@ var TimeTabler = {
 
     schoolUnitsEqual : function(schoolUnitA, schoolUnitB) {
 
-        if (schoolUnitA.targetType !== schoolUnitB.targetType)
+        if (schoolUnitA.targetType !== schoolUnitB.targetType){
             return false;
+        }
 
         return TimeTabler.sameCourse(schoolUnitA, schoolUnitB);
     },
@@ -285,25 +284,25 @@ var TimeTabler = {
         var firstTerm = jQuery.extend(true, {}, schoolUnit);
         var secondTerm = jQuery.extend(true, {}, schoolUnit);
 
-        firstTerm.target.ti = [];
-        secondTerm.target.ti = [];
+        firstTerm.target.times = [];
+        secondTerm.target.times = [];
 
-        firstTerm.t = 1;
-        secondTerm.t = 2;
+        firstTerm.term = 1;
+        secondTerm.term = 2;
 
         firstTerm.termThree = true;
         secondTerm.termThree = true;
 
-        var times = schoolUnit.target.ti;
+        var times = schoolUnit.target.times;
 
         for (var x = 0; x < times.length; x++) {
 
             if (times[x][0] === 1 || times[x][0] === 3) {
-                firstTerm.target.ti.push(times[x]);
+                firstTerm.target.times.push(times[x]);
             }
 
             if (times[x][0] === 2 || times[x][0] === 3) {
-                secondTerm.target.ti.push(times[x]);
+                secondTerm.target.times.push(times[x]);
             }
         }
         return {"first" : firstTerm, "second" : secondTerm};
@@ -311,7 +310,7 @@ var TimeTabler = {
 
     importSchoolUnit : function(schoolUnit) {
 
-        if (schoolUnit.t === 3) {
+        if (schoolUnit.term === 3) {
 
             var targets = TimeTabler.splitTargets(schoolUnit);
 
@@ -321,9 +320,9 @@ var TimeTabler = {
             return;
         }
 
-        var term_prefix = "term" + schoolUnit.t.toString();
+        var term_prefix = "term" + schoolUnit.term.toString();
 
-        var times = schoolUnit.target.ti;
+        var times = schoolUnit.target.times;
 
         for (var x = 0; x < times.length; x++) {
 
@@ -381,7 +380,7 @@ var TimeTabler = {
 
     removeSchoolUnit: function(schoolUnit) {
 
-        var times = schoolUnit.target.ti;
+        var times = schoolUnit.target.times;
 
         // Remove and free up any used colors.
         for (var color in TimeTabler.colorWheel){
@@ -393,7 +392,7 @@ var TimeTabler = {
             }
         }
 
-        if (schoolUnit.t === 3) {
+        if (schoolUnit.term === 3) {
 
             var targets = TimeTabler.splitTargets(schoolUnit);
 
@@ -403,7 +402,7 @@ var TimeTabler = {
             return;
         }
 
-        var term_prefix = "term" + schoolUnit.t.toString();
+        var term_prefix = "term" + schoolUnit.term.toString();
 
         for (var x = 0; x < times.length; x++) {
 
@@ -469,6 +468,7 @@ var TimeTabler = {
     getColor : function(schoolUnit) {
 
         var firstFreeColor = null;
+        var setColor = null;
 
         // Establish a new color or retrieve an exising color for the course.
         for (var color in TimeTabler.colorWheel) {
@@ -563,6 +563,8 @@ var TimeTabler = {
         var i = 0;
         var j = 0;
         var k = 0;
+        var supervisor = null;
+        var setColor = null;
 
         var days = ['mo', 'tu', 'we', 'th', 'fr', 'sa'];
 
@@ -628,7 +630,7 @@ var TimeTabler = {
 
                 if (newData) {
                     visited.push(course_set[j]);
-                    var units = course_set[j].u;
+                    var units = course_set[j].credits;
 
                     if (!course_set[j].termThree) {
                         term_units[0] += units/2;
@@ -650,26 +652,26 @@ var TimeTabler = {
                     master_element = $("#" + time_slot);
                     master_school_unit = course_set[0];
 
-                    var setColor = TimeTabler.getColor(master_school_unit);
+                    setColor = TimeTabler.getColor(master_school_unit);
 
                     master_element.attr({"bgcolor" : setColor, "rowspan" : 1});
                     master_element.css("background", setColor);
 
-                    var supervisor = "<font color='blue'>";
+                    supervisor = "<font color='blue'>";
 
-                    if (master_school_unit.targetType === "c" && master_school_unit.target.sups.length > 0) {
-                        supervisor +=  "</br>" + master_school_unit.target.sups[0];
+                    if (master_school_unit.targetType === "core" && master_school_unit.target.supervisors.length > 0) {
+                        supervisor +=  "</br>" + master_school_unit.target.supervisors[0];
                     }
 
                     supervisor += "</font>";
 
                     master_element.html(
-                      master_school_unit.cod + " " +
+                      master_school_unit.code + " " +
                       university.school_unit_prefixes[master_school_unit.targetType] +
-                      master_school_unit.target.n + supervisor +
-                      (master_school_unit.target.sn ? "</br>" + master_school_unit.target.sn : "") +
+                      master_school_unit.target.name + supervisor +
+                      (master_school_unit.target.serial ? "</br>" + master_school_unit.target.serial : "") +
                       (master_school_unit.target.loc ? ("</br>" + master_school_unit.target.loc) : "") +
-                      (master_school_unit.target.EOW ? "</br><font color='red'>ALTERNATING</font>" : "")
+                      (master_school_unit.target.alternating ? "</br><font color='red'>ALTERNATING</font>" : "")
                     );
                 } else {
                     master_element.attr("rowspan", parseInt(master_element.attr("rowspan")) + 1);
@@ -721,8 +723,8 @@ var TimeTabler = {
                     for (j = 0; j < course_set.length; j++) {
                         for (k = 0; k < course_set.length; k++) {
                             if (j != k) {
-                                if (!course_set[j].target.EOW ||
-                                    !course_set[k].target.EOW ||
+                                if (!course_set[j].target.alternating ||
+                                    !course_set[k].target.alternating ||
                                     !TimeTabler.sameCourse(course_set[j], course_set[k]) ||
                                     course_set[k].targetType === course_set[j].targetType)
                                 {
@@ -741,7 +743,7 @@ var TimeTabler = {
                         $("#" + time_slot).css("background", conflict_color);
                     } else {
 
-                        var setColor = TimeTabler.getColor(course_set[0]);
+                        setColor = TimeTabler.getColor(course_set[0]);
 
                         $("#" + time_slot).attr("bgcolor", setColor);
                         $("#" + time_slot).css("background", setColor);
@@ -754,21 +756,21 @@ var TimeTabler = {
                     for (j = 0; j < course_set.length; j++) {
 
                         var unit = course_set[j];
-                        var supervisor = "<font color='blue'>";
+                        supervisor = "<font color='blue'>";
 
-                        if (unit.targetType === "c") {
-                            if (unit.target.sups.length > 0) {
-                                supervisor +=  "</br>" + unit.target.sups[0];
+                        if (unit.targetType === "core") {
+                            if (unit.target.supervisors.length > 0) {
+                                supervisor +=  "</br>" + unit.target.supervisors[0];
                             }
                         }
 
                         supervisor += "</font>";
 
                         conflict_element.append(
-                          unit.cod + " " +
+                          unit.code + " " +
                           university.school_unit_prefixes[unit.targetType] +
-                          unit.target.n + supervisor +
-                          (unit.target.sn ? "</br>" + unit.target.sn : "") +
+                          unit.target.name + supervisor +
+                          (unit.target.serial ? "</br>" + unit.target.serial : "") +
                           (unit.target.loc ? "</br>" + unit.target.loc : "") +
                           "</br><font color='red'>" + (true_conflict ? "*** CONFLICT ***" : "ALTERNATING") +
                           "</br>");
@@ -981,31 +983,32 @@ var BoxManager = {
         for (var i in dataInScope) {
 
             var courseInfo = dataInScope[i];
+            var name = courseInfo.code + (!courseInfo.name ? "" : " " + courseInfo.name);
 
-            // Check if available
-            if (courseInfo.a) {
+            name += (university.show_term)? " T" + courseInfo.term : "";
 
-                var name = courseInfo.cod + (!courseInfo.n ? "" : " " + courseInfo.n);
-
-                name += (university.show_term)? " T" + courseInfo.t : "";
-
-                courseNames.push(name);
-                courseListings[name] = i;
-            }
+            courseNames.push(name);
+            courseListings[name] = i;
         }
 
         courseNames.sort();
 
         // Default value
         $("#course_select_" + set_number).html("");
-        $("#course_select_" + set_number).append($('<option></option>').html('Select a course...').attr({'selected' : 'selected', 'value' : 'bad'}));
+        $("#course_select_" + set_number).append($('<option></option>')
+            .html('Select a course...')
+            .attr({'selected' : 'selected', 'value' : 'bad'}));
 
         for (var x = 0; x < courseNames.length; x++) {
-            $("#course_select_" + set_number).append($('<option></option>').html(courseNames[x]).attr('value', courseListings[courseNames[x]]));
+            $("#course_select_" + set_number).append($('<option></option>')
+                .html(courseNames[x])
+                .attr('value', courseListings[courseNames[x]]));
         }
 
-        $('#advance_button_' + set_number).attr("onclick", "BoxManager.setSchoolUnits("  + set_number + ")");
-        $('#reverse_button_' + set_number).attr({"onclick" : "BoxManager.returnFromCourse("  + set_number + ")", "disabled" : false});
+        $('#advance_button_' + set_number)
+            .attr("onclick", "BoxManager.setSchoolUnits("  + set_number + ")");
+        $('#reverse_button_' + set_number)
+            .attr({"onclick" : "BoxManager.returnFromCourse("  + set_number + ")", "disabled" : false});
     },
 
     returnFromSchoolUnits: function(set_number) {
@@ -1027,9 +1030,6 @@ var BoxManager = {
 
     setSchoolUnits: function(set_number) {
 
-        var i = 0;
-        var j = 0;
-
         // Get selected department
         var selectedOption = $("#course_select_" + set_number + " option:selected").attr('value');
 
@@ -1045,45 +1045,62 @@ var BoxManager = {
         var dataInScope = BoxManager.getData(set_number);
 
         // Default value
-        $("#su_select_" + set_number).append($('<option></option>').html('Select a section type...').attr({'selected' : 'selected', 'value' : 'bad'}));
+        $("#su_select_" + set_number)
+            .append($('<option></option>')
+                        .html('Select a section type...')
+                        .attr({'selected' : 'selected', 'value' : 'bad'}));
 
         // Load each data set.
-        for (i in dataInScope) {
+        for (var section_type in dataInScope) {
 
-            var courseInfo = dataInScope[i];
+            if (section_type !== "core" && section_type !== "lab" &&
+                section_type !== "tutorial"){
+                continue;
+            }
 
-            if (i === 'l' || i === 'tu' || i === 'c') {
+            var courseInfo = dataInScope[section_type];
 
-                var prefix = university.school_unit_prefixes[x.substring(0,1)];
-                var el_name = university.school_unit_names[x.substring(0,1)].toLowerCase();
+            var prefix = university.school_unit_prefixes[section_type];
+            var el_name = university.school_unit_names[section_type].toLowerCase();
 
-                var id_type = (i === 'l')? "lab" : ((i === 'c')? "core" : "tutorial");
+            $("#" + section_type + "_select_" + set_number).html("");
+            $("#" + section_type + "_select_" + set_number)
+                .attr("disabled", false);
+            $("#" + section_type + "_select_" + set_number)
+                .append($('<option></option>')
+                            .html('Select a ' + el_name + '...')
+                            .attr({'selected' : 'selected', 'value' : 'bad'}));
 
-                $("#" + id_type + "_select_" + set_number).html("");
-                $("#" + id_type + "_select_" + set_number).attr("disabled", false);
-                $("#" + id_type + "_select_" + set_number)
-                    .append($('<option></option>').html('Select a ' + el_name + '...').attr({'selected' : 'selected', 'value' : 'bad'}));
+            var secListings = {};
+            var secNames = [];
 
-                var secListings = {};
-                var secNames = [];
+            for (section in dataInScope[section_type]) {
+                var name = dataInScope[section_type][section].name;
+                secNames.push(name);
+                secListings[name] = section;
+            }
 
-                for (j in dataInScope[i]) {
-
-                    var name = dataInScope[i][j].n;
-                    secNames.push(name);
-                    secListings[name] = j;
+            secNames.sort(
+                function (a,b) {
+                    return a - b;
                 }
+            );
 
-                secNames.sort(function (a,b){return a - b;});
-
-                for (var n in secNames) {
-                    $("#" + id_type + "_select_" + set_number).append($('<option></option>').html(prefix + secNames[n].toString()).attr('value', secListings[secNames[n]]));
-                }
+            for (var i in secNames) {
+                $("#" + section_type + "_select_" + set_number)
+                    .append($('<option></option>')
+                                .html(prefix + secNames[i].toString())
+                                .attr('value', secListings[secNames[i]]));
             }
         }
 
-        $('#advance_button_' + set_number).attr("onclick", "BoxManager.addCourse("  + set_number + ")");
-        $('#reverse_button_' + set_number).attr("onclick", "BoxManager.returnFromSchoolUnits("  + set_number + ")");
+        $('#advance_button_' + set_number)
+            .attr("onclick", "BoxManager.addCourse("  + set_number + ")");
+        $('#reverse_button_' + set_number)
+            .attr(
+                "onclick",
+                "BoxManager.returnFromSchoolUnits("  + set_number + ")"
+            );
     },
 
     addCourse : function(set_number) {
@@ -1100,12 +1117,12 @@ var BoxManager = {
         var needTut = typeof selectedTut != 'undefined';
 
         // Check to ensure all required data has been entered.
-        var needSet = [ needCore, needLab, needTut ];
-        var selectedSet = [ selectedCore, selectedLab, selectedTut];
-        var schoolUnitNameIdentifier = ['c', 'l', 't'];
+        var needSet = [needCore, needLab, needTut];
+        var selectedSet = [selectedCore, selectedLab, selectedTut];
+        var schoolUnitNameIdentifier = ['core', 'lab', 'tutorial'];
 
         for (i = 0; i < 3; i++) {
-            if (needSet[i] && selectedSet[o] === 'bad') {
+            if (needSet[i] && selectedSet[i] === 'bad') {
                 alert("Please select a " +
                     university.school_unit_names[schoolUnitNameIdentifier[i]].toLowerCase() +
                     " before proceeding..."
@@ -1114,7 +1131,7 @@ var BoxManager = {
             }
         }
 
-        var schoolUnitTypes = ['c', 'l', 'tu'];
+        var schoolUnitTypes = ['core', 'lab', 'tutorial'];
 
         for (i = 0; i < 3; i++) {
             if (needSet[i]) {
@@ -1158,9 +1175,9 @@ var BoxManager = {
         var needTut = typeof selectedTut != 'undefined';
 
         var sectioningData = [
-            {'enabled' : needCore, 'type' : 'c', 'choice' : selectedCore},
-            {'enabled' : needLab, 'type' : 'l','choice' : selectedLab},
-            {'enabled' : needTut, 'type' : 'tu', 'choice' : selectedTut}
+            {'enabled' : needCore, 'type' : 'core', 'choice' : selectedCore},
+            {'enabled' : needLab, 'type' : 'lab','choice' : selectedLab},
+            {'enabled' : needTut, 'type' : 'tutorial', 'choice' : selectedTut}
         ];
 
         for (i = 0; i < sectioningData.length; i++) {
@@ -1187,7 +1204,8 @@ var BoxManager = {
         $('#advance_button_' + set_number).attr("disabled", false);
         $('#reverse_button_' + set_number).attr("disabled", false);
 
-        $('#reverse_button_' + set_number).attr("onclick", "BoxManager.returnFromSchoolUnits(" + set_number + ")");
+        $('#reverse_button_' + set_number)
+            .attr("onclick", "BoxManager.returnFromSchoolUnits(" + set_number + ")");
     },
 
     createTarget : function(set_number) {
@@ -1200,7 +1218,7 @@ var BoxManager = {
         var targetPayload = jQuery.extend(true, {}, dataTarget);
 
         targetPayload.target = dataTarget[dpath[2]][dpath[3]];
-        targetPayload.targetType = dpath[2].charAt(0).toLowerCase();
+        targetPayload.targetType = dpath[2].toLowerCase();
         targetPayload.dep = dpath[0];
 
         return targetPayload;
