@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 public @interface LegacyMapping {
 
     enum LegacyType {
-        TUTORIAL("tu"), LAB("l"), CORE("c"), UNUSED(null);
+        TUTORIAL("tutorial"), LAB("lab"), CORE("core"), UNUSED(null);
 
         public final String jsonKey;
 

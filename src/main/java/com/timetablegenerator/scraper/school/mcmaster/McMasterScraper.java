@@ -350,7 +350,7 @@ public class McMasterScraper extends Scraper {
             if (courseData.find()) {
 
                 currentCourseName = courseData.group("name");
-                currentCourseCode = courseData.group("code");
+                currentCourseCode = courseData.group("code").replaceAll("\\s\\s+", " ");
                 currentCourseCredits = Double.parseDouble(courseData.group("credits"));
 
             } else {

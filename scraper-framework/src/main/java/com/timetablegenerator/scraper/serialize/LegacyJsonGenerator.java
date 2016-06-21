@@ -63,34 +63,34 @@ public enum LegacyJsonGenerator {
         // Create JSON object for course.
         JsonObject courseJson = new JsonObject();
 
-        courseJson.addProperty("cod", course.getCode());
-        courseJson.addProperty("n", course.getName());
+        courseJson.addProperty("code", course.getCode());
+        courseJson.addProperty("name", course.getName());
 
-        courseJson.addProperty("t", approximateTerm(course.getTerm()));
-        courseJson.addProperty("a", true);
-        courseJson.addProperty("tod", "D");
-        courseJson.addProperty("u", course.getCredits());
+        courseJson.addProperty("term", approximateTerm(course.getTerm()));
+        courseJson.addProperty("credits", course.getCredits());
 
         for (String sectionTypeKey : school.getSectionTypeCodes()){
 
             SectionType sectionType = course.getSectionType(sectionTypeKey);
 
-            if (sectionType == null)
+            if (sectionType == null) {
                 continue;
+            }
 
             LegacyMapping.LegacyType legacyType = legacyConfig.getLegacyMapping(sectionTypeKey);
 
             // Skip the components that are not used in the legacy mapping
-            if (legacyType == LegacyMapping.LegacyType.UNUSED)
+            if (legacyType == LegacyMapping.LegacyType.UNUSED) {
                 continue;
+            }
 
             String translatedType = legacyType.jsonKey;
 
             JsonArray sectionsWithinTypeArrayJson;
 
-            if (courseJson.has(translatedType))
+            if (courseJson.has(translatedType)) {
                 sectionsWithinTypeArrayJson = courseJson.getAsJsonArray(translatedType);
-            else {
+            } else {
                 sectionsWithinTypeArrayJson = new JsonArray();
                 courseJson.add(translatedType, sectionsWithinTypeArrayJson);
             }
@@ -105,19 +105,19 @@ public enum LegacyJsonGenerator {
 
                 Section section = sectionType.getSection(sectionKey);
 
-                section.isAlternating().ifPresent(x -> sectionJson.addProperty("EOW", x));
+                section.isAlternating().ifPresent(x -> sectionJson.addProperty("alternating", x));
 
-                if (section.getId().startsWith(sectionTypeKey))
-                    sectionJson.addProperty("n", section.getId().substring(sectionTypeKey.length()));
-                else
-                    sectionJson.addProperty("n", section.getId());
+                if (section.getId().startsWith(sectionTypeKey)) {
+                    sectionJson.addProperty("name", section.getId().substring(sectionTypeKey.length()));
+                } else {
+                    sectionJson.addProperty("name", section.getId());
+                }
+                sectionJson.add("supervisors", supervisorsArrayJson);
 
-                sectionJson.add("sups", supervisorsArrayJson);
-
-                section.getSerialNumber().ifPresent(x -> sectionJson.addProperty("sn", x));
+                section.getSerialNumber().ifPresent(x -> sectionJson.addProperty("serial", x));
 
                 JsonArray periodsJson = new JsonArray();
-                sectionJson.add("ti", periodsJson);
+                sectionJson.add("times", periodsJson);
 
                 for(RepeatingPeriod repeatingPeriod : section.getRepeatingPeriods()){
 
@@ -125,16 +125,16 @@ public enum LegacyJsonGenerator {
 
                     if(repeatingPeriod.isScheduled()) {
 
-                        periodJson.add(new JsonPrimitive(approximateTerm(repeatingPeriod.getTerm())));  // 0
-                        periodJson.add(new JsonPrimitive(repeatingPeriod.getDayOfWeek().name()          // 1
-                                .substring(0, 2).toLowerCase()));
-                        periodJson.add(new JsonPrimitive(repeatingPeriod.getStartTime().getHour()));    // 2
-                        periodJson.add(new JsonPrimitive(repeatingPeriod.getStartTime().getMinute()));  // 3
-                        periodJson.add(new JsonPrimitive(repeatingPeriod.getEndTime().getHour()));      // 4
-                        periodJson.add(new JsonPrimitive(repeatingPeriod.getEndTime().getMinute()));    // 5
+                        periodJson.add(approximateTerm(repeatingPeriod.getTerm()));  // 0
+                        periodJson.add(repeatingPeriod.getDayOfWeek().name()         // 1
+                                        .substring(0, 2).toLowerCase());
+                        periodJson.add(repeatingPeriod.getStartTime().getHour());    // 2
+                        periodJson.add(repeatingPeriod.getStartTime().getMinute());  // 3
+                        periodJson.add(repeatingPeriod.getEndTime().getHour());      // 4
+                        periodJson.add(repeatingPeriod.getEndTime().getMinute());    // 5
                     }
 
-                    repeatingPeriod.getRoom().ifPresent(x -> periodJson.add(new JsonPrimitive(x)));     // 6
+                    repeatingPeriod.getRoom().ifPresent(x -> periodJson.add(new JsonPrimitive(x))); // 6
 
                     aggregatedSupervisors.addAll(repeatingPeriod.getSupervisors());
                     periodsJson.add(periodJson);
@@ -163,9 +163,9 @@ public enum LegacyJsonGenerator {
             if (!coursesJson.has(c.getDepartment().getCode())) {
                 departmentArrayJson = new JsonArray();
                 coursesJson.add(c.getDepartment().getCode(), departmentArrayJson);
-            } else
+            } else {
                 departmentArrayJson = coursesJson.getAsJsonArray(c.getDepartment().getCode());
-
+            }
             // Create JSON object for course.
             departmentArrayJson.add(serializeCourse(school, legacyConfig, c));
         }
