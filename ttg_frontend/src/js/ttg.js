@@ -632,9 +632,9 @@ var TimeTabler = {
                     visited.push(course_set[j]);
                     var units = course_set[j].credits;
 
-                    if (!course_set[j].termThree) {
-                        term_units[0] += units/2;
-                        term_units[1] += units/2;
+                    if (course_set[j].termThree) {
+                        term_units[0] += units / 2;
+                        term_units[1] += units / 2;
                     } else {
                         term_units[term - 1] += units;
                     }
