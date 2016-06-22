@@ -19,7 +19,8 @@
     "grunt-concurrent": "2.3.0",
     "grunt-wiredep": "^3.0.0",
     "wiredep": "^4.0.0",
-    "grunt-cli": "^1.2.0"
+    "grunt-cli": "^1.2.0",
+    "serve-static": "^1.11.0"
   },
   "scripts": {
     "test": "grunt test"
