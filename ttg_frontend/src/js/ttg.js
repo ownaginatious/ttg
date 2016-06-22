@@ -1,45 +1,38 @@
-var course_colour = '#CCFF9A';
-var conflict_colour = '#FABD4E';
-
-var university_identification = null;
+var course_color = '#CCFF9A';
+var conflict_color = '#FABD4E';
 
 // Settings for the particular school.
-var settings_parcel = null;
+var university = null;
 
 var DataLoader = {
 
     universities : null,
-
     timingMap : null,
-
     reloadData : null,
 
-    buildTimingMap : function(){
+    buildTimingMap : function () {
 
-        DataLoader.breadthTimingMap = new Array();
-        DataLoader.depthTimingMap = new Array();
-
-        DataLoader.timingMap = new Array();
+        DataLoader.timingMap = [];
 
         var days = ['mo', 'tu', 'we', 'th', 'fr', 'sa'];
 
-        for(var term = 1; term < 3; term++){
-            for(var x = 0; x < days.length; x++){
+        for (var term = 1; term < 3; term++) {
+            for (var day = 0; day < days.length; day++) {
 
                 var last_hour = 0;
                 var last_minute = 0;
-
                 var hour = 8;
                 var minute = 0;
 
                 // Build depth map.
-                while( (hour == 22 && minute == 0) ||  (hour < 22)) {
+                while ((hour === 22 && minute === 0) || (hour < 22)) {
 
-                    var time_slot = "term" + term.toString() + "_" + days[x] + "_" + hour.toString() + minute.toString();
+                    var time_slot = "term" + term.toString() + "_" + days[day] +
+                                    "_" + hour.toString() + minute.toString();
 
                     DataLoader.timingMap.push(time_slot);
 
-                    if (minute == 30) {
+                    if (minute === 30) {
                         minute = 0;
                         hour++;
                     } else {
@@ -65,7 +58,7 @@ var DataLoader = {
 
                 DataLoader.universities = response;
 
-                TimetableManipulator.renderSchedule();
+                TimeTabler.renderSchedule();
 
                 var selector = $('<select></select>').attr("id", "university_selector");
 
@@ -77,19 +70,20 @@ var DataLoader = {
                         })
                 );
 
-                var depNames = new Array();
+                var ids = [];
 
                 // Sort the universities.
-                for (var x in response) {
-                    depNames.push(x);
+                for (var university in response) {
+                    ids.push(university);
                 }
 
-                depNames.sort();
+                ids.sort();
 
-                for (var x = 0; x < depNames.length; x++) {
+                for (var x = 0; x < ids.length; x++) {
                     selector.append(
-                        $('<option></option>').html(response[depNames[x]].name)
-                            .attr('value', depNames[x])
+                        $('<option></option>')
+                            .html(response[ids[x]].name)
+                            .attr('value', ids[x])
                     );
                 }
 
@@ -99,7 +93,7 @@ var DataLoader = {
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 alert("Failed to load supported university data. Please " +
-                      "contact the admin.")
+                      "contact the admin.");
             }
         });
     },
@@ -109,33 +103,32 @@ var DataLoader = {
         $("#state_create_button").attr("disabled", true);
         $("#state_create_button").html("Hold on...");
 
-        var i = 0;
+        var selectors = [];
 
-        var selectors = new Array();
+        for (var active = 0; active < BoxManager.activeSelectors.length; active++) {
 
-        for (var x = 0; x < BoxManager.activeSelectors.length; x++) {
+            var id = BoxManager.activeSelectors[active];
 
-            var i = BoxManager.activeSelectors[x];
+            if ($("#advance_button_" + id).attr("disabled") === "disabled") {
 
-            if ($("#advance_button_" + i).attr("disabled") == "disabled") {
+                id = "_select_" + BoxManager.activeSelectors[active] +
+                     " option:selected";
 
-                var selection_array = new Array();
+                var selection_array = [];
 
-                selection_array.push($("#dep_select_" + i + " option:selected").attr("value"));
-                selection_array.push($("#course_select_" + i + " option:selected").attr("value"));
-                selection_array.push($("#core_select_" + i + " option:selected").attr("value"));
-                selection_array.push($("#tutorial_select_" + i + " option:selected").attr("value"));
-                selection_array.push($("#lab_select_" + i + " option:selected").attr("value"));
+                selection_array.push($("#dep" + id ).attr("value"));
+                selection_array.push($("#course" + id).attr("value"));
+                selection_array.push($("#core" + id).attr("value"));
+                selection_array.push($("#tutorial" + id).attr("value"));
+                selection_array.push($("#lab" + id).attr("value"));
 
                 selectors.push(selection_array);
             }
-
-            i++;
         }
 
         var schedule_data = {
             "selectors" : selectors,
-            "school" : university_identification.prefix
+            "school" : university.id
         };
         $("#timetable_link").html("Saving...");
         $.ajax({
@@ -198,63 +191,57 @@ var DataLoader = {
 
     setUniversity : function() {
 
-        var selectedOption = null;
+        var universityId = null;
 
-        if(DataLoader.reloadData == null) {
-            selectedOption = $("#university_selector option:selected").attr('value');
+        if (!DataLoader.reloadData) {
+            universityId = $("#university_selector option:selected").attr('value');
         } else {
-            selectedOption = DataLoader.reloadData.school;
+            universityId = DataLoader.reloadData.school;
         }
 
-        if (selectedOption == "bad") {
+        if (universityId === "bad") {
             alert("Select a university before proceeding...");
             return;
         }
 
-        var selectedUniversitySettings = DataLoader.universities[selectedOption];
+        university = DataLoader.universities[universityId];
+        university.id = universityId;
 
-        university_identification = {
-                                        name : selectedUniversitySettings.name,
-                                        prefix : selectedOption
-                                    };
-
-        settings_parcel = selectedUniversitySettings.visual_settings;
-
-        $("#courses_div").html("Hold on, retrieving scheduling for "
-            + selectedUniversitySettings.name + "...");
+        $("#courses_div").html(
+          "Hold on, retrieving scheduling for " + university.name + "...");
 
         $("#course_add_button").html("<b>Add another course</b>");
         $("#course_add_button").attr("onclick",
-            "BoxManager.addNewSelector(TimetableManipulator.masterList)");
+            "BoxManager.addNewSelector(TimeTabler.masterList)");
         $("#course_add_button").attr("disabled", true);
 
         $.ajax({
             type: "GET",
-            url: "/api/v1/school/" + university_identification.prefix,
+            url: "/api/v1/school/" + universityId,
             dataType: "json",
             success: function(response) {
                 $("#course_add_button").attr("disabled", false);
                 $("#courses_div").html("<b>University</b> : " +
-                    university_identification.name + "</br>");
+                    university.name + "</br>");
 
-                TimetableManipulator.masterCourseList = response.courses;
-                TimetableManipulator.masterDepartmentList = response.departments;
+                TimeTabler.masterCourseList = response.courses;
+                TimeTabler.masterDepartmentList = response.departments;
 
-                if(DataLoader.reloadData != null)
+                if (DataLoader.reloadData) {
                     BoxManager.reconstructStage2(DataLoader.reloadData);
-                else
-                    BoxManager.addNewSelector(TimetableManipulator.masterList);
-
+                } else {
+                    BoxManager.addNewSelector(TimeTabler.masterList);
+                }
                 $("#save_state_div").css("display", "block");
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                alert("Failed to load school data. Please contact the admin.")
+                alert("Failed to load school data. Please contact the admin.");
             }
         });
     }
-}
+};
 
-var TimetableManipulator = {
+var TimeTabler = {
 
     runningSchedule : {},
     masterCourseList : null,
@@ -262,25 +249,21 @@ var TimetableManipulator = {
 
     sameCourse : function(schoolUnitA, schoolUnitB) {
 
-        if(schoolUnitA['tod'] != schoolUnitB['tod']) {
-            return false;
-        }
-        if(schoolUnitA['t'] != schoolUnitB['t']) {
-            if(typeof schoolUnitA['termThree'] == 'undefined' ||
-                typeof schoolUnitB['termThree'] == 'undefined') {
+        if (schoolUnitA.term !== schoolUnitB.term) {
+            if (!schoolUnitA.termThree || !schoolUnitB.termThree) {
                 return false;
             }
         }
 
-        if(schoolUnitA['n'] != schoolUnitB['n']) {
+        if (schoolUnitA.name !== schoolUnitB.name) {
             return false;
         }
 
-        if(schoolUnitA['cod'] != schoolUnitB['cod']) {
+        if (schoolUnitA.code !== schoolUnitB.code) {
             return false;
         }
 
-        if(schoolUnitA['dep'] != schoolUnitB['dep']) {
+        if (schoolUnitA.dep !== schoolUnitB.dep) {
             return false;
         }
 
@@ -289,10 +272,11 @@ var TimetableManipulator = {
 
     schoolUnitsEqual : function(schoolUnitA, schoolUnitB) {
 
-        if(schoolUnitA['targetType'] != schoolUnitB['targetType'])
+        if (schoolUnitA.targetType !== schoolUnitB.targetType){
             return false;
+        }
 
-        return TimetableManipulator.sameCourse(schoolUnitA, schoolUnitB);
+        return TimeTabler.sameCourse(schoolUnitA, schoolUnitB);
     },
 
     splitTargets : function(schoolUnit) {
@@ -300,25 +284,25 @@ var TimetableManipulator = {
         var firstTerm = jQuery.extend(true, {}, schoolUnit);
         var secondTerm = jQuery.extend(true, {}, schoolUnit);
 
-        firstTerm['target']['ti'] = new Array();
-        secondTerm['target']['ti'] = new Array();
+        firstTerm.target.times = [];
+        secondTerm.target.times = [];
 
-        firstTerm['t'] = 1;
-        secondTerm['t'] = 2;
+        firstTerm.term = 1;
+        secondTerm.term = 2;
 
         firstTerm.termThree = true;
         secondTerm.termThree = true;
 
-        var times = schoolUnit['target']['ti'];
+        var times = schoolUnit.target.times;
 
-        for(var x = 0; x < times.length; x++) {
+        for (var x = 0; x < times.length; x++) {
 
-            if(times[x][0] == 1 || times[x][0] == 3) {
-                firstTerm['target']['ti'].push(times[x]);
+            if (times[x][0] === 1 || times[x][0] === 3) {
+                firstTerm.target.times.push(times[x]);
             }
 
-            if(times[x][0] == 2 || times[x][0] == 3) {
-                secondTerm['target']['ti'].push(times[x]);
+            if (times[x][0] === 2 || times[x][0] === 3) {
+                secondTerm.target.times.push(times[x]);
             }
         }
         return {"first" : firstTerm, "second" : secondTerm};
@@ -326,19 +310,19 @@ var TimetableManipulator = {
 
     importSchoolUnit : function(schoolUnit) {
 
-        if (schoolUnit['t'] == 3) {
+        if (schoolUnit.term === 3) {
 
-            var targets = TimetableManipulator.splitTargets(schoolUnit);
+            var targets = TimeTabler.splitTargets(schoolUnit);
 
-            TimetableManipulator.importSchoolUnit(targets.first);
-            TimetableManipulator.importSchoolUnit(targets.second);
+            TimeTabler.importSchoolUnit(targets.first);
+            TimeTabler.importSchoolUnit(targets.second);
 
             return;
         }
 
-        var term_prefix = "term" + schoolUnit['t'].toString();
+        var term_prefix = "term" + schoolUnit.term.toString();
 
-        var times = schoolUnit['target']['ti'];
+        var times = schoolUnit.target.times;
 
         for (var x = 0; x < times.length; x++) {
 
@@ -351,23 +335,20 @@ var TimetableManipulator = {
 
             // Artificially insert the location as a 'loc' key into the target for
             // readibility in complicated code.
-            schoolUnit['target']['loc'] = times[x][6];
+            schoolUnit.target.loc = times[x][6];
 
             // Round the starting time to the slot it begins existing in.
-            if(minute != 30 && minute != 0) {
+            if (minute !== 30 && minute !== 0) {
 
                 if (minute > 30) {
                     if (minute - 30 > 15) {
-
                         minute = 0;
                         hour++;
-                    }
-                    else
+                    } else {
                         minute = 30;
-                }
-                else {
-
-                    if(30 - minute > 15) {
+                    }
+                } else {
+                    if (30 - minute > 15) {
                         minute = 0;
                     } else {
                         minute = 30;
@@ -375,19 +356,19 @@ var TimetableManipulator = {
                 }
             }
 
-            while ( (hour == finalHour && minute < finalMinute) || (hour < finalHour) ) {
+            while ( (hour === finalHour && minute < finalMinute) || (hour < finalHour) ) {
 
                 var timeID = term_prefix + "_" + day_prefix + "_" + hour.toString() + minute.toString();
 
-                var timeSlot = TimetableManipulator.runningSchedule[timeID];
+                var timeSlot = TimeTabler.runningSchedule[timeID];
 
-                if(typeof timeSlot == 'undefined') {
-                    TimetableManipulator.runningSchedule[timeID] = [schoolUnit];
+                if (!timeSlot) {
+                    TimeTabler.runningSchedule[timeID] = [schoolUnit];
                 } else {
-                    TimetableManipulator.runningSchedule[timeID].push(schoolUnit);
+                    TimeTabler.runningSchedule[timeID].push(schoolUnit);
                 }
 
-                if (minute == 30) {
+                if (minute === 30) {
                     minute = 0;
                     hour++;
                 } else {
@@ -399,29 +380,29 @@ var TimetableManipulator = {
 
     removeSchoolUnit: function(schoolUnit) {
 
-        var times = schoolUnit['target']['ti'];
+        var times = schoolUnit.target.times;
 
-        // Remove and free up any used colours.
-        for(var colour in TimetableManipulator.colourWheel){
-            if(TimetableManipulator.colourWheel[colour] != null){
-                if(TimetableManipulator.sameCourse(TimetableManipulator.colourWheel[colour], schoolUnit)){
-                    TimetableManipulator.colourWheel[colour] = null;
+        // Remove and free up any used colors.
+        for (var color in TimeTabler.colorWheel){
+            if (TimeTabler.colorWheel[color]){
+                if (TimeTabler.sameCourse(TimeTabler.colorWheel[color], schoolUnit)){
+                    TimeTabler.colorWheel[color] = null;
                     break;
                 }
             }
         }
 
-        if (schoolUnit['t'] == 3) {
+        if (schoolUnit.term === 3) {
 
-            var targets = TimetableManipulator.splitTargets(schoolUnit);
+            var targets = TimeTabler.splitTargets(schoolUnit);
 
-            TimetableManipulator.removeSchoolUnit(targets['first']);
-            TimetableManipulator.removeSchoolUnit(targets['second']);
+            TimeTabler.removeSchoolUnit(targets.first);
+            TimeTabler.removeSchoolUnit(targets.second);
 
             return;
         }
 
-        var term_prefix = "term" + schoolUnit['t'].toString();
+        var term_prefix = "term" + schoolUnit.term.toString();
 
         for (var x = 0; x < times.length; x++) {
 
@@ -431,31 +412,31 @@ var TimetableManipulator = {
             var finalHour = times[x][4];
             var finalMinute = times[x][5];
 
-            while ( (hour == finalHour && minute < finalMinute) || (hour < finalHour) ) {
+            while ((hour === finalHour && minute < finalMinute) || (hour < finalHour) ) {
 
                 var timeID = term_prefix + "_" + day_prefix + "_" + hour.toString() + minute.toString();
-                var timeSlot = TimetableManipulator.runningSchedule[timeID];
+                var timeSlot = TimeTabler.runningSchedule[timeID];
 
-                if (typeof timeSlot != 'undefined') {
+                if (timeSlot) {
 
                     var toRemove = null;
 
-                    for(var y in timeSlot) {
-                        if(TimetableManipulator.schoolUnitsEqual(timeSlot[y], schoolUnit)){
+                    for (var y in timeSlot) {
+                        if (TimeTabler.schoolUnitsEqual(timeSlot[y], schoolUnit)){
                             toRemove = y;
                             break;
                         }
                     }
 
-                    TimetableManipulator.runningSchedule[timeID].splice(y, 1);
+                    TimeTabler.runningSchedule[timeID].splice(y, 1);
 
                     // Remove the time-space from the running schedule if it is now empty.
-                    if(TimetableManipulator.runningSchedule[timeID].length == 0) {
-                        delete TimetableManipulator.runningSchedule[timeID];
+                    if (TimeTabler.runningSchedule[timeID].length === 0) {
+                        delete TimeTabler.runningSchedule[timeID];
                     }
                 }
 
-                if(minute == 30){
+                if (minute === 30){
                     minute = 0;
                     hour++;
                 } else {
@@ -465,8 +446,8 @@ var TimetableManipulator = {
         }
     },
 
-    // The colours must be predefined rather than random for aesthetic purposes.
-    colourWheel : {
+    // The colors must be predefined rather than random for aesthetic purposes.
+    colorWheel : {
                     '#DCF394' : null,
                     '#CCECF4' : null,
                     '#FFD7E3' : null,
@@ -484,42 +465,42 @@ var TimetableManipulator = {
                     '#DFE19D' : null
                 },
 
-    getColour : function(schoolUnit) {
+    getColor : function(schoolUnit) {
 
-        var firstFreeColour = null;
-        var setColour = null;
+        var firstFreeColor = null;
+        var setColor = null;
 
-        // Establish a new colour or retrieve an exising colour for the course.
-        for (var colour in TimetableManipulator.colourWheel) {
-            if (TimetableManipulator.colourWheel[colour] != null) {
-                if (TimetableManipulator.sameCourse(TimetableManipulator.colourWheel[colour], schoolUnit)) {
-                    setColour = colour;
+        // Establish a new color or retrieve an exising color for the course.
+        for (var color in TimeTabler.colorWheel) {
+            if (TimeTabler.colorWheel[color]) {
+                if (TimeTabler.sameCourse(TimeTabler.colorWheel[color], schoolUnit)) {
+                    setColor = color;
                     break;
                 }
             } else {
-                if(firstFreeColour == null) {
-                    firstFreeColour = colour;
+                if (!firstFreeColor) {
+                    firstFreeColor = color;
                 }
             }
         }
 
-        if (setColour == null) {
+        if (!setColor) {
 
-            // If we have run out of colours, just use the default colour.
-            if (firstFreeColour == null) {
-                setColour = course_colour;
+            // If we have run out of colors, just use the default color.
+            if (!firstFreeColor) {
+                setColor = course_color;
             } else {
-                TimetableManipulator.colourWheel[firstFreeColour] = schoolUnit;
-                setColour = firstFreeColour;
+                TimeTabler.colorWheel[firstFreeColor] = schoolUnit;
+                setColor = firstFreeColor;
             }
         }
 
         // If the user has selected that they desire monochrome.
-        if ($("input[name=course_colour_group]:checked").val() == 'mono') {
-            setColour = course_colour;
+        if ($("input[name=course_color_group]:checked").val() === 'mono') {
+            setColor = course_color;
         }
 
-        return setColour;
+        return setColor;
     },
 
     clearSchedule : function(){
@@ -539,16 +520,16 @@ var TimetableManipulator = {
             $("#term2_title").attr("colspan", 6);
         }
 
-        for (var x = 0; x < DataLoader.timingMap.length; x++) {
+        for (var i = 0; i < DataLoader.timingMap.length; i++) {
 
-            var time_slot = DataLoader.timingMap[x];
+            var time_slot = DataLoader.timingMap[i];
 
             var day = /^term[123]_([a-z]{2,2})_[0-9]+$/.exec(time_slot)[1];
 
-            if($("#" + time_slot).length > 0)
+            if ($("#" + time_slot).length > 0)
                 $("#" + time_slot).remove();
 
-            if(day != 'sa'){
+            if (day != 'sa'){
 
                 var newTime = $('<td></td>').attr({'id' : time_slot, 'class': 'daytime_slot'});
                 $("#" + time_slot.replace("_" + day + "_", "_")).append(newTime);
@@ -566,20 +547,24 @@ var TimetableManipulator = {
 
         var pattern = new RegExp("^term" + term + "_sa_");
 
-        for (var x = 0; x < DataLoader.timingMap.length; x++) {
+        for (var i = 0; i < DataLoader.timingMap.length; i++) {
 
-            var time_slot = DataLoader.timingMap[x];
+            var time_slot = DataLoader.timingMap[i];
 
-            if (pattern.exec(time_slot) != null) {
-
+            if (pattern.exec(time_slot)) {
                 var newTime = $('<td></td>').attr({'id' : time_slot, 'class': 'daytime_slot'});
-
                 $("#" + time_slot.replace("_sa_", "_")).append(newTime);
             }
         }
     },
 
     renderSchedule : function() {
+
+        var i = 0;
+        var j = 0;
+        var k = 0;
+        var supervisor = null;
+        var setColor = null;
 
         var days = ['mo', 'tu', 'we', 'th', 'fr', 'sa'];
 
@@ -593,17 +578,17 @@ var TimetableManipulator = {
         var master_element = null;      // The element where a new course (or alternating courses) started.
         var master_school_unit = null;  // The latest course to be rendered in the timetable.
 
-        var visited = new Array();
+        var visited = [];
 
         // Clear existing data from the schedule.
-        TimetableManipulator.clearSchedule();
+        TimeTabler.clearSchedule();
 
-        for (var x = 0; x < DataLoader.timingMap.length; x++) {
+        for (i = 0; i < DataLoader.timingMap.length; i++) {
 
-            var time_slot= DataLoader.timingMap[x];
-            var course_set = TimetableManipulator.runningSchedule[time_slot];
+            var time_slot= DataLoader.timingMap[i];
+            var course_set = TimeTabler.runningSchedule[time_slot];
 
-            if (course_set == null || course_set.length == 0) {
+            if (!course_set || course_set.length === 0) {
 
                 last_conflict_array = null;
                 conflict_element = null;
@@ -621,33 +606,33 @@ var TimetableManipulator = {
             term_hours[term - 1] += 0.5;
 
             // Check to see if any Saturday columns are necessary and build them if so.
-            if (day == 'sa') {
-                if (!saturday_built[0] && term == 1) {
-                    TimetableManipulator.buildSaturday(1);
+            if (day === 'sa') {
+                if (!saturday_built[0] && term === 1) {
+                    TimeTabler.buildSaturday(1);
                     saturday_built[0] = true;
-                } else if (!saturday_built[1] && term == 2) {
-                    TimetableManipulator.buildSaturday(2);
+                } else if (!saturday_built[1] && term === 2) {
+                    TimeTabler.buildSaturday(2);
                     saturday_built[1] = true;
                 }
             }
 
             // Check if the current course is new. If so, add it's units.
-            for (var y = 0; y < course_set.length; y++) {
+            for (j = 0; j < course_set.length; j++) {
 
                 var newData = true;
 
-                for (var w = 0; w < visited.length; w++) {
-                    if (TimetableManipulator.sameCourse(course_set[y], visited[w])) {
+                for (k = 0; k < visited.length; k++) {
+                    if (TimeTabler.sameCourse(course_set[j], visited[k])) {
                         newData = false;
                         break;
                     }
                 }
 
                 if (newData) {
-                    visited.push(course_set[y]);
-                    var units = course_set[y]['u'];
+                    visited.push(course_set[j]);
+                    var units = course_set[j].credits;
 
-                    if (typeof course_set[y].termThree != 'undefined') {
+                    if (!course_set[j].termThree) {
                         term_units[0] += units/2;
                         term_units[1] += units/2;
                     } else {
@@ -657,37 +642,37 @@ var TimetableManipulator = {
             }
 
             // If one school unit is currently occupying the time slot.
-            if (course_set.length == 1) {
+            if (course_set.length === 1) {
 
                 conflict_element = null;
                 last_conflict_array = null;
 
-                if (master_element == null || !TimetableManipulator.schoolUnitsEqual(course_set[0], master_school_unit)) {
+                if (!master_element || !TimeTabler.schoolUnitsEqual(course_set[0], master_school_unit)) {
 
                     master_element = $("#" + time_slot);
                     master_school_unit = course_set[0];
 
-                    var setColour = TimetableManipulator.getColour(master_school_unit);
+                    setColor = TimeTabler.getColor(master_school_unit);
 
-                    master_element.attr({"bgcolor" : setColour, "rowspan" : 1});
-                    master_element.css("background", setColour);
+                    master_element.attr({"bgcolor" : setColor, "rowspan" : 1});
+                    master_element.css("background", setColor);
 
-                    var supervisor = "<font color='blue'>";
+                    supervisor = "<font color='blue'>";
 
-                    if (master_school_unit['targetType'] == "c" && master_school_unit['target']['sups'].length > 0) {
-                        supervisor +=  "</br>" + master_school_unit['target']['sups'][0];
+                    if (master_school_unit.targetType === "core" && master_school_unit.target.supervisors.length > 0) {
+                        supervisor +=  "</br>" + master_school_unit.target.supervisors[0];
                     }
 
                     supervisor += "</font>";
 
-                    master_element.html( ((settings_parcel.uses_depheaders)? master_school_unit['dep'] + " " : "")
-                                        + master_school_unit['cod'] + " " + settings_parcel.school_unit_prefixes[master_school_unit['targetType']]
-                                        + master_school_unit['target']['n']
-                                        + supervisor
-                                        + ((settings_parcel.uses_serials)? "</br>" + master_school_unit['target']['sn'] : "")
-                                        + ((typeof master_school_unit['target']['loc'] != 'undefined')? ("</br>" + master_school_unit['target']['loc']) : "")
-                                        + ((master_school_unit['target']['EOW'])?
-                                            "</br><font color='red'>" + settings_parcel.eow_word + "</font>" : ""));
+                    master_element.html(
+                      master_school_unit.code + " " +
+                      university.school_unit_prefixes[master_school_unit.targetType] +
+                      master_school_unit.target.name + supervisor +
+                      (master_school_unit.target.serial ? "</br>" + master_school_unit.target.serial : "") +
+                      (master_school_unit.target.loc ? ("</br>" + master_school_unit.target.loc) : "") +
+                      (master_school_unit.target.alternating ? "</br><font color='red'>ALTERNATING</font>" : "")
+                    );
                 } else {
                     master_element.attr("rowspan", parseInt(master_element.attr("rowspan")) + 1);
                     $("#" + time_slot).remove();
@@ -700,15 +685,14 @@ var TimetableManipulator = {
 
                 var same_conflict = true;
 
-                if (last_conflict_array != null) {
-                    if (course_set.length == last_conflict_array.length) {
-
-                        for (var y = 0; y < course_set.length; y++) {
+                if (last_conflict_array) {
+                    if (course_set.length === last_conflict_array.length) {
+                        for (j = 0; j < course_set.length; j++) {
 
                             var found = false;
 
-                            for (var z = 0; z < last_conflict_array.length; z++) {
-                                if(TimetableManipulator.schoolUnitsEqual(course_set[y], last_conflict_array[z])){
+                            for (k = 0; k < last_conflict_array.length; k++) {
+                                if (TimeTabler.schoolUnitsEqual(course_set[j], last_conflict_array[k])){
                                     found = true;
                                     break;
                                 }
@@ -736,60 +720,60 @@ var TimetableManipulator = {
                     var true_conflict = false;
 
                     // Check if it's actually a conflict, or just two EOW conflicts.
-                    for (var n = 0; n < course_set.length; n++) {
-                        for (var m = 0; m < course_set.length; m++) {
-                            if (m != n) {
-                                if (!course_set[n]['target'].EOW
-                                    || !course_set[m]['target'].EOW
-                                    || !TimetableManipulator.sameCourse(course_set[m], course_set[n])
-                                    || course_set[m]['targetType'] == course_set[n]['targetType']
-                                ) {
+                    for (j = 0; j < course_set.length; j++) {
+                        for (k = 0; k < course_set.length; k++) {
+                            if (j != k) {
+                                if (!course_set[j].target.alternating ||
+                                    !course_set[k].target.alternating ||
+                                    !TimeTabler.sameCourse(course_set[j], course_set[k]) ||
+                                    course_set[k].targetType === course_set[j].targetType)
+                                {
                                     true_conflict = true;
                                     break;
                                 }
                             }
-                            if(true_conflict) {
+                            if (true_conflict) {
                                 break;
                             }
                         }
                     }
 
                     if (true_conflict) {
-                        $("#" + time_slot).attr("bgcolor", conflict_colour);
-                        $("#" + time_slot).css("background", conflict_colour);
+                        $("#" + time_slot).attr("bgcolor", conflict_color);
+                        $("#" + time_slot).css("background", conflict_color);
                     } else {
 
-                        var setColour = TimetableManipulator.getColour(course_set[0]);
+                        setColor = TimeTabler.getColor(course_set[0]);
 
-                        $("#" + time_slot).attr("bgcolor", setColour);
-                        $("#" + time_slot).css("background", setColour);
+                        $("#" + time_slot).attr("bgcolor", setColor);
+                        $("#" + time_slot).css("background", setColor);
                     }
 
                     $("#" + time_slot).attr("rowspan", 1);
 
                     conflict_element.html("");
 
-                    for (var n = 0; n < course_set.length; n++) {
+                    for (j = 0; j < course_set.length; j++) {
 
-                        var unit = course_set[n];
-                        var supervisor = "<font color='blue'>";
+                        var unit = course_set[j];
+                        supervisor = "<font color='blue'>";
 
-                        if (unit['targetType'] == "c") {
-                            if (unit['target']['sups'].length > 0) {
-                                supervisor +=  "</br>" + unit['target']['sups'][0];
+                        if (unit.targetType === "core") {
+                            if (unit.target.supervisors.length > 0) {
+                                supervisor +=  "</br>" + unit.target.supervisors[0];
                             }
                         }
 
                         supervisor += "</font>";
 
-                        conflict_element.append(((settings_parcel.uses_depheaders)? unit['dep'] + " " : "")
-                                            + unit['cod'] + " " + settings_parcel.school_unit_prefixes[unit['targetType']]
-                                            + unit['target']['n']
-                                            + supervisor
-                                            + ((settings_parcel.uses_serials)? "</br>" + unit['target']['sn'] : "")
-                                            + ((typeof unit['target']['loc'] != 'undefined')? ("</br>" + unit['target']['loc']) : "")
-                                            + "</br><font color='red'>" + ((true_conflict)? "*** CONFLICT ***" : settings_parcel.eow_word)
-                                            + "</br>");
+                        conflict_element.append(
+                          unit.code + " " +
+                          university.school_unit_prefixes[unit.targetType] +
+                          unit.target.name + supervisor +
+                          (unit.target.serial ? "</br>" + unit.target.serial : "") +
+                          (unit.target.loc ? "</br>" + unit.target.loc : "") +
+                          "</br><font color='red'>" + (true_conflict ? "*** CONFLICT ***" : "ALTERNATING") +
+                          "</br>");
                     }
                 }
             }
@@ -802,7 +786,7 @@ var TimetableManipulator = {
 
 var BoxManager = {
 
-    activeSelectors : new Array(),
+    activeSelectors : [],
 
     id_number : 0,
 
@@ -810,36 +794,23 @@ var BoxManager = {
 
     reconstructStage1 : function(state) {
 
-        state.type='multi';
         // Remove the old content.
         $("#courses_div").html("");
-        TimetableManipulator.runningSchedule = {};
+        TimeTabler.runningSchedule = {};
         BoxManager.id_number = 0;
 
-        errorFunc = function() {
-                        alert("This data state appears to be corrupted. This could be because someone has tampered "
-                                + "with the content, or because it was created with an older version of the time table generator."
-                                + "The page will be reloaded to remove the broken artifacts.");
-                        window.location = window.location;
-                    };
-
-        if (typeof state.type == 'undefined'
-            || typeof state.selectors == 'undefined'
-            || typeof state.school == 'undefined') {
-            errorFunc();
+        if (!state.selectors || !state.school ||
+            !(state.school in DataLoader.universities)){
+            alert("Bad scheduling data. Contact the administrator to fix this.");
+            window.location = window.location;
         }
 
-        $('input[name=course_colour_group]').filter('[value=' + state.type + ']').attr('checked', true);
+        $('input[name=course_color_group]')
+            .filter('[value=' + state.type + ']').attr('checked', true);
 
-        var university_on_record = DataLoader.universities[state.school];
-
-        if (typeof university_on_record == 'undefined') {
-            errorFunc();
-        }
-
-        // Dump the colour-wheel
-        for (var x in TimetableManipulator.colourWheel) {
-            TimetableManipulator.colourWheel[x] = null;
+        // Dump the color-wheel
+        for (var color in TimeTabler.colorWheel) {
+            TimeTabler.colorWheel[color] = null;
         }
 
         DataLoader.reloadData = state;
@@ -848,32 +819,34 @@ var BoxManager = {
 
     reconstructStage2 : function(state) {
 
-        var prefixes = ["dep_select_", "course_select_", "core_select_", "tutorial_select_", "lab_select_"];
+        var prefixes = ["dep_select_", "course_select_", "core_select_",
+                        "tutorial_select_", "lab_select_"];
 
-        for (var x = 0; x < state.selectors.length; x++) {
+        for (var i = 0; i < state.selectors.length; i++) {
 
-            var selector = state.selectors[x];
+            var selector = state.selectors[i];
 
-            BoxManager.addNewSelector(TimetableManipulator.masterCourseList);
+            BoxManager.addNewSelector(TimeTabler.masterCourseList);
 
             for (var y = 0; y < selector.length; y++) {
 
-                if(selector[y] == null && y > 2)
+                if (!selector[y] && y > 2) {
                     continue;
+                }
 
-                if ($("#" + prefixes[y] + x + " option[value='" + selector[y] + "']").length > 0) {
-                    $("#" + prefixes[y] + x ).val(selector[y]);
-
+                if ($("#" + prefixes[y] + i + " option[value='" + selector[y] + "']").length > 0) {
+                    $("#" + prefixes[y] + i ).val(selector[y]);
                     if (y < 2) {
-                        $("#advance_button_" + x).click();
+                        $("#advance_button_" + i).click();
                     }
                 } else {
-                    alert("Cannot find an option with the value '" + selector[y] + "' under this menu. Skipping");
+                    alert("Cannot find an option with the value '" +
+                          selector[y] + "' under this menu. Skipping");
                     break;
                 }
             }
 
-            $("#advance_button_" + x).click();
+            $("#advance_button_" + i).click();
         }
     },
 
@@ -894,7 +867,7 @@ var BoxManager = {
         $('#select_set_' + id).remove();
 
         for (var i = BoxManager.activeSelectors.length; i >= 0; i--) {
-            if (BoxManager.activeSelectors[i] == id) {
+            if (BoxManager.activeSelectors[i] === id) {
                 BoxManager.activeSelectors.splice(i, 1);
                 break;
             }
@@ -902,6 +875,8 @@ var BoxManager = {
     },
 
     addNewSelector : function() {
+
+        var i = 0;
 
         var id_number = BoxManager.id_number;
 
@@ -912,18 +887,26 @@ var BoxManager = {
         var dep_select = $('<select></select>').attr('id', "dep_select_" + id_number);
 
         // Default value
-        dep_select.append($('<option></option>').html('Select a department...').attr({'selected' : 'selected', 'value' : 'bad'}));
+        dep_select.append(
+            $('<option></option>')
+              .html('Select a department...')
+              .attr({'selected' : 'selected', 'value' : 'bad'})
+        );
 
         var departments = [];
 
-        for (x in TimetableManipulator.masterDepartmentList) {
-            departments.push(x);
+        for (i in TimeTabler.masterDepartmentList) {
+            departments.push(i);
         }
 
         departments.sort();
 
-        for (var x = 0; x < departments.length; x++) {
-            dep_select.append($('<option></option>').html(departments[x]).attr("value", TimetableManipulator.masterDepartmentList[departments[x]]));
+        for (i = 0; i < departments.length; i++) {
+            dep_select.append(
+                $('<option></option>')
+                  .html(departments[i])
+                  .attr("value", TimeTabler.masterDepartmentList[departments[i]])
+            );
         }
 
         var course_select = $('<select></select>').attr({ "disabled": true, "id": "course_select_" + id_number});
@@ -946,7 +929,7 @@ var BoxManager = {
 
         parentDiv.append(holster);
 
-        BoxManager.data_path[id_number] = new Array();
+        BoxManager.data_path[id_number] = [];
 
         BoxManager.activeSelectors.push(id_number);
 
@@ -955,9 +938,9 @@ var BoxManager = {
 
     getData : function(id) {
 
-        var data_pos = TimetableManipulator.masterCourseList;
+        var data_pos = TimeTabler.masterCourseList;
 
-        for (x in BoxManager.data_path[id]) {
+        for (var x in BoxManager.data_path[id]) {
             data_pos = data_pos[BoxManager.data_path[id][x]];
         }
         return data_pos;
@@ -981,7 +964,7 @@ var BoxManager = {
         // Get selected department
         var selectedOption = $("#dep_select_" + set_number + " option:selected").attr('value');
 
-        if (selectedOption == 'bad') {
+        if (selectedOption === 'bad') {
             alert("Please select a department before proceeding...");
             return;
         }
@@ -995,37 +978,37 @@ var BoxManager = {
 
         // For array position lookup
         var courseListings = {};
-        var courseNames = new Array();
+        var courseNames = [];
 
-        for (var x in dataInScope) {
+        for (var i in dataInScope) {
 
-            var courseInfo = dataInScope[x];
+            var courseInfo = dataInScope[i];
+            var name = courseInfo.code + (!courseInfo.name ? "" : " " + courseInfo.name);
 
-            // Check if available
-            if (courseInfo['a'] == true) {
+            name += (university.show_term)? " T" + courseInfo.term : "";
 
-                var name = courseInfo['cod'] + ((typeof courseInfo['n'] == 'undefined')? "" : " " + courseInfo['n']);
-
-                name += (settings_parcel.show_term)? " T" + courseInfo['t'] : "";
-                name += (settings_parcel.show_tod)? " " + courseInfo['tod'] : "";
-
-                courseNames.push(name);
-                courseListings[name] = x;
-            }
+            courseNames.push(name);
+            courseListings[name] = i;
         }
 
         courseNames.sort();
 
         // Default value
         $("#course_select_" + set_number).html("");
-        $("#course_select_" + set_number).append($('<option></option>').html('Select a course...').attr({'selected' : 'selected', 'value' : 'bad'}));
+        $("#course_select_" + set_number).append($('<option></option>')
+            .html('Select a course...')
+            .attr({'selected' : 'selected', 'value' : 'bad'}));
 
         for (var x = 0; x < courseNames.length; x++) {
-            $("#course_select_" + set_number).append($('<option></option>').html(courseNames[x]).attr('value', courseListings[courseNames[x]]));
+            $("#course_select_" + set_number).append($('<option></option>')
+                .html(courseNames[x])
+                .attr('value', courseListings[courseNames[x]]));
         }
 
-        $('#advance_button_' + set_number).attr("onclick", "BoxManager.setSchoolUnits("  + set_number + ")");
-        $('#reverse_button_' + set_number).attr({"onclick" : "BoxManager.returnFromCourse("  + set_number + ")", "disabled" : false});
+        $('#advance_button_' + set_number)
+            .attr("onclick", "BoxManager.setSchoolUnits("  + set_number + ")");
+        $('#reverse_button_' + set_number)
+            .attr({"onclick" : "BoxManager.returnFromCourse("  + set_number + ")", "disabled" : false});
     },
 
     returnFromSchoolUnits: function(set_number) {
@@ -1050,7 +1033,7 @@ var BoxManager = {
         // Get selected department
         var selectedOption = $("#course_select_" + set_number + " option:selected").attr('value');
 
-        if (selectedOption == 'bad') {
+        if (selectedOption === 'bad') {
             alert("Please select a course before proceeding...");
             return;
         }
@@ -1062,87 +1045,110 @@ var BoxManager = {
         var dataInScope = BoxManager.getData(set_number);
 
         // Default value
-        $("#su_select_" + set_number).append($('<option></option>').html('Select a section type...').attr({'selected' : 'selected', 'value' : 'bad'}));
+        $("#su_select_" + set_number)
+            .append($('<option></option>')
+                        .html('Select a section type...')
+                        .attr({'selected' : 'selected', 'value' : 'bad'}));
 
         // Load each data set.
-        for (var x in dataInScope) {
+        for (var section_type in dataInScope) {
 
-            var courseInfo = dataInScope[x];
+            if (section_type !== "core" && section_type !== "lab" &&
+                section_type !== "tutorial"){
+                continue;
+            }
 
-            if (x == 'l' || x == 'tu' || x == 'c') {
+            var courseInfo = dataInScope[section_type];
 
-                var prefix = settings_parcel.school_unit_prefixes[x.substring(0,1)];
-                var el_name = settings_parcel.school_unit_names[x.substring(0,1)].toLowerCase();
+            var prefix = university.school_unit_prefixes[section_type];
+            var el_name = university.school_unit_names[section_type].toLowerCase();
 
-                var id_type = (x == 'l')? "lab" : ((x == 'c')? "core" : "tutorial");
+            $("#" + section_type + "_select_" + set_number).html("");
+            $("#" + section_type + "_select_" + set_number)
+                .attr("disabled", false);
+            $("#" + section_type + "_select_" + set_number)
+                .append($('<option></option>')
+                            .html('Select a ' + el_name + '...')
+                            .attr({'selected' : 'selected', 'value' : 'bad'}));
 
-                $("#" + id_type + "_select_" + set_number).html("");
-                $("#" + id_type + "_select_" + set_number).attr("disabled", false);
-                $("#" + id_type + "_select_" + set_number).append($('<option></option>').html('Select a ' + el_name + '...').attr({'selected' : 'selected', 'value' : 'bad'}));
+            var secListings = {};
+            var secNames = [];
 
-                var secListings = {};
-                var secNames = new Array();
+            for (section in dataInScope[section_type]) {
+                var name = dataInScope[section_type][section].name;
+                secNames.push(name);
+                secListings[name] = section;
+            }
 
-                for (var n in dataInScope[x]) {
-
-                    var name = dataInScope[x][n]['n'];
-                    secNames.push(name);
-                    secListings[name] = n;
+            secNames.sort(
+                function (a,b) {
+                    return a - b;
                 }
+            );
 
-                secNames.sort( function(a,b){return a-b} );
-
-                for (var n in secNames) {
-                    $("#" + id_type + "_select_" + set_number).append($('<option></option>').html(prefix + secNames[n].toString()).attr('value', secListings[secNames[n]]));
-                }
+            for (var i in secNames) {
+                $("#" + section_type + "_select_" + set_number)
+                    .append($('<option></option>')
+                                .html(prefix + secNames[i].toString())
+                                .attr('value', secListings[secNames[i]]));
             }
         }
 
-        $('#advance_button_' + set_number).attr("onclick", "BoxManager.addCourse("  + set_number + ")");
-        $('#reverse_button_' + set_number).attr("onclick", "BoxManager.returnFromSchoolUnits("  + set_number + ")");
+        $('#advance_button_' + set_number)
+            .attr("onclick", "BoxManager.addCourse("  + set_number + ")");
+        $('#reverse_button_' + set_number)
+            .attr(
+                "onclick",
+                "BoxManager.returnFromSchoolUnits("  + set_number + ")"
+            );
     },
 
     addCourse : function(set_number) {
+
+        var i = 0;
 
         // Get selected sections.
         var selectedCore = $("#core_select_" + set_number + " option:selected").attr('value');
         var selectedLab = $("#lab_select_" + set_number + " option:selected").attr('value');
         var selectedTut = $("#tutorial_select_" + set_number + " option:selected").attr('value');
 
-        var needCore = !(typeof selectedCore == 'undefined');
-        var needLab = !(typeof selectedLab == 'undefined');
-        var needTut = !(typeof selectedTut == 'undefined');
+        var needCore = typeof selectedCore != 'undefined';
+        var needLab = typeof selectedLab != 'undefined';
+        var needTut = typeof selectedTut != 'undefined';
 
         // Check to ensure all required data has been entered.
-        var needSet = [ needCore, needLab, needTut ];
-        var selectedSet = [ selectedCore, selectedLab, selectedTut];
-        var schoolUnitNameIdentifier = ['c', 'l', 't'];
+        var needSet = [needCore, needLab, needTut];
+        var selectedSet = [selectedCore, selectedLab, selectedTut];
+        var schoolUnitNameIdentifier = ['core', 'lab', 'tutorial'];
 
-        for (var x = 0; x < 3; x++) {
-            if (needSet[x] && selectedSet[x] == 'bad') {
-                alert("Please select a " + settings_parcel.school_unit_names[schoolUnitNameIdentifier[x]].toLowerCase() + " before proceeding...");
+        for (i = 0; i < 3; i++) {
+            if (needSet[i] && selectedSet[i] === 'bad') {
+                alert("Please select a " +
+                    university.school_unit_names[schoolUnitNameIdentifier[i]].toLowerCase() +
+                    " before proceeding..."
+                );
                 return;
             }
         }
 
-        var schoolUnitTypes = ['c', 'l', 'tu'];
+        var schoolUnitTypes = ['core', 'lab', 'tutorial'];
 
-        for (var x = 0; x < 3; x++) {
-            if (needSet[x]) {
+        for (i = 0; i < 3; i++) {
+            if (needSet[i]) {
 
-                BoxManager.data_path[set_number].push(schoolUnitTypes[x]);
-                BoxManager.data_path[set_number].push(selectedSet[x]);
+                BoxManager.data_path[set_number].push(schoolUnitTypes[i]);
+                BoxManager.data_path[set_number].push(selectedSet[i]);
 
                 var targetPayload = BoxManager.createTarget(set_number);
 
-                TimetableManipulator.importSchoolUnit(targetPayload);
+                TimeTabler.importSchoolUnit(targetPayload);
 
                 BoxManager.data_path[set_number].pop();
                 BoxManager.data_path[set_number].pop();
             }
         }
 
-        TimetableManipulator.renderSchedule();
+        TimeTabler.renderSchedule();
 
         $('#core_select_' + set_number).attr("disabled", true);
         $('#lab_select_' + set_number).attr("disabled", true);
@@ -1151,42 +1157,45 @@ var BoxManager = {
         $('#advance_button_' + set_number).attr("disabled", true);
         $('#reverse_button_' + set_number).attr("disabled", false);
 
-        $('#reverse_button_' + set_number).attr("onclick", "BoxManager.removeCourse(" + set_number + ")");
+        $('#reverse_button_' + set_number)
+            .attr("onclick", "BoxManager.removeCourse(" + set_number + ")");
     },
 
     removeCourse : function(set_number) {
+
+        var i = 0;
 
         // Get selecteds sections.
         var selectedCore = $("#core_select_" + set_number + " option:selected").attr('value');
         var selectedLab = $("#lab_select_" + set_number + " option:selected").attr('value');
         var selectedTut = $("#tutorial_select_" + set_number + " option:selected").attr('value');
 
-        var needCore = !(typeof selectedCore == 'undefined');
-        var needLab = !(typeof selectedLab == 'undefined');
-        var needTut = !(typeof selectedTut == 'undefined');
+        var needCore = typeof selectedCore != 'undefined';
+        var needLab = typeof selectedLab != 'undefined';
+        var needTut = typeof selectedTut != 'undefined';
 
-        var sectioningData = [{ 'enabled' : needCore, 'type' : 'c', 'choice' : selectedCore},
-                                { 'enabled' : needLab, 'type' : 'l','choice' : selectedLab},
-                                {'enabled' : needTut, 'type' : 'tu', 'choice' : selectedTut}
-                            ];
+        var sectioningData = [
+            {'enabled' : needCore, 'type' : 'core', 'choice' : selectedCore},
+            {'enabled' : needLab, 'type' : 'lab','choice' : selectedLab},
+            {'enabled' : needTut, 'type' : 'tutorial', 'choice' : selectedTut}
+        ];
 
-        for (var y = 0; y < sectioningData.length; y++) {
+        for (i = 0; i < sectioningData.length; i++) {
+            if (sectioningData[i].enabled) {
 
-            if (sectioningData[y].enabled) {
-
-                BoxManager.data_path[set_number].push(sectioningData[y].type);
-                BoxManager.data_path[set_number].push(sectioningData[y].choice);
+                BoxManager.data_path[set_number].push(sectioningData[i].type);
+                BoxManager.data_path[set_number].push(sectioningData[i].choice);
 
                 var targetPayload = BoxManager.createTarget(set_number);
 
-                TimetableManipulator.removeSchoolUnit(targetPayload);
+                TimeTabler.removeSchoolUnit(targetPayload);
 
                 BoxManager.data_path[set_number].pop();
                 BoxManager.data_path[set_number].pop();
             }
         }
 
-        TimetableManipulator.renderSchedule();
+        TimeTabler.renderSchedule();
 
         $('#core_select_' + set_number).attr("disabled", !needCore);
         $('#lab_select_' + set_number).attr("disabled", !needLab);
@@ -1195,7 +1204,8 @@ var BoxManager = {
         $('#advance_button_' + set_number).attr("disabled", false);
         $('#reverse_button_' + set_number).attr("disabled", false);
 
-        $('#reverse_button_' + set_number).attr("onclick", "BoxManager.returnFromSchoolUnits(" + set_number + ")");
+        $('#reverse_button_' + set_number)
+            .attr("onclick", "BoxManager.returnFromSchoolUnits(" + set_number + ")");
     },
 
     createTarget : function(set_number) {
@@ -1203,13 +1213,13 @@ var BoxManager = {
         var dpath = BoxManager.data_path[set_number];
         var dep = dpath[0];
 
-        var dataTarget = TimetableManipulator.masterCourseList[dpath[0]][dpath[1]];
+        var dataTarget = TimeTabler.masterCourseList[dpath[0]][dpath[1]];
 
         var targetPayload = jQuery.extend(true, {}, dataTarget);
 
-        targetPayload['target'] = dataTarget[dpath[2]][dpath[3]];
-        targetPayload['targetType'] = dpath[2].charAt(0).toLowerCase();
-        targetPayload['dep'] = dpath[0];
+        targetPayload.target = dataTarget[dpath[2]][dpath[3]];
+        targetPayload.targetType = dpath[2].toLowerCase();
+        targetPayload.dep = dpath[0];
 
         return targetPayload;
     }

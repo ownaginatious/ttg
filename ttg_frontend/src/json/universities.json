@@ -1,81 +1,57 @@
 {
     "utsc": {
-        "visual_settings": {
-            "show_term": false,
-            "uses_serials": false,
-            "eow_word": "",
-            "uses_depheaders": false,
-            "school_unit_names": {
-                "t": "Tutorial",
-                "c": "Lecture",
-                "l": "Practical"
-            },
-            "school_unit_prefixes": {
-                "t": "TUT",
-                "c": "LEC",
-                "l": "PRA"
-            },
-            "show_tod": false
+        "show_term": false,
+        "school_unit_names": {
+            "tutorial": "Tutorial",
+            "core": "Lecture",
+            "lab": "Practical"
+        },
+        "school_unit_prefixes": {
+            "tutorial": "TUT",
+            "core": "LEC",
+            "lab": "PRA"
         },
         "name": "University of Toronto Scarborough Campus 2016/2017"
     },
     "western": {
-        "visual_settings": {
-            "show_term": false,
-            "uses_serials": true,
-            "eow_word": "",
-            "uses_depheaders": false,
-            "school_unit_names": {
-                "t": "Tutorial",
-                "c": "Lecture",
-                "l": "Lab"
-            },
-            "school_unit_prefixes": {
-                "t": "TUT",
-                "c": "LEC",
-                "l": "LAB"
-            },
-            "show_tod": false
+        "show_term": false,
+        "school_unit_names": {
+            "tutorial": "Tutorial",
+            "core": "Lecture",
+            "lab": "Lab"
+        },
+        "school_unit_prefixes": {
+            "tutorial": "TUT",
+            "core": "LEC",
+            "lab": "LAB"
         },
         "name": "University of Western Ontario 2016/2017"
     },
     "mcmaster": {
-        "visual_settings": {
-            "show_term": true,
-            "uses_serials": false,
-            "eow_word": "EOW",
-            "uses_depheaders": false,
-            "school_unit_names": {
-                "t": "Tutorial",
-                "c": "Core",
-                "l": "Lab"
-            },
-            "school_unit_prefixes": {
-                "t": "T",
-                "c": "C",
-                "l": "L"
-            },
-            "show_tod": false
+        "show_term": true,
+        "school_unit_names": {
+            "tutorial": "Tutorial",
+            "core": "Core",
+            "lab": "Lab"
+        },
+        "school_unit_prefixes": {
+            "tutorial": "T",
+            "core": "C",
+            "lab": "L"
         },
         "name": "McMaster University 2016/2017"
     },
     "mcmaster_summer": {
-        "visual_settings": {
-            "show_term": true,
-            "uses_serials": false,
-            "eow_word": "EOW",
-            "uses_depheaders": false,
-            "school_unit_names": {
-                "t": "Tutorial",
-                "c": "Core",
-                "l": "Lab"
-            },
-            "school_unit_prefixes": {
-                "t": "T",
-                "c": "C",
-                "l": "L"
-            },
-            "show_tod": false
+        "show_term": true,
+        "school_unit_names": {
+            "tutorial": "Tutorial",
+            "core": "Core",
+            "lab": "Lab"
+        },
+        "school_unit_prefixes": {
+            "tutorial": "T",
+            "core": "C",
+            "lab": "L"
         },
         "name": "McMaster University Summer 2016"
     }
