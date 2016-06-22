@@ -4,7 +4,7 @@
   "private": true,
   "description": "Grunt automation for the Timetable Generator front end",
   "devDependencies": {
-    "grunt": "^1.0.1",
+    "grunt": "^0.4.0",
     "grunt-bower-task": "^0.4.0",
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-copy": "^1.0.0",
