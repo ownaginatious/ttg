@@ -21,14 +21,11 @@ module.exports = function(grunt) {
             dev: {
                 files: {
                     'dist/index.html': 'src/html/index.html',
-                    'dist/data/universities.json': 'src/json/universities.json'
+                    'dist/listings.html': 'src/html/listings.html'
                 }
             },
             prod: {
                 files: [{
-                    src: 'src/html/index.html',
-                    dest: 'dist/index.html'
-                }, {
                     src: 'src/json/universities.json',
                     dest: 'dist/data/universities.json'
                 }, {
@@ -53,59 +50,65 @@ module.exports = function(grunt) {
                     src: 'src/json/universities.json',
                     dest: 'dist/data/universities.json'
                 }, {
-                    expand: true,
-                    cwd: 'bower_components/',
-                    src: '**',
+                    src: 'bower_components/',
                     dest: 'dist/lib/'
                 }, {
                     src: 'favicon.ico',
                     dest: 'dist/favicon.ico'
                 }, {
                     src: 'src/js/ttg.js',
-                    dest: 'dist/lib/ttg.js'
+                    dest: 'dist/js/ttg.js'
                 }, {
-                    expand: true,
-                    cwd: 'src/css',
-                    src: '**',
+                    src: 'src/css/',
                     dest: 'dist/styles/'
                 }]
             }
         },
         htmlmin: {
-            main: {
+            prod: {
                 options: {
                     removeComments: true,
                     collapseWhitespace: true
                 },
                 files: {
-                    'dist/index.html': 'dist/index.html'
+                    'dist/index.html': 'dist/index.html',
+                    'dist/listings.html': 'dist/listings.html'
                 }
             }
         },
         uglify: {
-            main: {
+            prod: {
                 files: {
-                    'dist/lib/ttg.js': 'src/js/ttg.js'
+                    'dist/js/ttg.js': 'src/js/ttg.js'
                 }
             }
         },
         wiredep: {
             main: {
                 options: {
+                    overrides: {
+                        bootstrap: {
+                            "main": [
+                                "dist/css/bootstrap.css",
+                                "dist/js/bootstrap.js"
+                            ]
+                        }
+                    },
                     directory: 'dist/lib/',
                     fileTypes: {
                         html: {
                             replace: {
-                                js: '<script src="static/{{filePath}}"></script>'
+                                js:  '<script type="text/javascript" src="static/{{filePath}}"></script>',
+                                css: '<script type="text/css" src="static/{{filePath}}"></script>'
                             }
                         }
                     }
                 },
-                src: 'dist/index.html'
+                src: ['dist/index.html', 'dist/listings.html']
             }
         },
         watch: {
-            main: {
+            dev: {
                 files: ['src/**/*'],
                 tasks: ['dev-build']
             }
@@ -143,7 +146,7 @@ module.exports = function(grunt) {
             }
         },
         concurrent: {
-            serve: {
+            dev_serve: {
                 tasks: ['watch:main', ['configureProxies:dev', 'connect:dev']],
                 options: {
                     logConcurrentOutput: true
@@ -167,6 +170,6 @@ module.exports = function(grunt) {
 
     grunt.registerTask('dev-build', ['bower', 'copy:dev', 'symlink:dev',
                                      'wiredep']);
-    grunt.registerTask('prod-build', ['bower', 'clean', 'uglify', 'copy:prod',
-                                      'wiredep', 'htmlmin']);
+    grunt.registerTask('prod-build', ['bower', 'clean', 'uglify:prod',
+                                      'copy:prod', 'wiredep', 'htmlmin:prod']);
 };
