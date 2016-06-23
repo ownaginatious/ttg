@@ -18,7 +18,7 @@ module.exports = function(grunt) {
             }
         },
         copy: {
-            dev: {
+            main: {
                 files: {
                     'dist/index.html': 'src/html/index.html',
                     'dist/listings.html': 'src/html/listings.html'
@@ -168,8 +168,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-connect-proxy');
     grunt.loadNpmTasks('grunt-concurrent');
 
-    grunt.registerTask('dev-build', ['bower', 'copy:dev', 'symlink:dev',
+    grunt.registerTask('dev-build', ['bower', 'copy', 'symlink:dev',
                                      'wiredep']);
-    grunt.registerTask('prod-build', ['bower', 'clean', 'uglify:prod',
+    grunt.registerTask('prod-build', ['bower', 'clean', 'uglify:prod', 'copy',
                                       'copy:prod', 'wiredep', 'htmlmin:prod']);
 };
