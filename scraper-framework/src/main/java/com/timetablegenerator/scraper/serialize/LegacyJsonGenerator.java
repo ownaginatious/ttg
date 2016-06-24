@@ -6,6 +6,8 @@ import com.timetablegenerator.model.period.RepeatingPeriod;
 import com.timetablegenerator.scraper.annotation.LegacyMapping;
 import com.timetablegenerator.scraper.annotation.LegacySchool;
 
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,6 +18,9 @@ import java.util.Set;
 public enum LegacyJsonGenerator {
 
     INSTANCE;
+
+    private final DateTimeFormatter UPDATE_TIME_FORMAT =
+            DateTimeFormatter.ofPattern("YYYY-MM-dd'T'HH:mm'Z'").withZone(ZoneOffset.UTC);
 
     private int approximateTerm(TermClassifier tc){
 
@@ -150,6 +155,8 @@ public enum LegacyJsonGenerator {
     public JsonObject toJson(School school, LegacySchool legacyConfig, TimeTable tt) {
 
         JsonObject rootJson = new JsonObject();
+
+        rootJson.addProperty("last_update", tt.getLastUpdate().format(UPDATE_TIME_FORMAT));
 
         // Create the array of courses.
         JsonObject coursesJson = new JsonObject();
