@@ -220,9 +220,11 @@ var DataLoader = {
             url: "/api/v1/school/" + universityId,
             dataType: "json",
             success: function(response) {
+                var dateString = moment(response.last_update, moment.ISO_8601)
+                                 .format('MMM Do YYYY h:mm A ZZ')
                 $("#course_add_button").attr("disabled", false);
                 $("#courses_div").html("<b>University</b> : " +
-                    university.name + "</br>");
+                    university.name + "<br/><b>Last updated:</b> " + dateString + "<br/>");
 
                 TimeTabler.masterCourseList = response.courses;
                 TimeTabler.masterDepartmentList = response.departments;
