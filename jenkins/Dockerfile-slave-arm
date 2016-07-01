@@ -10,8 +10,9 @@ RUN echo "http://dl-6.alpinelinux.org/alpine/edge/community" >> /etc/apk/reposit
 ENV JAVA_VERSION=8 \
     JAVA_UPDATE=91 \
     JAVA_BUILD=14 \
-    JAVA_HOME="/usr/lib/jvm/default-jvm"\
-    JAVA_FILE="jdk-${JAVA_VERSION}u${JAVA_UPDATE}-linux-arm32-vfp-hflt.tar.gz""
+    JAVA_HOME="/usr/lib/jvm/default-jvm"
+
+ENV JAVA_FILE="jdk-${JAVA_VERSION}u${JAVA_UPDATE}-linux-arm32-vfp-hflt.tar.gz""
 
 RUN apk add --no-cache --virtual=build-dependencies wget ca-certificates && \
     cd "/tmp" && \
