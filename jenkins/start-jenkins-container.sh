@@ -35,7 +35,7 @@ image="docker.timetablegenerator.io/ttg/jenkins-${jenkins_type}${arch:-}"
 
 # Check if the container is already running.
 running="$(docker ps --filter name=${container} --format {{.Names}})"
-stopped="$(docker ps -a --filter --filter name=${container} --format {{.Names}})"
+stopped="$(docker ps -a --filter name=${container} --format {{.Names}})"
 
 if [ ! -z "${running}" ]
 then
