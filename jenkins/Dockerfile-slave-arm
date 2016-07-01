@@ -6,7 +6,7 @@ RUN echo "http://dl-6.alpinelinux.org/alpine/edge/community" >> /etc/apk/reposit
     apk add --no-cache docker wget bash && \
     rm -rf /var/cache/apk/*
 RUN mkdir /opt && cd /opt && \
-    wget "http://download.oracle.com/otn/java/ejdk/8u91-b14/ejdk-8u91-linux-arm-sflt.tar.gz" && \
+    wget "http://download.oracle.com/otn-pub/java/jdk/8u91-b14/jdk-8u91-linux-arm32-vfp-hflt.tar.gz" && \
     tar -xvf ejdk-8u91-linux-arm-sflt.tar.gz && \
     rm ejdk-8u91-linux-arm-sflt.tar.gz
 CMD wget "http://jenkins.timetablegenerator.io/jnlpJars/slave.jar" && \
