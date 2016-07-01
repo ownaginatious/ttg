@@ -16,8 +16,14 @@ then
     exit 1
 fi
 
+if [ -z "${3:-}" ] && "${slave}"
+then
+   >&2 printf " -> Missing JENKINS_SLAVE_SECRET argument (arg 3)\n"
+   exit 1
+fi
+
 "${master}" && jenkins_type="master" || jenkins_type="slave"
-"${master}" && ports="-p ${JENKINS_PORT}:8080 -p ${JENKINS_SLAVE_PORT}:50000"
+"${master}" && ports="-p ${JENKINS_PORT}:8080 -p ${JENKINS_SLAVE_PORT}:50000" || ports=""
 container="ttg-jenkins-${jenkins_type}"
 image="docker.timetablegenerator.com/ttg/jenkins-${jenkins_type}"
 
@@ -45,10 +51,14 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 printf " -> Starting new Jenkins ${jenkins_type} container (${container})... "
 
+# Pull the latest version of the image.
+docker pull "${image}"
+
 # Communication with this docker server will be integrated into the Jenkins container
 docker run -d -v /var/run/docker.sock:/var/run/docker.sock \
-              -v "$2":/var/jenkins_home \
-              ${ports:-} \
+              -v "$2":/var/jenkins_home "${ports}" \
+              -e "JENKINS_SLAVE_SECRET=${3:-}"\
+              -e "JENKINS_SLAVE_ID=$(hostname)"\
               --name "${container}" "${image}" > /dev/null
 
 # Hack to get docker to run as the root user. Permission
