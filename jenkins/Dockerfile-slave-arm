@@ -47,8 +47,7 @@ RUN apk add --no-cache --virtual=build-dependencies wget ca-certificates && \
     rm "/tmp/"*
 
 CMD wget "http://jenkins.timetablegenerator.io/jnlpJars/slave.jar" && \
-    export JAVA_HOME="/opt/jdk1.8.0_91" && \
-    /opt/jdk1.8.0_91/bin/java -jar "./slave.jar" \
+    java -jar "./slave.jar" \
          -jnlpUrl "http://jenkins.timetablegenerator.io/computer/${JENKINS_SLAVE_ID}/slave-agent.jnlp" \
          -secret "${JENKINS_SLAVE_SECRET}"
 
