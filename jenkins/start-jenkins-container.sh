@@ -1,6 +1,12 @@
 #! /bin/bash
 set -e -u
 
+# Microcontroller slaves require a different build.
+if [ ! -z "$(uname -a | grep 'arm')" ]
+then
+    arch="-arm"
+fi
+
 [ -z "${JENKINS_PORT:-}" ] && JENKINS_PORT=8080
 [ -z "${JENKINS_SLAVE_PORT:-}" ] && JENKINS_SLAVE_PORT=50000
 
@@ -25,11 +31,11 @@ fi
 "${master}" && jenkins_type="master" || jenkins_type="slave"
 "${master}" && ports="-p ${JENKINS_PORT}:8080 -p ${JENKINS_SLAVE_PORT}:50000" || ports=""
 container="ttg-jenkins-${jenkins_type}"
-image="docker.timetablegenerator.io/ttg/jenkins-${jenkins_type}"
+image="docker.timetablegenerator.io/ttg/jenkins-${jenkins_type}${arch:-}"
 
 # Check if the container is already running.
-running="$(docker ps --filter status=running --filter name=${container} --format {{.Names}})"
-stopped="$(docker ps --filter status=exited --filter name=${container} --format {{.Names}})"
+running="$(docker ps --filter name=${container} --format {{.Names}})"
+stopped="$(docker ps -a --filter --filter name=${container} --format {{.Names}})"
 
 if [ ! -z "${running}" ]
 then
@@ -56,7 +62,7 @@ docker pull "${image}"
 
 # Communication with this docker server will be integrated into the Jenkins container
 docker run -d -v /var/run/docker.sock:/var/run/docker.sock \
-              -v "$2":/var/jenkins_home "${ports}" \
+              -v "$2":/var/jenkins_home ${ports} \
               -e "JENKINS_SLAVE_SECRET=${3:-}"\
               -e "JENKINS_SLAVE_ID=$(hostname)"\
               --name "${container}" "${image}" > /dev/null

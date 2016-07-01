@@ -1,0 +1,10 @@
+FROM hypriot/rpi-alpine-scratch
+ENV EDITED_ON 2016-07-01
+RUN echo "http://dl-6.alpinelinux.org/alpine/edge/community" > /etc/apk/repositories && \
+    apk add docker && \
+    apk add wget
+CMD [ "wget", "http://jenkins.timetablegenerator.io/jnlpJars/slave.jar", "&&", \
+      "java", "-jar", "./slave.jar", \
+              "-jnlpUrl", "http://jenkins.timetablegenerator.io/computer/${JENKINS_SLAVE_ID}/slave-agent.jnlp", \
+              "-secret", "${JENKINS_SLAVE_SECRET}" ]
+
