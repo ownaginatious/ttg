@@ -1,4 +1,4 @@
-FROM hypriot/rpi-alpine-scratch
+FROM hypriot/rpi-alpine-scratch:edge
 ENV EDITED_ON 2016-07-01
 RUN echo "http://dl-6.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories && \
     apk update && \
