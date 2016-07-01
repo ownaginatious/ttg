@@ -3,10 +3,15 @@ ENV EDITED_ON 2016-07-01
 RUN echo "http://dl-6.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories && \
     apk update && \
     apk upgrade && \
-    apk add docker wget bash && \
+    apk add --no-cache docker wget bash && \
     rm -rf /var/cache/apk/*
+RUN cd /opt && \
+    wget "http://download.oracle.com/otn/java/ejdk/8u91-b14/ejdk-8u91-linux-arm-sflt.tar.gz" && \
+    tar -xvf ejdk-8u91-linux-arm-sflt.tar.gz && \
+    rm ejdk-8u91-linux-arm-sflt.tar.gz
 CMD wget "http://jenkins.timetablegenerator.io/jnlpJars/slave.jar" && \
-    java -jar "./slave.jar" \
+    export JAVA_HOME="/opt/jdk1.8.0_91" && \
+    /opt/jdk1.8.0_91/bin/java -jar "./slave.jar" \
          -jnlpUrl "http://jenkins.timetablegenerator.io/computer/${JENKINS_SLAVE_ID}/slave-agent.jnlp" \
          -secret "${JENKINS_SLAVE_SECRET}"
 
