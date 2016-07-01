@@ -5,8 +5,8 @@ RUN echo "http://dl-6.alpinelinux.org/alpine/edge/community" >> /etc/apk/reposit
     apk upgrade && \
     apk add docker wget bash && \
     rm -rf /var/cache/apk/*
-CMD [ "wget", "http://jenkins.timetablegenerator.io/jnlpJars/slave.jar", "&&", \
-      "java", "-jar", "./slave.jar", \
-              "-jnlpUrl", "http://jenkins.timetablegenerator.io/computer/${JENKINS_SLAVE_ID}/slave-agent.jnlp", \
-              "-secret", "${JENKINS_SLAVE_SECRET}" ]
+CMD wget "http://jenkins.timetablegenerator.io/jnlpJars/slave.jar" && \
+    java -jar "./slave.jar" \
+         -jnlpUrl "http://jenkins.timetablegenerator.io/computer/${JENKINS_SLAVE_ID}/slave-agent.jnlp" \
+         -secret "${JENKINS_SLAVE_SECRET}"
 
