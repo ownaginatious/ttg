@@ -1,0 +1,8 @@
+FROM ownaginatious/armv6h-java:8u40
+ENV EDITED_ON 2016-07-03
+
+CMD wget "http://jenkins.timetablegenerator.io/jnlpJars/slave.jar" && \
+    java -jar "./slave.jar" \
+         -jnlpUrl "http://jenkins.timetablegenerator.io/computer/${JENKINS_SLAVE_ID}/slave-agent.jnlp" \
+         -secret "${JENKINS_SLAVE_SECRET}"
+
