@@ -2,9 +2,11 @@
 set -e -u
 
 # Microcontroller slaves require a different build.
-if [ ! -z "$(uname -a | grep 'arm')" ]
+if [ ! -z "$(uname -m | grep 'armv6')" ]
 then
-    arch="-arm"
+    arch="-armv6"
+elif [ ! -z "$(uname -m | grep 'armv7')" ]
+    arch="-armv7"
 fi
 
 [ -z "${JENKINS_PORT:-}" ] && JENKINS_PORT=8080
