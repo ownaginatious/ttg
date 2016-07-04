@@ -1,0 +1,4 @@
+FROM ownaginatious/armv6h-java:8u40
+ADD ./build/libs/ttg-scraper.jar /dist/ttg-scraper.jar
+ENTRYPOINT [ "java", "-jar", "/dist/ttg-scraper.jar" ]
+
