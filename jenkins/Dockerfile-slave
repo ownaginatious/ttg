@@ -7,6 +7,6 @@ RUN apt-get update && \
     apt-get update && apt-get install -y docker-engine
 CMD [ "wget", "http://jenkins.timetablegenerator.io/jnlpJars/slave.jar", "&&", \
       "java", "-jar", "./slave.jar", \
-              "-jnlpUrl", "http://jenkins.timetablegenerator.io/computer/${JENKINS_SLAVE_ID}/slave-agent.jnlp", \
+              "-jnlpUrl", "https://jenkins.timetablegenerator.io/computer/${JENKINS_SLAVE_ID}/slave-agent.jnlp", \
               "-secret", "${JENKINS_SLAVE_SECRET}" ]
 
