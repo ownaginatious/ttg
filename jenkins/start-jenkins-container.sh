@@ -6,6 +6,7 @@ if [ ! -z "$(uname -m | grep 'armv6')" ]
 then
     arch="-armv6"
 elif [ ! -z "$(uname -m | grep 'armv7')" ]
+then
     arch="-armv7"
 fi
 
