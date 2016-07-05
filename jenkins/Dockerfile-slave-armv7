@@ -1,4 +1,4 @@
-FROM ownaginatious/armv6h-archlinux:2016-07
+FROM ownaginatious/armv7h-archlinux:2016-07
 ENV EDITED_ON 2016-07-03
 RUN pacman -Sy jdk8-openjdk jre8-openjdk wget git
 
