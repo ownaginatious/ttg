@@ -1,4 +1,4 @@
-FROM ownaginatious/armv6h-archlinux:2016-07
+FROM ownaginatious/armv7h-archlinux:2016-07
 ENV LAST_UPDATED=2016-07-05
 RUN pacman -Sy jre8-openjdk jdk8-openjdk
 ADD ./build/libs/ttg-scraper.jar /dist/ttg-scraper.jar
