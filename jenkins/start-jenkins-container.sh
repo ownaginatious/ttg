@@ -4,10 +4,10 @@ set -e -u
 # Microcontroller slaves require a different build.
 if [[ "$(uname -m)" =~ ^armv6.*$ ]]
 then
-    arch="-armv6v"
+    arch="-armv6h"
 elif [[ "$(uname -m)" =~ ^armv7.*$ ]]
 then
-    arch="-armv7v"
+    arch="-armv7h"
 fi
 
 [ -z "${JENKINS_PORT:-}" ] && JENKINS_PORT=8080
