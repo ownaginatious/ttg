@@ -1,6 +1,6 @@
 FROM ownaginatious/armv6h-archlinux:2016-07
 ENV EDITED_ON 2016-07-03
-RUN pacman -Sy --noconfirm jdk8-openjdk jre8-openjdk wget git
+RUN pacman -Sy --noconfirm jdk8-openjdk jre8-openjdk wget git docker
 
 CMD wget "http://jenkins.timetablegenerator.io/jnlpJars/slave.jar" && \
     java -jar "./slave.jar" \
