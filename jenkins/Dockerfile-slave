@@ -6,7 +6,7 @@ RUN apt-get update && \
     echo "deb https://apt.dockerproject.org/repo debian-jessie main"  > /etc/apt/sources.list.d/docker.list && \
     apt-get update && apt-get install -y docker-engine
 
-CMD [ -d '/ssh_keys' ] && (cp -R /ssh_keys && /root/.ssh/ && \
+CMD [ -d '/ssh_keys' ] && (cp -R /ssh_keys /root/.ssh/ && \
                            chown -R root:root /root/.ssh/ && \
                            chmod 400 -R /root/.ssh/) || true && \
     wget http://jenkins.timetablegenerator.io/jnlpJars/slave.jar && \
