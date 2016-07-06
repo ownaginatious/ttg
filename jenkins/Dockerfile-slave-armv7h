@@ -1,6 +1,11 @@
 FROM ownaginatious/armv7h-archlinux:2016-07
-ENV EDITED_ON 2016-07-03
-RUN pacman -Sy --noconfirm jdk8-openjdk jre8-openjdk wget git docker
+ENV EDITED_ON 2016-07-05
+RUN pacman -Sy --noconfirm wget git docker && \
+    wget https://sunnyvale.dillon.io/java/jdk8-openjdk-8.u77-1-armv7h.pkg.tar.xz && \
+    wget https://sunnyvale.dillon.io/java/jre8-openjdk-8.u77-1-armv7h.pkg.tar.xz && \
+    wget https://sunnyvale.dillon.io/java/jre8-openjdk-headless-8.u77-1-armv7h.pkg.tar.xz && \
+    pacman -U --noconfirm jre8* jdk8* && \
+    rm jre8* jdk8*
 
 CMD wget "http://jenkins.timetablegenerator.io/jnlpJars/slave.jar" && \
     java -jar "./slave.jar" \
