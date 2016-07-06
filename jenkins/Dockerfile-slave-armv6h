@@ -1,11 +1,6 @@
-FROM ownaginatious/armv6h-archlinux:2016-07
-ENV EDITED_ON 2016-07-05
-RUN pacman -Sy --noconfirm wget git docker openssh && \
-    wget https://sunnyvale.dillon.io/java/jdk8-openjdk-8.u77-1-armv6h.pkg.tar.xz && \
-    wget https://sunnyvale.dillon.io/java/jre8-openjdk-8.u77-1-armv6h.pkg.tar.xz && \
-    wget https://sunnyvale.dillon.io/java/jre8-openjdk-headless-8.u77-1-armv6h.pkg.tar.xz && \
-    pacman -U --noconfirm jre8* jdk8* && \
-    rm jre8* jdk8*
+FROM ownaginatious/armv6h-archlinux-java:latest
+ENV EDITED_ON 2016-07-06
+RUN pacman -Sy --noconfirm wget git docker openssh
 
 CMD [ -d '/ssh_keys' ] && (cp -R /ssh_keys /root/.ssh/ && \
                            chown -R root:root /root/.ssh/ && \
