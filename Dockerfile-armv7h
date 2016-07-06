@@ -1,11 +1,4 @@
-FROM ownaginatious/armv7h-archlinux:2016-07
+FROM ownaginatious/armv7h-archlinux-java:latest
 ENV LAST_UPDATED=2016-07-05
-RUN pacman -Sy --noconfirm wget && \
-    wget https://sunnyvale.dillon.io/java/jdk8-openjdk-8.u77-1-armv7h.pkg.tar.xz && \
-    wget https://sunnyvale.dillon.io/java/jre8-openjdk-8.u77-1-armv7h.pkg.tar.xz && \
-    wget https://sunnyvale.dillon.io/java/jre8-openjdk-headless-8.u77-1-armv7h.pkg.tar.xz && \
-    pacman -U --noconfirm jre8* jdk8* && \
-    rm jre8* jdk8*
 ADD ./build/libs/ttg-scraper.jar /dist/ttg-scraper.jar
 ENTRYPOINT [ "java", "-jar", "/dist/ttg-scraper.jar" ]
-
