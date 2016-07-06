@@ -25,10 +25,16 @@ then
     exit 1
 fi
 
-if [ -z "${3:-}" ] && "${slave}"
+if [ -z "${3:-}" ]
 then
-   >&2 printf " -> Missing JENKINS_SLAVE_SECRET argument (arg 3)\n"
-   exit 1
+    >&2 printf " -> Missing SSH dir argument (arg 3)\n"
+    exit 1
+fi
+
+if [ -z "${4:-}" ] && "${slave}"
+then
+    >&2 printf " -> Missing JENKINS_SLAVE_SECRET argument (arg 4)\n"
+    exit 1
 fi
 
 "${master}" && jenkins_type="master" || jenkins_type="slave"
@@ -66,8 +72,9 @@ docker pull "${image}"
 # Communication with this docker server will be integrated into the Jenkins container
 docker run -d -v /var/run/docker.sock:/var/run/docker.sock \
               -v "$2":/var/jenkins_home ${ports} \
-              -e "JENKINS_SLAVE_SECRET=${3:-}"\
-              -e "JENKINS_SLAVE_ID=$(hostname)"\
+              -v "$3":/var/jenkins_home/.ssh:ro ${ports} \
+              -e "JENKINS_SLAVE_SECRET=${4:-}" \
+              -e "JENKINS_SLAVE_ID=$(hostname)" \
               --name "${container}" "${image}" > /dev/null
 
 # Hack to get docker to run as the root user. Permission
