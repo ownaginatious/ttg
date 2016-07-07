@@ -11,6 +11,6 @@ CMD [ -d '/ssh_keys' ] && (cp -R /ssh_keys /root/.ssh/ && \
                            chmod 400 -R /root/.ssh/) || true && \
     wget http://jenkins.timetablegenerator.io/jnlpJars/slave.jar && \
     java -jar ./slave.jar \
-         -jnlpUrl https://jenkins.timetablegenerator.io/computer/${JENKINS_SLAVE_ID}/slave-agent.jnlp
+         -jnlpUrl https://jenkins.timetablegenerator.io/computer/${JENKINS_SLAVE_ID}/slave-agent.jnlp \
          -secret ${JENKINS_SLAVE_SECRET}
 
