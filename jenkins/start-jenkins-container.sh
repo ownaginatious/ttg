@@ -73,6 +73,7 @@ docker pull "${image}"
 # given privileged access to do so.
 if [ ! -z "${arch:-}" ]
 then
+    printf " -> Container will be started with special system privileges [--privileged]"
     super_container="--privileged"
 fi
 
@@ -82,8 +83,8 @@ docker run -d -v /var/run/docker.sock:/var/run/docker.sock \
               -v "$3":/ssh_keys:ro ${ports} \
               -e "JENKINS_SLAVE_SECRET=${4:-}" \
               -e "JENKINS_SLAVE_ID=$(hostname)" \
-              --name "${container}" "${image}" \
-              ${super_container:-} > /dev/null
+              --name "${container}" "${super_container:-}" \
+              "${image}" > /dev/null
 
 # Hack to get docker to run as the root user. Permission
 # is denied to the jenkins user on /var/run/docker.sock
