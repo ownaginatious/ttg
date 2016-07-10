@@ -354,8 +354,11 @@ public class McMasterScraper extends Scraper {
                 currentCourseCredits = Double.parseDouble(courseData.group("credits"));
 
             } else {
-                throw new IllegalArgumentException("Unable to parse course information from \""
-                        + courseTitleString + "\"");
+                LOGGER.warn(
+                        String.format("Strangely formatted course title detected (%s). Skipping this course...",
+                                courseTitleString)
+                );
+                continue;
             }
 
             for (Element e : departmentSchedule.getElementById("ACE_$ICField237$" + i)
