@@ -71,7 +71,7 @@ docker pull "${image}"
 
 # Non-x86 containers have to build their own images in chroots, so they should be
 # given privileged access to do so.
-if [ -z "${arch:-}" ]
+if [ ! -z "${arch:-}" ]
 then
     super_container="--privileged"
 fi
@@ -83,7 +83,7 @@ docker run -d -v /var/run/docker.sock:/var/run/docker.sock \
               -e "JENKINS_SLAVE_SECRET=${4:-}" \
               -e "JENKINS_SLAVE_ID=$(hostname)" \
               --name "${container}" "${image}" \
-              ${super_container} > /dev/null
+              ${super_container:-} > /dev/null
 
 # Hack to get docker to run as the root user. Permission
 # is denied to the jenkins user on /var/run/docker.sock
