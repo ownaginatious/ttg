@@ -1,5 +1,5 @@
-FROM ownaginatious/armv6h-archlinux-java:latest
-ENV EDITED_ON 2016-07-06
+FROM ownaginatious/armv6h-archlinux-java-oracle:latest
+ENV EDITED_ON 2016-07-11
 RUN pacman -Sy --noconfirm curl wget git docker openssh
 
 CMD [ -d '/ssh_keys' ] && (cp -R /ssh_keys /root/.ssh/ && \
