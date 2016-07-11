@@ -1,6 +1,6 @@
 FROM ownaginatious/armv7h-archlinux-java-oracle:latest
-ENV EDITED_ON 2016-07-11 \
-    KEYSTORE $JAVA_HOME/jre/lib/security/cacerts
+ENV EDITED_ON=2016-07-11 \
+    KEYSTORE=$JAVA_HOME/jre/lib/security/cacerts
 
 RUN pacman -Sy --noconfirm --noprogressbar curl wget git docker openssh && \
     wget https://letsencrypt.org/certs/isrgrootx1.pem && \
