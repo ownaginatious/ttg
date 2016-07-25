@@ -28,6 +28,7 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @SchoolConfig(
         name = "University of Western Ontario", id = "western",
@@ -52,13 +53,15 @@ public class WesternScraper extends Scraper {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final String TIMETABLE_ROOT = "http://studentservices.uwo.ca/secure/timetables/mastertt/ttindex.cfm";
+    private final String ORIGIN = "http://studentservices.uwo.ca";
+    private final String TIMETABLE_ROOT = ORIGIN + "/secure/timetables/mastertt/ttindex.cfm";
+    private final String EDUC_TIMETABLE_ROOT = ORIGIN + "/secure/timetables/eductt/ttindex.cfm";
 
     private final Pattern TIME_PATTERN =
             Pattern.compile("^(?<hour>[0-9]{1,2}):(?<minute>[0-9]{2}) (?<tod>[AP])M$");
 
     private final Pattern COURSE_PATTERN =
-            Pattern.compile("^(?<code>(?<department>[A-Z-]+) [0-9]+(?<term>[A-Z]?)) - (?<name>.+)$");
+            Pattern.compile("^(?<code>(?<department>[A-Z-]+) [0-9]+(?<term>[A-Z]?)) - (?<name>.*)$");
 
     // Credit signifiers.
     private static final String QUARTER_CREDITS = "QRST";
@@ -83,21 +86,33 @@ public class WesternScraper extends Scraper {
     private Collection<Course> getCourses(Department department) throws IOException {
 
         // Create a blank request to acquire cookies.
-        RestRequest request = RestRequest.get(TIMETABLE_ROOT).run().nextPost(TIMETABLE_ROOT)
-                .setFormParameter("subject", department.getCode())
-                .setFormParameter("Designation", "Any")
-                .setFormParameter("catalognbr", "")
-                .setFormParameter("CourseTime", "All")
-                .setFormParameter("Component", "All")
-                .setFormParameter("time", "")
-                .setFormParameter("end_time", "")
-                .setFormParameter("day", "m")
-                .setFormParameter("day", "tu")
-                .setFormParameter("day", "w")
-                .setFormParameter("day", "th")
-                .setFormParameter("day", "f")
-                .setFormParameter("Campus", "Any")
-                .setFormParameter("command", "search");
+        RestRequest request;
+
+        if (!department.getCode().equals("EDUC")) {
+            request = RestRequest.get(TIMETABLE_ROOT).run().nextPost(TIMETABLE_ROOT)
+                    .setFormParameter("subject", department.getCode())
+                    .setFormParameter("Designation", "Any")
+                    .setFormParameter("catalognbr", "")
+                    .setFormParameter("CourseTime", "All")
+                    .setFormParameter("Component", "All")
+                    .setFormParameter("time", "")
+                    .setFormParameter("end_time", "")
+                    .setFormParameter("day", "m")
+                    .setFormParameter("day", "tu")
+                    .setFormParameter("day", "w")
+                    .setFormParameter("day", "th")
+                    .setFormParameter("day", "f")
+                    .setFormParameter("Campus", "Any")
+                    .setFormParameter("command", "search");
+        } else {
+            // The EDUC department requires special handling.
+            request = RestRequest.get(EDUC_TIMETABLE_ROOT).run().nextPost(EDUC_TIMETABLE_ROOT)
+                    .setHeader("Referer", EDUC_TIMETABLE_ROOT)
+                    .setHeader("Origin", ORIGIN)
+                    .setFormParameter("subject", "EDUC")
+                    .setFormParameter("catalognbr", "")
+                    .setFormParameter("command", "search");
+        }
 
         Document d;
 
@@ -125,9 +140,7 @@ public class WesternScraper extends Scraper {
         Collection<Course> courses = new ArrayList<>();
 
         // Iterate through the course listings.
-        d.select(".table-striped")
-                .forEach(e -> courses.add(parseCourseData(e, department)));
-
+        d.select(".table-striped").forEach(e -> courses.add(parseCourseData(e, department)));
         return courses;
     }
 
@@ -135,24 +148,40 @@ public class WesternScraper extends Scraper {
 
         final Course c;
 
-        String caption = courseElement.select("caption").text();
+        String caption;
+
+        if (!department.getCode().equals("EDUC")) {
+           caption = courseElement.select("caption").text();
+        } else {
+            // EDUC courses are strangely formatted and required special handling.
+            caption = "EDUC ";
+            Set<String> codes = courseElement.select("table.table-striped > tbody > tr > td:first-child")
+                    .stream().map(Element::text).collect(Collectors.toSet());
+            if (codes.size() > 1){
+                throw new IllegalStateException("Course contains more than 1 code: " + codes.toString());
+            }
+            caption += codes.iterator().next() + " - ";
+        }
+
         Matcher courseMatch = COURSE_PATTERN.matcher(caption);
 
-        if (!courseMatch.find())
+        if (!courseMatch.find()) {
             throw new IllegalArgumentException("Could not parse the course designation \"" + caption + "\".");
+        }
 
-        if (!courseMatch.group("department").equals(department.getCode()))
+        if (!courseMatch.group("department").equals(department.getCode())) {
             throw new IllegalArgumentException("The department signifier to this course deviates from the expected ("
                     + department.getCode() + ").");
+        }
 
         String courseCode = courseMatch.group("code");
         String courseName = courseMatch.group("name");
 
         String termId = courseMatch.group("term");
 
-        if (termId.length() == 0 || FULL_YEAR_TERM.contains(termId))
+        if (termId.length() == 0 || FULL_YEAR_TERM.contains(termId)) {
             c = new Course(getSchool(), TermClassifier.FULL_SCHOOL_YEAR, department, courseCode, courseName, 1.00);
-        else {
+        } else {
 
             TermClassifier courseTerm;
 
@@ -195,6 +224,11 @@ public class WesternScraper extends Scraper {
         for (Element sectionElement : sectionList) {
 
             ListIterator<Element> columns = sectionElement.select("td").listIterator();
+
+            // The first column of education courses is always the course number, which is dropped.
+            if (department.getCode().equals("EDUC")) {
+                columns.next();
+            }
 
             String sectionId = ParsingTools.sanitize(columns.next().ownText());
             String sectionType = ParsingTools.sanitize(columns.next().ownText());
@@ -352,11 +386,15 @@ public class WesternScraper extends Scraper {
             String name = ParsingTools.sanitize(departmentBlock.ownText());
             String code = ParsingTools.sanitize(departmentBlock.attr("value"));
 
-            if (name.equals("All Subjects"))
+            if (name.equals("All Subjects")) {
                 continue;
+            }
 
             departments.add(new Department(code, name));
         }
+
+        // Add the education department.
+        departments.add(new Department("EDUC", "Education"));
 
         int i = 0;
 
