@@ -227,6 +227,7 @@ public class Course implements Diffable<Course> {
         if (!this.name.equals(that.name)) {
             return this.name.compareTo(that.name);
         }
+        // Some standard classes will use this instead of .equals() so ensure non-zero if not equal.
         return this.equals(that) ? 0 : -1;
     }
 

@@ -46,13 +46,19 @@ public class RemovalDelta extends Delta {
 
     @Override
     public int compareTo(@Nonnull Delta that) {
+
         if (that instanceof AdditionDelta) {
             return 1;
         }
-        if (this.getPropertyType() != that.getPropertyType()) {
-            return this.getPropertyType().compareTo(that.getPropertyType());
+        if (!(that instanceof RemovalDelta)) {
+            return -1;
         }
-        // Only way to ensure a stable reproducible ordering.
-        return this.oldValue.hashCode() - ((RemovalDelta) that).oldValue.hashCode();
+
+        RemovalDelta thatSame = (RemovalDelta) that;
+
+        if (this.getPropertyType() != thatSame.getPropertyType()) {
+            return this.getPropertyType().compareTo(thatSame.getPropertyType());
+        }
+        return this.oldValue.toString().compareTo(thatSame.oldValue.toString());
     }
 }

@@ -1,15 +1,14 @@
 package com.timetablegenerator.tests.api.diff;
 
 import com.timetablegenerator.Settings;
-import com.timetablegenerator.delta.PropertyType;
-import com.timetablegenerator.delta.AdditionDelta;
-import com.timetablegenerator.delta.ValueChangeDelta;
-import com.timetablegenerator.delta.RemovalDelta;
+import com.timetablegenerator.delta.*;
+import com.timetablegenerator.model.Section;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
 
-public class ValueDelta {
+public class ValueDeltaTests {
 
     private static String I = Settings.getIndent();
 
@@ -93,17 +92,17 @@ public class ValueDelta {
 
     @Test
     public void change() {
-        ValueChangeDelta vcd = ValueChangeDelta.of(PropertyType.CAMPUS, "Hello", "Hello2");
+        ReplaceDelta vcd = ReplaceDelta.of(PropertyType.CAMPUS, "Hello", "Hello2");
         assertEquals(PropertyType.CAMPUS, vcd.getPropertyType());
         assertEquals("Hello", vcd.getOldValue());
         assertEquals("Hello2", vcd.getNewValue());
 
-        vcd = ValueChangeDelta.of(PropertyType.CREDITS, 1.25, 3.43);
+        vcd = ReplaceDelta.of(PropertyType.CREDITS, 1.25, 3.43);
         assertEquals(PropertyType.CREDITS, vcd.getPropertyType());
         assertEquals(1.25, vcd.getOldValue());
         assertEquals(3.43, vcd.getNewValue());
 
-        vcd = ValueChangeDelta.of(PropertyType.IS_ALTERNATING, false, true);
+        vcd = ReplaceDelta.of(PropertyType.IS_ALTERNATING, false, true);
         assertEquals(PropertyType.IS_ALTERNATING, vcd.getPropertyType());
         assertEquals(false, vcd.getOldValue());
         assertEquals(true, vcd.getNewValue());
@@ -111,18 +110,18 @@ public class ValueDelta {
 
     @Test
     public void changeString() {
-        ValueChangeDelta vcd = ValueChangeDelta.of(PropertyType.CAMPUS, "Hello", "Hello2");
-        assertEquals("MODIFIED [CAMPUS]\n"
+        ReplaceDelta vcd = ReplaceDelta.of(PropertyType.CAMPUS, "Hello", "Hello2");
+        assertEquals("REPLACED [CAMPUS]\n"
                 + I + "Old value : \"Hello\"\n"
                 + I + "New value : \"Hello2\"", vcd.toString());
     }
 
     @Test
     public void changeEquality() {
-        ValueChangeDelta vcd1 = ValueChangeDelta.of(PropertyType.CAMPUS, "Hello", "Hello2");
-        ValueChangeDelta vcd2 = ValueChangeDelta.of(PropertyType.NOTE, "Hello", "Hello2");
-        ValueChangeDelta vcd3 = ValueChangeDelta.of(PropertyType.CAMPUS, "Hellow", "Hello2");
-        ValueChangeDelta vcd4 = ValueChangeDelta.of(PropertyType.CAMPUS, "Hello", "Hello2");
+        ReplaceDelta vcd1 = ReplaceDelta.of(PropertyType.CAMPUS, "Hello", "Hello2");
+        ReplaceDelta vcd2 = ReplaceDelta.of(PropertyType.NOTE, "Hello", "Hello2");
+        ReplaceDelta vcd3 = ReplaceDelta.of(PropertyType.CAMPUS, "Hellow", "Hello2");
+        ReplaceDelta vcd4 = ReplaceDelta.of(PropertyType.CAMPUS, "Hello", "Hello2");
 
         assertEquals(vcd1, vcd4);
         assertNotEquals(vcd1, vcd2);
@@ -132,6 +131,83 @@ public class ValueDelta {
 
     @Test(expected = IllegalArgumentException.class)
     public void badChangeType() {
-        ValueChangeDelta.of(PropertyType.ONE_TIME_PERIOD, 1, 2);
+        ReplaceDelta.of(PropertyType.ONE_TIME_PERIOD, 1, 2);
+    }
+
+    @Test
+    public void additionDeltaComparison() {
+
+        AdditionDelta a1 = AdditionDelta.of(PropertyType.NUM_ENROLLED, 1);
+        AdditionDelta a2 = AdditionDelta.of(PropertyType.NUM_ENROLLED, 2);
+        assertEquals(0, a1.compareTo(a1));
+
+        assertThat(a1.compareTo(a2), lessThan(0));
+
+        AdditionDelta a3 = AdditionDelta.of(PropertyType.CREDITS, 2.0);
+        assertThat(a3.compareTo(a1), lessThan(0));
+        assertThat(a3.compareTo(a2), lessThan(0));
+        assertThat(a1.compareTo(a3), greaterThan(0));
+        assertThat(a1.compareTo(a3), greaterThan(0));
+    }
+
+    @Test
+    public void removalDeltaComparison() {
+
+        RemovalDelta r1 = RemovalDelta.of(PropertyType.NUM_ENROLLED, 1);
+        RemovalDelta r2 = RemovalDelta.of(PropertyType.NUM_ENROLLED, 2);
+        assertEquals(0, r1.compareTo(r1));
+
+        assertThat(r1.compareTo(r2), lessThan(0));
+
+        RemovalDelta r3 = RemovalDelta.of(PropertyType.CREDITS, 2.0);
+        assertThat(r3.compareTo(r1), lessThan(0));
+        assertThat(r3.compareTo(r2), lessThan(0));
+        assertThat(r1.compareTo(r3), greaterThan(0));
+        assertThat(r1.compareTo(r3), greaterThan(0));
+    }
+
+    @Test
+    public void replaceDeltaComparison() {
+
+        ReplaceDelta c1 = ReplaceDelta.of(PropertyType.NUM_ENROLLED, 0, 1);
+        ReplaceDelta c2 = ReplaceDelta.of(PropertyType.NUM_ENROLLED, 0, 2);
+        assertEquals(0, c1.compareTo(c1));
+
+        assertThat(c1.compareTo(c2), lessThan(0));
+        assertThat(c2.compareTo(c1), greaterThan(0));
+
+        ReplaceDelta c3 = ReplaceDelta.of(PropertyType.CREDITS, 2.0, 3.0);
+        assertThat(c3.compareTo(c1), lessThan(0));
+        assertThat(c3.compareTo(c2), lessThan(0));
+        assertThat(c1.compareTo(c3), greaterThan(0));
+        assertThat(c1.compareTo(c3), greaterThan(0));
+    }
+
+    @Test
+    public void interDeltaComparison() {
+
+        AdditionDelta a1 = AdditionDelta.of(PropertyType.NUM_ENROLLED, 1);
+        RemovalDelta r1 = RemovalDelta.of(PropertyType.NUM_ENROLLED, 1);
+        ReplaceDelta c1 = ReplaceDelta.of(PropertyType.NUM_ENROLLED, 1, 2);
+
+        assertThat(r1.compareTo(a1), greaterThan(0));
+        assertThat(a1.compareTo(r1), lessThan(0));
+
+        assertThat(c1.compareTo(a1), greaterThan(0));
+        assertThat(a1.compareTo(c1), lessThan(0));
+
+        assertThat(c1.compareTo(r1), greaterThan(0));
+        assertThat(r1.compareTo(c1), lessThan(0));
+
+        StructureDelta sd = StructureDelta.of(PropertyType.SECTION, Section.of("ABC"));
+
+        assertThat(a1.compareTo(sd), lessThan(0));
+        assertThat(sd.compareTo(a1), greaterThan(0));
+
+        assertThat(r1.compareTo(sd), lessThan(0));
+        assertThat(sd.compareTo(r1), greaterThan(0));
+
+        assertThat(c1.compareTo(sd), lessThan(0));
+        assertThat(sd.compareTo(c1), greaterThan(0));
     }
 }

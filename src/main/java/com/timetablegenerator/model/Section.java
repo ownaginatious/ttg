@@ -379,9 +379,10 @@ public class Section implements Diffable<Section> {
 
     @Override
     public int compareTo(@Nonnull Section that) {
-        if (this.sectionId.equals(that.sectionId)){
+        if (!this.sectionId.equals(that.sectionId)){
             return this.sectionId.compareTo(that.sectionId);
         }
+        // Some standard classes will use this instead of .equals() so ensure non-zero if not equal.
         return this.equals(that) ? 0 : -1;
     }
 }

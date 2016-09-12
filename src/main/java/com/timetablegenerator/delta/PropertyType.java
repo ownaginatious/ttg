@@ -5,6 +5,10 @@ import com.timetablegenerator.model.period.OneTimePeriod;
 import com.timetablegenerator.model.period.RepeatingPeriod;
 import lombok.NonNull;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 public enum PropertyType {
 
     TERM(TermDefinition.class),
@@ -35,11 +39,25 @@ public enum PropertyType {
         }
     }
 
+    private static Set<PropertyType> MANY_TYPES = new HashSet<>();
+
+    static {
+        MANY_TYPES.addAll(Arrays.asList(
+                TIMETABLE, SECTION, COURSE, PRE_REQUISITE, ANTI_REQUISITE,
+                CROSS_LISTING, CO_REQUISITE, REPEATING_PERIOD, ONE_TIME_PERIOD,
+                SUPERVISOR, NOTE
+        ));
+    }
+
     public Class<?> getExpectedType(){
         return this.expectedType;
     }
 
     public String getFieldName() {
         return this.name();
+    }
+
+    public boolean isSingular(){
+        return !MANY_TYPES.contains(this);
     }
 }

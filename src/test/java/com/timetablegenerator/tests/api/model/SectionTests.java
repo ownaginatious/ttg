@@ -206,7 +206,7 @@ public class SectionTests {
     }
 
     @Test
-    public void notes(){
+    public void notes() {
 
         List<String> notes = TestUtils.getRandomStrings(50, 120);
 
@@ -236,7 +236,7 @@ public class SectionTests {
     }
 
     @Test
-    public void online(){
+    public void online() {
         assertFalse(s1.isOnline().isPresent());
         s1.setOnline(true);
         assertTrue(s1.isOnline().isPresent());
@@ -247,7 +247,7 @@ public class SectionTests {
     }
 
     @Test
-    public void cancelled(){
+    public void cancelled() {
         assertFalse(s1.isCancelled().isPresent());
         s1.setCancelled(true);
         assertTrue(s1.isCancelled().isPresent());
@@ -258,7 +258,7 @@ public class SectionTests {
     }
 
     @Test
-    public void alternating(){
+    public void alternating() {
         assertFalse(s1.isAlternating().isPresent());
         s1.setAlternating(true);
         assertTrue(s1.isAlternating().isPresent());
@@ -269,7 +269,7 @@ public class SectionTests {
     }
 
     @Test
-    public void serialNumber(){
+    public void serialNumber() {
         String serial = TestUtils.getRandomString(10);
         assertFalse(s1.getSerialNumber().isPresent());
         s1.setSerialNumber(serial);
@@ -296,7 +296,7 @@ public class SectionTests {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void deltaUnrelatedSections(){
+    public void deltaUnrelatedSections() {
 
         Section s = s1;
         setUp();
@@ -305,7 +305,7 @@ public class SectionTests {
     }
 
     @Test
-    public void sectionValuePropertyDelta(){
+    public void sectionValuePropertyDelta() {
 
         // Serial number change.
         s1.setSerialNumber("123");
@@ -323,9 +323,9 @@ public class SectionTests {
         s2.setWaiting(5).setMaximumWaiting(10);
 
         expected.addAdded(PropertyType.NUM_WAITING, 5)
-                           .addAdded(PropertyType.MAX_WAITING, 10).addAdded(PropertyType.WAITING_LIST, true);
+                .addAdded(PropertyType.MAX_WAITING, 10).addAdded(PropertyType.WAITING_LIST, true);
         invertExpected.addRemoved(PropertyType.NUM_WAITING, 5)
-                      .addRemoved(PropertyType.MAX_WAITING, 10).addRemoved(PropertyType.WAITING_LIST, true);
+                .addRemoved(PropertyType.MAX_WAITING, 10).addRemoved(PropertyType.WAITING_LIST, true);
 
         assertEquals(expected, s1.findDifferences(s2));
         assertEquals(invertExpected, s2.findDifferences(s1));
@@ -453,13 +453,13 @@ public class SectionTests {
     }
 
     @Test
-    public void sectionWithSerialString(){
+    public void sectionWithSerialString() {
         s1.setSerialNumber("Test Serial");
         assertEquals(s1.getSectionId() + " {Test Serial}", s1.toString());
     }
 
     @Test
-    public void sectionCancelledString(){
+    public void sectionCancelledString() {
         String header = s1.getSectionId() + " {Test Serial}";
         s1.setSerialNumber("Test Serial");
         s1.setCancelled(true);
@@ -469,7 +469,7 @@ public class SectionTests {
     }
 
     @Test
-    public void sectionOnlineString(){
+    public void sectionOnlineString() {
         String header = s1.getSectionId() + " {Test Serial} [CANCELLED]";
         s1.setSerialNumber("Test Serial");
         s1.setCancelled(true);
@@ -480,7 +480,7 @@ public class SectionTests {
     }
 
     @Test
-    public void sectionAlternating(){
+    public void sectionAlternating() {
         String header = s1.getSectionId() + " {Test Serial} [CANCELLED] [ONLINE]";
         s1.setSerialNumber("Test Serial");
         s1.setCancelled(true);
@@ -492,7 +492,7 @@ public class SectionTests {
     }
 
     @Test
-    public void sectionFullString(){
+    public void sectionFullString() {
         String header = s1.getSectionId() + " {Test Serial} [CANCELLED]";
         s1.setSerialNumber("Test Serial");
         s1.setCancelled(true);
@@ -503,7 +503,7 @@ public class SectionTests {
     }
 
     @Test
-    public void sectionEnrollmentString(){
+    public void sectionEnrollmentString() {
         String header = s1.getSectionId() + " {Test Serial} [CANCELLED] [ONLINE] [ALTERNATES]";
         s1.setSerialNumber("Test Serial");
         s1.setCancelled(true);
@@ -518,7 +518,7 @@ public class SectionTests {
     }
 
     @Test
-    public void sectionWaitingString(){
+    public void sectionWaitingString() {
         String header = s1.getSectionId()
                 + " {Test Serial} [CANCELLED] [ONLINE] [ALTERNATES] [enrolled: 3/?]";
         s1.setSerialNumber("Test Serial");
@@ -535,7 +535,7 @@ public class SectionTests {
     }
 
     @Test
-    public void sectionPeriodsString(){
+    public void sectionPeriodsString() {
         String header = s1.getSectionId()
                 + " {Test Serial} [CANCELLED] [ONLINE] [ALTERNATES] [enrolled: 3/?] [waiting: 100/100]";
         s1.setSerialNumber("Test Serial");
@@ -569,7 +569,17 @@ public class SectionTests {
     }
 
     @Test
-    public void sectionNotesString(){
+    public void sectionComparison() {
+
+        this.s1 = Section.of("A");
+        this.s2 = Section.of("B");
+        assertEquals(0, this.s1.compareTo(this.s1));
+        assertThat(this.s1.compareTo(this.s2), lessThan(0));
+        assertThat(this.s2.compareTo(this.s1), greaterThan(0));
+    }
+
+    @Test
+    public void sectionNotesString() {
 
         s1.setSerialNumber("Test Serial");
         s1.setCancelled(true);
@@ -609,7 +619,7 @@ public class SectionTests {
     }
 
     @Test
-    public void sectionEquality(){
+    public void sectionEquality() {
 
         // Same section ID.
         Section s1 = Section.of("testing");

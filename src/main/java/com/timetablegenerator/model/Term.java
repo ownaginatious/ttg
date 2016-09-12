@@ -109,6 +109,7 @@ public class Term implements Comparable<Term> {
             }
             return this.key.compareTo(that.key);
         }
+        // Some standard classes will use this instead of .equals() so ensure non-zero if not equal.
         return this.equals(that) ? 0 : -1;
     }
 }

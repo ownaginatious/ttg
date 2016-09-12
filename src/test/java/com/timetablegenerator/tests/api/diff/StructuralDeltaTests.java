@@ -1,6 +1,5 @@
 package com.timetablegenerator.tests.api.diff;
 
-import com.timetablegenerator.Settings;
 import com.timetablegenerator.delta.*;
 import com.timetablegenerator.model.*;
 import com.timetablegenerator.model.period.OneTimePeriod;
@@ -9,10 +8,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
 
-public class StructuralDelta {
-
-    private static String I = Settings.getIndent();
+public class StructuralDeltaTests {
 
     private Term term = TermDefinition.builder("SEM1", "Semester 1", 0)
             .build().createForYear(2016);
@@ -81,7 +79,7 @@ public class StructuralDelta {
         this.scd.hasValueChanges();
         this.scd.addValueIfChanged(PropertyType.CREDITS, 1.0, 1.3);
         assertEquals(1, this.scd.getValueChanges().size());
-        assertEquals(ValueChangeDelta.class, this.scd.getValueChanges().stream()
+        assertEquals(ReplaceDelta.class, this.scd.getValueChanges().stream()
                         .findFirst().orElse(null).getClass());
 
         this.setUp();
@@ -110,7 +108,7 @@ public class StructuralDelta {
         this.scd.hasValueChanges();
         this.scd.addValueIfChanged(PropertyType.IS_ALTERNATING, false, true);
         assertEquals(1, this.scd.getValueChanges().size());
-        assertEquals(ValueChangeDelta.class, this.scd.getValueChanges().stream()
+        assertEquals(ReplaceDelta.class, this.scd.getValueChanges().stream()
                 .findFirst().orElse(null).getClass());
 
         this.setUp();
@@ -139,7 +137,7 @@ public class StructuralDelta {
         this.scd.hasValueChanges();
         this.scd.addValueIfChanged(PropertyType.SERIAL_NUMBER, "AAA", "BBB");
         assertEquals(1, this.scd.getValueChanges().size());
-        assertEquals(ValueChangeDelta.class, this.scd.getValueChanges().stream()
+        assertEquals(ReplaceDelta.class, this.scd.getValueChanges().stream()
                 .findFirst().orElse(null).getClass());
 
         this.setUp();
@@ -258,6 +256,22 @@ public class StructuralDelta {
         assertTrue(this.scd.hasSubstructureChanges());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void ambiguousValueDiff() {
+        this.scd.addValueIfChanged(PropertyType.NAME, "TestA", "TestC");
+        this.scd.addValueIfChanged(PropertyType.NAME, "TestB", "TestC");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void ambiguousSubstructureDiff() {
+        this.scd.addSubstructureChange(
+                StructureDelta.of(PropertyType.SECTION, Section.of("ID")).addRemoved(PropertyType.NOTE, "B")
+        );
+        this.scd.addSubstructureChange(
+                StructureDelta.of(PropertyType.SECTION, Section.of("ID")).addRemoved(PropertyType.NOTE, "A")
+        );
+    }
+
     @Test
     public void string() {
 
@@ -267,10 +281,68 @@ public class StructuralDelta {
         this.scd.addValueIfChanged(PropertyType.NOTE, null, "My Note 2");
         this.scd.addValueIfChanged(PropertyType.CREDITS, 2.32, 4.343);
         this.scd.addSubstructureChange(
-                StructureDelta.of(PropertyType.SECTION, Section.of("ID"))
-                    .addRemoved(PropertyType.NOTE, "Hello")
+                StructureDelta.of(PropertyType.SECTION, Section.of("ID3"))
+                    .addRemoved(PropertyType.NOTE, "2. This is quite the note!")
+                    .addRemoved(PropertyType.NOTE, "1. This is a second note!")
+        );
+        this.scd.addSubstructureChange(
+                StructureDelta.of(PropertyType.SECTION, Section.of("ID1"))
+                        .addRemoved(PropertyType.NUM_ENROLLED, 43)
+        );
+        this.scd.addSubstructureChange(
+                StructureDelta.of(PropertyType.SECTION, Section.of("ID2"))
+                        .addRemoved(PropertyType.NOTE, "Hello")
         );
 
-        assertEquals("", this.scd.toString());
+        String expected =
+                "MODIFIED [REPEATING_PERIOD] (id = 2016/SEM1/TBA/TBA/TBA)\n" +
+                "\n" +
+                "    Value changes:\n" +
+                "\n" +
+                "        ADDED [NOTE] (value = My Note 2)\n" +
+                "        ADDED [SUPERVISOR] (value = My Supervisor)\n" +
+                "        ADDED [SUPERVISOR] (value = My Supervisor 2)\n" +
+                "        REMOVED [NOTE] (value = My Note)\n" +
+                "        REPLACED [CREDITS]\n" +
+                "            Old value : \"4.343\"\n" +
+                "            New value : \"2.32\"\n" +
+                "\n" +
+                "    Substructure changes:\n" +
+                "\n" +
+                "        MODIFIED [SECTION] (id = ID1)\n" +
+                "        \n" +
+                "            Value changes:\n" +
+                "        \n" +
+                "                REMOVED [NUM_ENROLLED] (value = 43)\n" +
+                "\n" +
+                "        MODIFIED [SECTION] (id = ID2)\n" +
+                "        \n" +
+                "            Value changes:\n" +
+                "        \n" +
+                "                REMOVED [NOTE] (value = Hello)\n" +
+                "\n" +
+                "        MODIFIED [SECTION] (id = ID3)\n" +
+                "        \n" +
+                "            Value changes:\n" +
+                "        \n" +
+                "                REMOVED [NOTE] (value = 1. This is a second note!)\n" +
+                "                REMOVED [NOTE] (value = 2. This is quite the note!)";
+
+        assertEquals(expected, this.scd.toString());
+    }
+
+    @Test
+    public void structureDeltaCompare() {
+
+        StructureDelta scd1 = StructureDelta.of(PropertyType.SECTION, Section.of("ABC"));
+        StructureDelta scd2 = StructureDelta.of(PropertyType.REPEATING_PERIOD, this.rp1);
+
+        assertThat(scd1.compareTo(scd2), lessThan(0));
+        assertThat(scd2.compareTo(scd1), greaterThan(0));
+
+        AdditionDelta ad = AdditionDelta.of(PropertyType.CREDITS, 1.0);
+
+        assertThat(scd1.compareTo(ad), greaterThan(0));
+        assertThat(ad.compareTo(scd1), lessThan(0));
     }
 }
