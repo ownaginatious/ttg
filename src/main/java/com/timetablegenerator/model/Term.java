@@ -61,23 +61,23 @@ public class Term implements Comparable<Term> {
     }
 
     public Optional<LocalDate> getStartDate() {
-        return this.startDate != null ? Optional.of(this.startDate) : Optional.empty();
+        return Optional.ofNullable(this.startDate);
     }
 
     public Optional<LocalDate> getEndDate() {
-        return this.endDate != null ? Optional.of(this.endDate) : Optional.empty();
+        return Optional.ofNullable(this.endDate);
     }
 
     public Optional<LocalDate> getExamStartDate() {
-        return this.examStartDate != null ? Optional.of(this.examStartDate) : Optional.empty();
+        return Optional.ofNullable(this.examStartDate);
     }
 
     public Optional<LocalDate> getExamEndDate() {
-        return this.examEndDate != null ? Optional.of(this.examEndDate) : Optional.empty();
+        return Optional.ofNullable(this.examEndDate);
     }
 
     public Optional<String> getKey() {
-        return this.key != null ? Optional.of(this.key) : Optional.empty();
+        return Optional.ofNullable(this.key);
     }
 
     public Term getSubterm(String code) {

@@ -5,10 +5,7 @@ import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureDelta;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.util.stream.Collectors;
@@ -16,22 +13,22 @@ import javax.annotation.Nonnull;
 import java.util.*;
 
 @EqualsAndHashCode
+@RequiredArgsConstructor(staticName = "of")
 @Accessors(chain = true)
 public class Course implements Diffable<Course> {
 
     private static final String I = Settings.getIndent();
 
     // Required data.
-    @Getter private final School school;
-    @Getter private final String code;
-    @Getter private final String name;
-    @Getter private final String uniqueId;
-    @Getter private final Department department;
-    @Getter private final Term term;
+    @NonNull @Getter private final School school;
+    @NonNull @Getter private final Term term;
+    @NonNull @Getter private final Department department;
+    @NonNull @Getter private final String code;
+    @NonNull @Getter private final String name;
 
     // Optional data.
-    @Setter private String description = null;
-    @Setter private Double credits = null;
+    @NonNull @Setter private String description = null;
+    @NonNull @Setter private Double credits = null;
     private final List<String> notes = new ArrayList<>();
 
     private final Map<String, Course> crossListings = new HashMap<>();
@@ -41,40 +38,15 @@ public class Course implements Diffable<Course> {
 
     private final Map<String, SectionType> sectionTypes = new HashMap<>();
 
-    private Course(School school, Term term, Department department,
-                   String courseCode, String courseName) {
-
-        // Null check most parameters to the function.
-        this.school = school;
-        this.term = term;
-        this.department = department;
-        this.code = courseCode;
-        this.name = courseName;
-
-        // Generate the unique identifier for this course.
-        this.uniqueId = this.department.getCode() + this.code + this.term.getTermDefinition().getCode();
-    }
-
-    /**
-     * Creates a new course object representing a single course within a timetable.
-     *
-     * @param school     The school for the school's terms.
-     * @param term       The term this course is part of.
-     * @param department The department to which this course belongs.
-     * @param code       The code of this course.
-     * @param name       The name of this course.
-     */
-    public static Course of(@NonNull School school, @NonNull Term term,
-                            @NonNull Department department, @NonNull String code,
-                            @NonNull String name) {
-        return new Course(school, term, department, code, name);
+    public String getUniqueId(){
+        return this.department.getCode() + this.code + this.term.getTermDefinition().getCode();
     }
 
     private void checkRelationalIntegrity(Map<String, Course> collection, Course course) {
         if (course == this) {
             throw new IllegalArgumentException("A course cannot be related to itself");
         }
-        String courseId = course.uniqueId;
+        String courseId = course.getUniqueId();
         boolean ok = (collection == this.prerequisites || !this.prerequisites.keySet().contains(courseId)) &&
                 (collection == this.antirequisites || !this.antirequisites.keySet().contains(courseId)) &&
                 (collection == this.crossListings || !this.crossListings.keySet().contains(courseId)) &&
@@ -120,11 +92,11 @@ public class Course implements Diffable<Course> {
     }
 
     public Optional<Double> getCredits() {
-        return this.credits == null ? Optional.empty() : Optional.of(this.credits);
+        return Optional.ofNullable(this.credits);
     }
 
     public Optional<String> getDescription() {
-        return this.description == null ? Optional.empty() : Optional.of(this.description);
+        return Optional.ofNullable(this.description);
     }
 
     public List<String> getNotes() {
@@ -233,15 +205,15 @@ public class Course implements Diffable<Course> {
 
     @Override
     public String getDeltaId() {
-        return this.uniqueId;
+        return this.getUniqueId();
     }
 
     @Override
     public StructureDelta findDifferences(Course that) {
 
-        if (!this.uniqueId.equals(that.uniqueId) || !Objects.equals(this.school, that.school)) {
-            throw new IllegalArgumentException("Courses are not related: \"" + this.uniqueId
-                    + "\" and \"" + that.uniqueId + "\"");
+        if (!this.getUniqueId().equals(that.getUniqueId()) || !Objects.equals(this.school, that.school)) {
+            throw new IllegalArgumentException("Courses are not related: \"" + this.getUniqueId()
+                    + "\" and \"" + that.getUniqueId() + "\"");
         }
 
         final StructureDelta delta = StructureDelta.of(PropertyType.COURSE, this);
@@ -282,7 +254,9 @@ public class Course implements Diffable<Course> {
         sectionTypeKeys.stream()
                 .filter(x -> this.sectionTypes.containsKey(x) && that.sectionTypes.containsKey(x))
                 .filter(x -> !this.sectionTypes.get(x).equals(that.sectionTypes.get(x)))
-                .forEach(x -> delta.addSubstructureChange(this.sectionTypes.get(x).findDifferences(that.sectionTypes.get(x))));
+                .forEach(x -> delta.addSubstructureChange(
+                        this.sectionTypes.get(x).findDifferences(that.sectionTypes.get(x)))
+                );
 
         return delta;
     }

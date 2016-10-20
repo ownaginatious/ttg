@@ -3,9 +3,7 @@ package com.timetablegenerator.model;
 import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureDelta;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
+import lombok.*;
 
 import javax.annotation.Nonnull;
 import java.time.ZoneOffset;
@@ -18,6 +16,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
 
 @EqualsAndHashCode(exclude={"lastUpdate"})
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TimeTable implements Diffable<TimeTable> {
 
     @Getter private final School school;
@@ -25,12 +24,6 @@ public class TimeTable implements Diffable<TimeTable> {
     @Getter private final ZonedDateTime lastUpdate;
 
     private final Map<String, Course> courses = new ConcurrentSkipListMap<>();
-
-    private TimeTable(School school, Term term, ZonedDateTime parseTime) {
-        this.school = school;
-        this.term = term;
-        this.lastUpdate = parseTime;
-    }
 
     public static TimeTable of(@NonNull School school, @NonNull Term term) {
         return new TimeTable(school, term, ZonedDateTime.now(ZoneOffset.UTC));
@@ -62,7 +55,7 @@ public class TimeTable implements Diffable<TimeTable> {
         return "[school: " + this.school.getId() + ", " +
                 "term: " + this.term + ", " +
                 "departments: " + courses.values().stream()
-                .collect(Collectors.groupingBy(Course::getDepartment)).size() + ", " +
+                    .collect(Collectors.groupingBy(Course::getDepartment)).size() + ", " +
                 "courses: " + courses.size() + ", " +
                 "last_update: " + lastUpdate.toString() + "]";
     }

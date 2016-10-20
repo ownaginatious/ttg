@@ -7,54 +7,44 @@ import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.StructureDelta;
 import com.timetablegenerator.model.period.RepeatingPeriod;
 import com.timetablegenerator.model.period.OneTimePeriod;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.annotation.Nonnull;
 import java.util.*;
 
 @EqualsAndHashCode()
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor(staticName = "of")
 @Accessors(chain = true)
 public class Section implements Diffable<Section> {
 
     private static final String I = Settings.getIndent();
 
     @Setter private String serialNumber;
-    @Getter private final String sectionId;
+    @NonNull @Getter private final String sectionId;
 
     private Boolean waitingList;
 
-    private int waiting = -1;
-    private int maxWaiting = -1;
+    private Integer waiting;
+    private Integer maxWaiting;
 
     private Boolean full;
 
-    private int enrollment = -1;
-    private int maxEnrollment = -1;
-
+    private Integer enrollment;
+    private Integer maxEnrollment;
 
     private final Set<RepeatingPeriod> repeatingPeriods = new TreeSet<>();
     private final Set<OneTimePeriod> oneTimePeriods = new TreeSet<>();
 
     private final List<String> notes = new ArrayList<>();
 
-    @Setter private Boolean cancelled = null;
-    @Setter private Boolean online = null;
-    @Setter private Boolean alternating = null;
-
-    private Section(@NonNull String sectionId) {
-        this.sectionId = sectionId;
-    }
-
-    public static Section of(String sectionId) {
-        return new Section(sectionId);
-    }
+    @NonNull @Setter private Boolean cancelled = null;
+    @NonNull @Setter private Boolean online = null;
+    @NonNull @Setter private Boolean alternating = null;
 
     public Optional<String> getSerialNumber() {
-        return this.serialNumber == null ? Optional.empty() : Optional.of(this.serialNumber);
+        return Optional.ofNullable(this.serialNumber);
     }
 
     public Section addNotes(@NonNull Collection<String> notes) {
@@ -72,15 +62,15 @@ public class Section implements Diffable<Section> {
     }
 
     public Optional<Boolean> isOnline() {
-        return this.online == null ? Optional.empty() : Optional.of(this.online);
+        return Optional.ofNullable(this.online);
     }
 
     public Optional<Boolean> isCancelled() {
-        return this.cancelled == null ? Optional.empty() : Optional.of(this.cancelled);
+        return Optional.ofNullable(this.cancelled);
     }
 
     public Optional<Boolean> isAlternating() {
-        return this.alternating == null ? Optional.empty() : Optional.of(this.alternating);
+        return Optional.ofNullable(this.alternating);
     }
 
     public Section setWaitingList(boolean waitingList) {
@@ -88,23 +78,23 @@ public class Section implements Diffable<Section> {
         this.waitingList = waitingList;
 
         if (!this.waitingList) {
-            this.waiting = -1;
+            this.waiting = null;
         }
         return this;
     }
 
     public Optional<Boolean> hasWaitingList() {
-        return this.waitingList == null ? Optional.empty() : Optional.of(this.waitingList);
+        return Optional.ofNullable(this.waitingList);
     }
 
     public Optional<Integer> getWaiting() {
-        return this.waiting == -1 ? Optional.empty() : Optional.of(this.waiting);
+        return Optional.ofNullable(this.waiting);
     }
 
     public Section setWaiting(int waiting) {
         if (waiting < 0) {
             throw new IllegalArgumentException("Waiting number must be greater than or equal to 0 (" + waiting + ")");
-        } else if (this.maxWaiting >= 0 && waiting > this.maxWaiting) {
+        } else if (this.maxWaiting != null && waiting > this.maxWaiting) {
             throw new IllegalArgumentException("Waiting number must be less than the maximum ("
                     + waiting + "/" + this.maxWaiting + ")");
         }
@@ -114,14 +104,14 @@ public class Section implements Diffable<Section> {
     }
 
     public Optional<Integer> getMaxWaiting() {
-        return this.maxWaiting == -1 ? Optional.empty() : Optional.of(this.maxWaiting);
+        return Optional.ofNullable(this.maxWaiting);
     }
 
     public Section setMaximumWaiting(int maxWaiting) {
         if (maxWaiting < 0) {
             throw new IllegalArgumentException("Maximum number of people waiting must be greater than or equal to 0 ("
                     + maxWaiting + ")");
-        } else if (this.waiting >= 0 && this.waiting > maxWaiting) {
+        } else if (this.waiting != null && this.waiting > maxWaiting) {
             throw new IllegalArgumentException("Number of people waiting must be less than or equal to the maximum ("
                     + this.waiting + "/" + maxWaiting + ")");
         }
@@ -134,11 +124,11 @@ public class Section implements Diffable<Section> {
         this.full = full;
 
         if (!this.full) {
-            this.enrollment = -1;
+            this.enrollment = null;
         } else {
-            if (this.maxEnrollment != -1)
+            if (this.maxEnrollment != null)
                 this.enrollment = this.maxEnrollment;
-            if (this.maxEnrollment == -1 && this.enrollment != -1)
+            if (this.maxEnrollment == null && this.enrollment != null)
                 this.maxEnrollment = this.enrollment;
         }
 
@@ -146,31 +136,31 @@ public class Section implements Diffable<Section> {
     }
 
     public Optional<Boolean> isFull() {
-        return this.full == null ? Optional.empty() : Optional.of(this.full);
+        return Optional.ofNullable(this.full);
     }
 
     public Optional<Integer> getEnrollment() {
-        return this.enrollment == -1 ? Optional.empty() : Optional.of(enrollment);
+        return Optional.ofNullable(this.enrollment);
     }
 
     public Section setEnrollment(int enrollment) {
 
         if (enrollment < 0) {
             throw new IllegalArgumentException("Enrollment must be greater than or equal to 0 (" + enrollment + ")");
-        } else if (this.maxEnrollment >= 0 && enrollment > this.maxEnrollment) {
+        } else if (this.maxEnrollment != null && enrollment > this.maxEnrollment) {
             throw new IllegalArgumentException("Number of people enrolled must be less than the maximum ("
                     + enrollment + "/" + this.maxEnrollment + ")");
         }
         this.enrollment = enrollment;
 
-        if (this.maxEnrollment >= 0) {
-            this.full = this.enrollment == this.maxEnrollment;
+        if (this.maxEnrollment != null) {
+            this.full = this.enrollment.equals(this.maxEnrollment);
         }
         return this;
     }
 
     public Optional<Integer> getMaxEnrollment() {
-        return this.maxEnrollment == -1 ? Optional.empty() : Optional.of(this.maxEnrollment);
+        return Optional.ofNullable(this.maxEnrollment);
     }
 
     public Section setMaximumEnrollment(int maxEnrollment) {
@@ -178,15 +168,15 @@ public class Section implements Diffable<Section> {
         if (maxEnrollment < 0) {
             throw new IllegalArgumentException("Maximum number of people enrolled must be greater than or equal to 0 ("
                     + maxWaiting + ")");
-        } else if (this.enrollment >= 0 && this.enrollment > maxEnrollment) {
+        } else if (this.enrollment != null && this.enrollment > maxEnrollment) {
             throw new IllegalArgumentException("Number of people enrolled must be less than the maximum ("
                     + this.enrollment + "/" + maxEnrollment + ")");
         }
 
         this.maxEnrollment = maxEnrollment;
 
-        if (this.enrollment >= 0) {
-            this.full = this.enrollment == this.maxEnrollment;
+        if (this.enrollment != null) {
+            this.full = this.enrollment.equals(this.maxEnrollment);
         }
 
         return this;

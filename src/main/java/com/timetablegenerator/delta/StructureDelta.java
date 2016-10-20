@@ -87,7 +87,7 @@ public class StructureDelta extends Delta {
     }
 
     private <T> StructureDelta addValueIfChangedInternal(PropertyType propertyType,
-                                             Comparable<T> oldValue, Comparable<T> newValue) {
+                                                         Comparable<T> oldValue, Comparable<T> newValue) {
         Delta newDelta = null;
         if (!Objects.equals(oldValue, newValue)) {
             if (newValue == null) {

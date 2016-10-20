@@ -5,9 +5,7 @@ import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureDelta;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
+import lombok.*;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -17,9 +15,9 @@ public class SectionType implements Diffable<SectionType> {
 
     private static final String I = Settings.getIndent();
 
-    @Getter private final School school;
-    @Getter private final String code;
-    @Getter private final String name;
+    @NonNull @Getter private final School school;
+    @NonNull @Getter private final String code;
+    @NonNull @Getter private final String name;
 
     private final Map<String, Section> sections = new TreeMap<>();
 
