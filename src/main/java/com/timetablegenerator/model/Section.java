@@ -299,9 +299,9 @@ public class Section implements Diffable<Section> {
                 .filter(x -> that.oneTimePeriods.stream()
                         .noneMatch(
                                 y -> x.getTerm().equals(y.getTerm()) &&
-                                        Objects.equals(x.getStartDateTime(), y.getStartDateTime()) &&
-                                        Objects.equals(x.getEndDateTime(), y.getEndDateTime())
-                        ))
+                                        Objects.equals(x.getDateTimeRange(), y.getDateTimeRange())
+                        )
+                )
                 .forEach(x -> delta.addRemoved(PropertyType.ONE_TIME_PERIOD, x));
 
         // Find added one-time periods.
@@ -309,17 +309,15 @@ public class Section implements Diffable<Section> {
                 .filter(x -> this.oneTimePeriods.stream()
                         .noneMatch(
                                 y -> x.getTerm().equals(y.getTerm()) &&
-                                        x.getStartDateTime().equals(y.getStartDateTime()) &&
-                                        x.getEndDateTime().equals(y.getEndDateTime())
-                        ))
-                .forEach(x -> delta.addAdded(PropertyType.ONE_TIME_PERIOD, x));
+                                        Objects.equals(x.getDateTimeRange(), y.getDateTimeRange())
+                        )
+                ).forEach(x -> delta.addAdded(PropertyType.ONE_TIME_PERIOD, x));
 
         // Find changed one-time periods.
         for (OneTimePeriod thisOtp : this.oneTimePeriods) {
             for (OneTimePeriod thatOtp : that.oneTimePeriods) {
                 boolean cond = thisOtp.getTerm().equals(thatOtp.getTerm()) &&
-                        thisOtp.getStartDateTime().equals(thatOtp.getStartDateTime()) &&
-                        Objects.equals(thisOtp.getEndDateTime(), thatOtp.getEndDateTime());
+                        thisOtp.getDateTimeRange().equals(thatOtp.getDateTimeRange());
                 if (cond) {
                     if (!thisOtp.equals(thatOtp))
                         delta.addSubstructureChange(thisOtp.findDifferences(thatOtp));
@@ -332,31 +330,25 @@ public class Section implements Diffable<Section> {
         this.repeatingPeriods.stream()
                 .filter(x -> that.repeatingPeriods.stream()
                         .noneMatch(
-                                y -> x.getTerm().equals(y.getTerm())
-                                        && x.getDayOfWeek().equals(y.getDayOfWeek())
-                                        && x.getStartTime().equals(y.getStartTime())
-                                        && x.getEndTime().equals(y.getEndTime())
-                        ))
-                .forEach(x -> delta.addRemoved(PropertyType.REPEATING_PERIOD, x));
+                                y -> x.getTerm().equals(y.getTerm()) &&
+                                        x.getDayTimeRange().equals(y.getDayTimeRange())
+                        )
+                ).forEach(x -> delta.addRemoved(PropertyType.REPEATING_PERIOD, x));
 
         // Find added repeating periods.
         that.repeatingPeriods.stream()
                 .filter(x -> this.repeatingPeriods.stream()
                         .noneMatch(
-                                y -> x.getTerm().equals(y.getTerm())
-                                        && x.getDayOfWeek().equals(y.getDayOfWeek())
-                                        && x.getStartTime().equals(y.getStartTime())
-                                        && x.getEndTime().equals(y.getEndTime())
+                                y -> x.getTerm().equals(y.getTerm()) &&
+                                        x.getDayTimeRange().equals(y.getDayTimeRange())
                         )
                 ).forEach(x -> delta.addAdded(PropertyType.REPEATING_PERIOD, x));
 
         // Find changed repeating periods.
         for (RepeatingPeriod thisRp : this.repeatingPeriods)
             for (RepeatingPeriod thatRp : that.repeatingPeriods) {
-                boolean cond = thisRp.getTerm().equals(thatRp.getTerm())
-                        && thisRp.getStartTime().equals(thatRp.getStartTime())
-                        && thisRp.getEndTime().equals(thatRp.getEndTime())
-                        && thisRp.getDayOfWeek().equals(thatRp.getDayOfWeek());
+                boolean cond = thisRp.getTerm().equals(thatRp.getTerm()) &&
+                        thisRp.getDayTimeRange().equals(thatRp.getDayTimeRange());
                 if (cond) {
                     if (!thisRp.equals(thatRp))
                         delta.addSubstructureChange(thisRp.findDifferences(thatRp));

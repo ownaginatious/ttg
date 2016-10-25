@@ -33,7 +33,7 @@ public class StructuralDeltaTests {
     @Test
     public void additionString() {
         AdditionDelta ad = AdditionDelta.of(PropertyType.REPEATING_PERIOD, this.rp1);
-        assertEquals("ADDED [REPEATING_PERIOD] (id = 2016/SEM1/TBA/TBA/TBA)", ad.toString());
+        assertEquals("ADDED [REPEATING_PERIOD] (id = 2016/SEM1/TBA)", ad.toString());
     }
 
     @Test
@@ -58,7 +58,7 @@ public class StructuralDeltaTests {
     @Test
     public void removalString() {
         RemovalDelta rd = RemovalDelta.of(PropertyType.REPEATING_PERIOD, this.rp1);
-        assertEquals("REMOVED [REPEATING_PERIOD] (id = 2016/SEM1/TBA/TBA/TBA)", rd.toString());
+        assertEquals("REMOVED [REPEATING_PERIOD] (id = 2016/SEM1/TBA)", rd.toString());
     }
 
     @Test
@@ -162,7 +162,7 @@ public class StructuralDeltaTests {
 
     @Test
     public void structureChangeCreation() {
-        assertEquals("2016/SEM1/TBA/TBA/TBA", this.scd.getIdentifier());
+        assertEquals("2016/SEM1/TBA", this.scd.getIdentifier());
     }
 
     @Test
@@ -228,7 +228,7 @@ public class StructuralDeltaTests {
     @Test
     public void substructureChange(){
         this.scd.addSubstructureChange(StructureDelta.of(PropertyType.REPEATING_PERIOD, this.rp1));
-        assertEquals("2016/SEM1/TBA/TBA/TBA",
+        assertEquals("2016/SEM1/TBA",
                 this.scd.getSubstructureChanges().stream()
                         .findFirst().orElse(null).getIdentifier()
         );
@@ -295,7 +295,7 @@ public class StructuralDeltaTests {
         );
 
         String expected =
-                "MODIFIED [REPEATING_PERIOD] (id = 2016/SEM1/TBA/TBA/TBA)\n" +
+                "MODIFIED [REPEATING_PERIOD] (id = 2016/SEM1/TBA)\n" +
                 "\n" +
                 "    Value changes:\n" +
                 "\n" +

@@ -3,8 +3,7 @@ package com.timetablegenerator.tests.api.model;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureDelta;
 import com.timetablegenerator.model.*;
-import com.timetablegenerator.model.period.OneTimePeriod;
-import com.timetablegenerator.model.period.RepeatingPeriod;
+import com.timetablegenerator.model.period.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -135,28 +134,28 @@ public class TimeTableTests {
 
         Section s1a = Section.of("SA")
                 .addPeriod(RepeatingPeriod.of(this.term_fall_first_quarter)
-                        .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX))
+                        .setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX)))
                 .addPeriod(OneTimePeriod.of(this.term_fall_second_quarter)
-                        .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX));
+                        .setDateTimeRange(DateTimeRange.of(LocalDateTime.MIN, LocalDateTime.MAX)));
         Section s2a = Section.of("SB")
                 .addPeriod(RepeatingPeriod.of(this.term_fall_first_quarter)
-                        .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX)
+                        .setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX))
                         .setCampus("Campus").setRoom("Room"));
         Section s3a = Section.of("SC")
                 .addPeriod(OneTimePeriod.of(this.term_fall_second_quarter)
-                        .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX));
+                        .setDateTimeRange(DateTimeRange.of(LocalDateTime.MIN, LocalDateTime.MAX)));
 
         TimeTable tt1 = TimeTable.of(this.school, this.term_fall);
         TimeTable tt2 = TimeTable.of(this.school, this.term_fall);
 
         Section s1b = Section.of("SA")
                 .addPeriod(RepeatingPeriod.of(this.term_fall_first_quarter)
-                        .setTime(DayOfWeek.THURSDAY, LocalTime.MIN, LocalTime.MAX))
+                        .setDayTimeRange(DayTimeRange.of(DayOfWeek.THURSDAY, LocalTime.MIN, LocalTime.MAX)))
                 .addPeriod(OneTimePeriod.of(this.term_fall_second_quarter)
-                        .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX).setRoom("123"));
+                        .setDateTimeRange(DateTimeRange.of(LocalDateTime.MIN, LocalDateTime.MAX)).setRoom("123"));
         Section s2b = Section.of("SB")
                 .addPeriod(RepeatingPeriod.of(this.term_fall_first_quarter)
-                        .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX)
+                        .setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX))
                         .setCampus("New Campus").setRoom("Room"));
 
         Course c2a = Course.of(this.school, this.term_fall_first_quarter, d2, "CB", "Course B");

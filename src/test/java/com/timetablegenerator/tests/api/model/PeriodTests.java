@@ -5,8 +5,7 @@ import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureDelta;
 import com.timetablegenerator.model.Term;
 import com.timetablegenerator.model.TermDefinition;
-import com.timetablegenerator.model.period.OneTimePeriod;
-import com.timetablegenerator.model.period.RepeatingPeriod;
+import com.timetablegenerator.model.period.*;
 import com.timetablegenerator.tests.api.TestUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,31 +65,37 @@ public class PeriodTests {
     public void setTimeRepeating() {
         assertFalse(rp1.isScheduled());
         for (DayOfWeek dow: DayOfWeek.values()) {
-            rp1.setTime(dow, LocalTime.MIN, LocalTime.MAX);
-            assertEquals(dow, rp1.getDayOfWeek().orElse(null));
-            assertEquals(LocalTime.MIN, rp1.getStartTime().orElse(null));
-            assertEquals(LocalTime.MAX, rp1.getEndTime().orElse(null));
+            DayTimeRange dtr = DayTimeRange.of(dow, LocalTime.MIN, LocalTime.MAX);
+            rp1.setDayTimeRange(dtr);
+            assertTrue(rp1.getDayTimeRange().isPresent());
+
+            DayTimeRange actualDtr = rp1.getDayTimeRange().orElse(null);
+            assertEquals(dow, actualDtr.getDayOfWeek());
+            assertEquals(LocalTime.MIN, actualDtr.getStartTime());
+            assertEquals(LocalTime.MAX, actualDtr.getEndTime());
             assertTrue(rp1.isScheduled());
         }
     }
 
     @Test(expected = IllegalStateException.class)
-    public void setTimeRepeatingStartAfterEnd() {
-        rp1.setTime(DayOfWeek.FRIDAY, LocalTime.MAX, LocalTime.MIN);
+    public void setDayTimeRangeStartAfterEnd() {
+        DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MAX, LocalTime.MIN);
     }
 
     @Test
     public void setDateTimeOneTime() {
         assertFalse(otp1.isScheduled());
-        otp1.setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX);
-        assertEquals(LocalDateTime.MIN, otp1.getStartDateTime().orElse(LocalDateTime.MAX));
-        assertEquals(LocalDateTime.MAX, otp1.getEndDateTime().orElse(LocalDateTime.MIN));
+        DateTimeRange dateTimeRange = DateTimeRange.of(LocalDateTime.MIN, LocalDateTime.MAX);
+        otp1.setDateTimeRange(dateTimeRange);
+        DateTimeRange actualDateTimeRange = otp1.getDateTimeRange().orElse(null);
+        assertEquals(LocalDateTime.MIN, actualDateTimeRange.getStartDateTime());
+        assertEquals(LocalDateTime.MAX, actualDateTimeRange.getEndDateTime());
         assertTrue(otp1.isScheduled());
     }
 
     @Test(expected = IllegalStateException.class)
-    public void setDateTimeOneTimeStartAfterEnd() {
-        otp1.setDateTimes(LocalDateTime.MAX, LocalDateTime.MIN);
+    public void setDateTimeStartAfterEnd() {
+        DateTimeRange.of(LocalDateTime.MAX, LocalDateTime.MIN);
     }
 
     @Test
@@ -193,8 +198,10 @@ public class PeriodTests {
         assertThat(otp2.compareTo(otp1), greaterThan(0));
 
         // Compare different times.
-        otp1 = OneTimePeriod.of(this.term_fall).setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX);
-        otp2 = OneTimePeriod.of(this.term_fall).setDateTimes(LocalDateTime.MAX, LocalDateTime.MAX);
+        otp1 = OneTimePeriod.of(this.term_fall)
+                .setDateTimeRange(DateTimeRange.of(LocalDateTime.MIN, LocalDateTime.MAX));
+        otp2 = OneTimePeriod.of(this.term_fall)
+                .setDateTimeRange(DateTimeRange.of(LocalDateTime.MAX, LocalDateTime.MAX));
         assertThat(otp1.compareTo(otp2), lessThan(0));
         assertThat(otp2.compareTo(otp1), greaterThan(0));
 
@@ -217,27 +224,34 @@ public class PeriodTests {
         assertThat(rp2.compareTo(rp1), greaterThan(0));
 
         // Compare different days of the week.
-        rp1 = RepeatingPeriod.of(this.term_fall).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
-        rp2 = RepeatingPeriod.of(this.term_fall).setTime(DayOfWeek.SATURDAY, LocalTime.MIN, LocalTime.MAX);
+        rp1 = RepeatingPeriod.of(this.term_fall)
+                .setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX));
+        rp2 = RepeatingPeriod.of(this.term_fall)
+                .setDayTimeRange(DayTimeRange.of(DayOfWeek.SATURDAY, LocalTime.MIN, LocalTime.MAX));
         assertThat(rp1.compareTo(rp2), lessThan(0));
         assertThat(rp2.compareTo(rp1), greaterThan(0));
 
         // Compare set to unset day of week.
-        rp1 = RepeatingPeriod.of(this.term_fall).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
+        rp1 = RepeatingPeriod.of(this.term_fall)
+                .setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX));
         rp2 = RepeatingPeriod.of(this.term_fall);
         assertThat(rp1.compareTo(rp2), greaterThan(0));
         assertThat(rp2.compareTo(rp1), lessThan(0));
 
 
         // Compare different start times.
-        rp1 = RepeatingPeriod.of(this.term_fall).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
-        rp2 = RepeatingPeriod.of(this.term_fall).setTime(DayOfWeek.FRIDAY, LocalTime.MAX, LocalTime.MAX);
+        rp1 = RepeatingPeriod.of(this.term_fall)
+                .setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX));
+        rp2 = RepeatingPeriod.of(this.term_fall)
+                .setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MAX, LocalTime.MAX));
         assertThat(rp1.compareTo(rp2), lessThan(0));
         assertThat(rp2.compareTo(rp1), greaterThan(0));
 
         // Compare different end times.
-        rp1 = RepeatingPeriod.of(this.term_fall).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MIN);
-        rp2 = RepeatingPeriod.of(this.term_fall).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
+        rp1 = RepeatingPeriod.of(this.term_fall)
+                .setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MIN));
+        rp2 = RepeatingPeriod.of(this.term_fall)
+                .setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX));
         assertThat(rp1.compareTo(rp2), lessThan(0));
         assertThat(rp2.compareTo(rp1), greaterThan(0));
     }
@@ -279,26 +293,26 @@ public class PeriodTests {
 
         assertEquals(rp1, rp2);
 
-        // Set time vs unset.
-        rp2.setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
+        // Set dayTimeRange vs unset.
+        rp2.setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX));
         assertNotEquals(rp1, rp2);
 
         // Different day of the week.
-        rp1.setTime(DayOfWeek.THURSDAY, LocalTime.MIN, LocalTime.MAX);
+        rp1.setDayTimeRange(DayTimeRange.of(DayOfWeek.THURSDAY, LocalTime.MIN, LocalTime.MAX));
         assertNotEquals(rp1, rp2);
 
-        // Different start time.
+        // Different start dayTimeRange.
         rp1 = RepeatingPeriod.of(this.term_fall)
-                .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
+                .setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX));
         rp2 = RepeatingPeriod.of(this.term_fall)
-                .setTime(DayOfWeek.FRIDAY, LocalTime.MAX, LocalTime.MAX);
+                .setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MAX, LocalTime.MAX));
         assertNotEquals(rp1, rp2);
 
-        // Different end time.
+        // Different end dayTimeRange.
         rp1 = RepeatingPeriod.of(this.term_fall)
-                .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MIN);
+                .setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MIN));
         rp2 = RepeatingPeriod.of(this.term_fall)
-                .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
+                .setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX));
         assertNotEquals(rp1, rp2);
     }
 
@@ -307,22 +321,22 @@ public class PeriodTests {
 
         assertEquals(otp1, otp2);
 
-        // Set time vs unset.
-        otp2.setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX);
+        // Set dayTimeRange vs unset.
+        otp2.setDateTimeRange(DateTimeRange.of(LocalDateTime.MIN, LocalDateTime.MAX));
         assertNotEquals(otp1, otp2);
 
-        // Different start date time.
+        // Different start date dayTimeRange.
         otp1 = OneTimePeriod.of(this.term_fall)
-                .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX);
+                .setDateTimeRange(DateTimeRange.of(LocalDateTime.MIN, LocalDateTime.MAX));
         otp2 = OneTimePeriod.of(this.term_fall)
-                .setDateTimes(LocalDateTime.MAX, LocalDateTime.MAX);
+                .setDateTimeRange(DateTimeRange.of(LocalDateTime.MAX, LocalDateTime.MAX));
         assertNotEquals(otp1, otp2);
 
-        // Different end date time.
+        // Different end date dayTimeRange.
         otp1 = OneTimePeriod.of(this.term_fall)
-                .setDateTimes(LocalDateTime.MIN, LocalDateTime.MIN);
+                .setDateTimeRange(DateTimeRange.of(LocalDateTime.MIN, LocalDateTime.MIN));
         otp2 = OneTimePeriod.of(this.term_fall)
-                .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX);
+                .setDateTimeRange(DateTimeRange.of(LocalDateTime.MIN, LocalDateTime.MAX));
         assertNotEquals(otp1, otp2);
     }
 
@@ -345,9 +359,9 @@ public class PeriodTests {
         assertEquals("TBA TBA -> TBA [Term: Fall (fall) 2016] " +
                 "(campus: Test Campus, room: Test Room)", rp1.toString());
 
-        // With a day, start time, end time, and day of week.
+        // With a day, start dayTimeRange, end dayTimeRange, and day of week.
         setUp();
-        rp1.setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
+        rp1.setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX));
         assertEquals("FRIDAY 00:00 -> 23:59 [Term: Fall (fall) 2016]", rp1.toString());
 
         // With campus and room.
@@ -378,26 +392,28 @@ public class PeriodTests {
     @Test
     public void oneTimePeriodString(){
 
-        assertEquals("TBA -> TBA [Term: Fall (fall) 2016]", otp1.toString());
+        assertEquals("TBA [Term: Fall (fall) 2016]", otp1.toString());
 
         // With a campus.
         otp1.setCampus("Test Campus");
-        assertEquals("TBA -> TBA [Term: Fall (fall) 2016] (campus: Test Campus)", otp1.toString());
+        assertEquals("TBA [Term: Fall (fall) 2016] (campus: Test Campus)", otp1.toString());
 
         // With a room.
         setUp();
         otp1.setRoom("Test Room");
-        assertEquals("TBA -> TBA [Term: Fall (fall) 2016] (room: Test Room)", otp1.toString());
+        assertEquals("TBA [Term: Fall (fall) 2016] (room: Test Room)", otp1.toString());
 
         // With a campus and room.
         otp1.setCampus("Test Campus");
-        assertEquals("TBA -> TBA [Term: Fall (fall) 2016] " +
+        assertEquals("TBA [Term: Fall (fall) 2016] " +
                 "(campus: Test Campus, room: Test Room)", otp1.toString());
 
-        // With a day, start time, end time, and day of week.
+        // With a day, start dayTimeRange, end dayTimeRange, and day of week.
         setUp();
-        otp1.setDateTimes(LocalDateTime.of(2015, 11, 25, 11, 23),
-                         LocalDateTime.of(2015, 11, 25, 12, 23));
+        otp1.setDateTimeRange(DateTimeRange.of(
+                        LocalDateTime.of(2015, 11, 25, 11, 23),
+                        LocalDateTime.of(2015, 11, 25, 12, 23)
+                ));
         assertEquals("2015-11-25T11:23 -> 2015-11-25T12:23 [Term: Fall (fall) 2016]", otp1.toString());
 
         // With campus and room.
@@ -432,22 +448,22 @@ public class PeriodTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void repeatingTimePeriodsIncomparableByTime(){
-        rp1.setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX).findDifferences(rp2);
+        rp1.setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX)).findDifferences(rp2);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void repeatingTimePeriodsIncomparableByTerm(){
-        rp1.setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX).findDifferences(rp2);
+        rp1.setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX)).findDifferences(rp2);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void oneTimePeriodsIncomparableByTime(){
-        otp1.setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX).findDifferences(otp2);
+        otp1.setDateTimeRange(DateTimeRange.of(LocalDateTime.MIN, LocalDateTime.MAX)).findDifferences(otp2);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void oneTimePeriodsIncomparableByTerm(){
-        otp1.setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX).findDifferences(otp2);
+        otp1.setDateTimeRange(DateTimeRange.of(LocalDateTime.MIN, LocalDateTime.MAX)).findDifferences(otp2);
     }
 
     @Test

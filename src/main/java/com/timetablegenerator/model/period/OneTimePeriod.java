@@ -7,22 +7,20 @@ import com.timetablegenerator.delta.StructureDelta;
 import com.timetablegenerator.model.Term;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import javax.annotation.Nonnull;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @EqualsAndHashCode(callSuper = true)
+@Accessors(chain = true)
 public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, Diffable<OneTimePeriod> {
 
-    private static final DateTimeFormatter DATETIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'hh:mm");
-
-    private LocalDateTime startDateTime;
-    private LocalDateTime endDateTime;
+    @Setter @NonNull private DateTimeRange dateTimeRange;
 
     private OneTimePeriod(Term term) {
         super(term);
@@ -32,30 +30,13 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
         return new OneTimePeriod(term);
     }
 
-    public OneTimePeriod setDateTimes(@NonNull LocalDateTime startDateTime, @NonNull LocalDateTime endDateTime) {
-
-        if (endDateTime.isBefore(startDateTime)) { // Catch unaccounted AM/PM crossings.
-            throw new IllegalStateException("The start time '" + startDateTime + "' is after the end time '"
-                    + endDateTime + "'");
-        }
-
-        this.startDateTime = startDateTime;
-        this.endDateTime = endDateTime;
-
-        return this;
-    }
-
-    public Optional<LocalDateTime> getStartDateTime() {
-        return this.startDateTime == null ? Optional.empty() : Optional.of(startDateTime);
-    }
-
-    public Optional<LocalDateTime> getEndDateTime() {
-        return this.endDateTime == null ? Optional.empty() : Optional.of(endDateTime);
+    public Optional<DateTimeRange> getDateTimeRange(){
+        return Optional.ofNullable(this.dateTimeRange);
     }
 
     @Override
     public boolean isScheduled() {
-        return this.startDateTime != null;
+        return this.dateTimeRange != null;
     }
 
     @Override
@@ -63,12 +44,10 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
 
         StringBuilder sb = new StringBuilder();
 
-        if (this.startDateTime != null && this.endDateTime != null) {
-            sb.append(this.startDateTime.format(DATETIME_FORMAT))
-                    .append(" -> ")
-                    .append(this.endDateTime.format(DATETIME_FORMAT));
+        if (this.dateTimeRange != null) {
+            sb.append(this.dateTimeRange);
         } else {
-            sb.append("TBA -> TBA");
+            sb.append("TBA");
         }
 
         sb.append(" [Term: ").append(this.getTerm()).append(']');
@@ -107,71 +86,69 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
     public int compareTo(@Nonnull OneTimePeriod that) {
         if (!this.getTerm().equals(that.getTerm())) {
             return this.getTerm().compareTo(that.getTerm());
-        } else if (this.startDateTime != null && that.startDateTime != null) {
-            return this.startDateTime.compareTo(that.startDateTime);
-        } else if (this.startDateTime == null && that.startDateTime != null) {
-            return -1;
-        } else if (this.startDateTime != null) {
-            return 1;
+        } else if (!Objects.equals(this.dateTimeRange, that.dateTimeRange)) {
+            if (this.dateTimeRange == null) {
+                return -1;
+            } else if (that.dateTimeRange == null){
+                return 1;
+            }
+            return this.dateTimeRange.compareTo(that.dateTimeRange);
         }
         return this.equals(that) ? 0 : -1;
     }
 
     @Override
-    public String getDeltaId(){
+    public String getDeltaId() {
         String id = this.getTerm().getYear() + "/" +
                 this.getTerm().getTermDefinition().getCode();
-        if (this.startDateTime != null) {
-            return id + "/"
-                    + this.startDateTime.format(DATETIME_FORMAT) + "/"
-                    + this.endDateTime.format(DATETIME_FORMAT);
+        if (this.dateTimeRange != null) {
+            return id + "/" + this.dateTimeRange;
         } else {
-            return id + "/TBA/TBA";
+            return id + "/TBA";
         }
     }
 
     @Override
-    public OneTimePeriod addSupervisors(String... supervisors){
+    public OneTimePeriod addSupervisors(String... supervisors) {
         super.addSupervisors(supervisors);
         return this;
     }
 
     @Override
-    public OneTimePeriod addSupervisors(Collection<String> supervisors){
+    public OneTimePeriod addSupervisors(Collection<String> supervisors) {
         super.addSupervisors(supervisors);
         return this;
     }
 
     @Override
-    public OneTimePeriod addNotes(String... note){
+    public OneTimePeriod addNotes(String... note) {
         super.addNotes(note);
         return this;
     }
 
     @Override
-    public OneTimePeriod addNotes(Collection<String> notes){
+    public OneTimePeriod addNotes(Collection<String> notes) {
         super.addNotes(notes);
         return this;
     }
 
     @Override
-    public OneTimePeriod setRoom(String room){
+    public OneTimePeriod setRoom(String room) {
         super.setRoom(room);
         return this;
     }
 
     @Override
-    public OneTimePeriod setCampus(String campus){
+    public OneTimePeriod setCampus(String campus) {
         super.setCampus(campus);
         return this;
     }
 
     public StructureDelta findDifferences(OneTimePeriod that) {
 
-        if (this.getTerm() != that.getTerm() || !Objects.equals(this.startDateTime, that.startDateTime) ||
-                !Objects.equals(this.endDateTime, that.endDateTime)) {
+        if (this.getTerm() != that.getTerm() || !Objects.equals(this.dateTimeRange, that.dateTimeRange)) {
             throw new IllegalArgumentException(
-                    String.format("Cannot compare temporally unequal one-time periods: (%s) and (%s)",
+                    String.format("Cannot compare temporally unequal one-dayTimeRange periods: (%s) and (%s)",
                             this.getDeltaId(), that.getDeltaId()));
         }
 

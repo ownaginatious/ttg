@@ -32,7 +32,7 @@ abstract class Period {
     }
 
     public Optional<Boolean> isOnline(){
-        return this.online == null ? Optional.empty() : Optional.of(this.online);
+        return Optional.ofNullable(this.online);
     }
 
     public Period addSupervisors(String... supervisors){
@@ -65,11 +65,11 @@ abstract class Period {
     }
 
     public Optional<String> getRoom(){
-        return this.room == null ? Optional.empty(): Optional.of(this.room);
+        return Optional.ofNullable(this.room);
     }
 
     public Optional<String> getCampus(){
-        return this.campus == null ? Optional.empty() : Optional.of(this.campus);
+        return Optional.ofNullable(this.campus);
     }
 
     public abstract boolean isScheduled();

@@ -7,6 +7,8 @@ import com.timetablegenerator.delta.StructureDelta;
 import com.timetablegenerator.model.*;
 import static org.junit.Assert.*;
 
+import com.timetablegenerator.model.period.DateTimeRange;
+import com.timetablegenerator.model.period.DayTimeRange;
 import com.timetablegenerator.model.period.OneTimePeriod;
 import com.timetablegenerator.model.period.RepeatingPeriod;
 import com.timetablegenerator.tests.api.TestUtils;
@@ -18,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CourseTests {
 
@@ -403,17 +406,17 @@ public class CourseTests {
 
         Section s1 = Section.of("A01")
                 .addPeriod(OneTimePeriod.of(this.term_fq)
-                        .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
+                        .setDateTimeRange(DateTimeRange.of(LocalDateTime.MIN, LocalDateTime.MAX))
                         .setCampus("Campus B").setRoom("987")
                         .addNotes("Some note", "Some note 2"));
         Section s2 = Section.of("A02")
                 .addPeriod(RepeatingPeriod.of(this.term_sq)
-                        .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX)
+                        .setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX))
                         .setCampus("Campus B").setRoom("997"));
         c.addSection("A", s1).addSection("A", s2);
         Section s3 = Section.of("B01")
                 .addPeriod(RepeatingPeriod.of(this.term_fq)
-                        .setTime(DayOfWeek.THURSDAY, LocalTime.MIN, LocalTime.MAX)
+                        .setDayTimeRange(DayTimeRange.of(DayOfWeek.THURSDAY, LocalTime.MIN, LocalTime.MAX))
                         .setCampus("Campus A").setRoom("123"));
         c.addSection("B", s3);
         c.addNotes("Note 1", "Note 2", "Note 3\n\tNote 3 continuation...");
@@ -436,10 +439,10 @@ public class CourseTests {
                         c.getDepartment().toString(),
                         c.getTerm().toString(),
                         c3.getUniqueId(),
-                        Arrays.asList(c2.getUniqueId(), c5.getUniqueId()).stream().sorted()
+                        Stream.of(c2.getUniqueId(), c5.getUniqueId()).sorted()
                                 .collect(Collectors.joining(", ")),
                         c1.getUniqueId(),
-                        Arrays.asList(c4.getUniqueId(), c6.getUniqueId()).stream().sorted()
+                        Stream.of(c4.getUniqueId(), c6.getUniqueId()).sorted()
                                 .collect(Collectors.joining(", ")),
                         StringUtilities.indent(1, c.getSectionType("A").orElse(null).toString()),
                         StringUtilities.indent(1, c.getSectionType("B").orElse(null).toString())),

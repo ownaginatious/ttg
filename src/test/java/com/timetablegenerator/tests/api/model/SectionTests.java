@@ -7,8 +7,7 @@ import com.timetablegenerator.delta.StructureDelta;
 import com.timetablegenerator.model.Section;
 import com.timetablegenerator.model.Term;
 import com.timetablegenerator.model.TermDefinition;
-import com.timetablegenerator.model.period.OneTimePeriod;
-import com.timetablegenerator.model.period.RepeatingPeriod;
+import com.timetablegenerator.model.period.*;
 import com.timetablegenerator.tests.api.TestUtils;
 import org.junit.*;
 
@@ -280,11 +279,11 @@ public class SectionTests {
     public void periods() {
 
         RepeatingPeriod p1 = RepeatingPeriod.of(this.term_fall_first_quarter)
-                .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
+                .setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX));
         RepeatingPeriod p2 = RepeatingPeriod.of(this.term_fall_second_quarter)
-                .setTime(DayOfWeek.TUESDAY, LocalTime.MIN, LocalTime.MAX);
+                .setDayTimeRange(DayTimeRange.of(DayOfWeek.TUESDAY, LocalTime.MIN, LocalTime.MAX));
         OneTimePeriod p3 = OneTimePeriod.of(this.term_fall_second_quarter)
-                .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX);
+                .setDateTimeRange(DateTimeRange.of(LocalDateTime.MIN, LocalDateTime.MAX));
 
         s1.addPeriod(p1);
         s1.addPeriod(p1);
@@ -395,18 +394,24 @@ public class SectionTests {
     @Test
     public void sectionStructuralPropertyPeriodsDelta() {
 
-        RepeatingPeriod p1 = RepeatingPeriod.of(this.term_fall_first_quarter).setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
-        RepeatingPeriod p2 = RepeatingPeriod.of(this.term_fall_second_quarter).setTime(DayOfWeek.TUESDAY, LocalTime.MIN, LocalTime.MAX);
-        OneTimePeriod p3 = OneTimePeriod.of(this.term_fall_second_quarter).setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
+        RepeatingPeriod p1 = RepeatingPeriod.of(this.term_fall_first_quarter)
+                .setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX));
+        RepeatingPeriod p2 = RepeatingPeriod.of(this.term_fall_second_quarter)
+                .setDayTimeRange(DayTimeRange.of(DayOfWeek.TUESDAY, LocalTime.MIN, LocalTime.MAX));
+        OneTimePeriod p3 = OneTimePeriod.of(this.term_fall_second_quarter)
+                .setDateTimeRange(DateTimeRange.of(LocalDateTime.MIN, LocalDateTime.MAX))
                 .setRoom("My Room");
 
-        OneTimePeriod p4 = OneTimePeriod.of(this.term_fall_second_quarter).setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
+        OneTimePeriod p4 = OneTimePeriod.of(this.term_fall_second_quarter)
+                .setDateTimeRange(DateTimeRange.of(LocalDateTime.MIN, LocalDateTime.MAX))
                 .addSupervisors("Test Supervisor 1").addSupervisors("Test Supervisor 2");
 
-        RepeatingPeriod p5 = RepeatingPeriod.of(this.term_fall_second_quarter).setTime(DayOfWeek.TUESDAY, LocalTime.MIN, LocalTime.MAX)
+        RepeatingPeriod p5 = RepeatingPeriod.of(this.term_fall_second_quarter)
+                .setDayTimeRange(DayTimeRange.of(DayOfWeek.TUESDAY, LocalTime.MIN, LocalTime.MAX))
                 .setCampus("Test Campus").addNotes("Note 1", "Note 2", "Note 3");
 
-        OneTimePeriod p6 = OneTimePeriod.of(this.term_fall).setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
+        OneTimePeriod p6 = OneTimePeriod.of(this.term_fall)
+                .setDateTimeRange(DateTimeRange.of(LocalDateTime.MIN, LocalDateTime.MAX))
                 .addSupervisors("Test Supervisor 1");
 
         s2.addPeriod(p1);
@@ -546,15 +551,15 @@ public class SectionTests {
         s1.setWaiting(100);
         s1.setMaximumWaiting(100);
 
-        // Add one-time and unique periods.
+        // Add one-dayTimeRange and unique periods.
         OneTimePeriod p1 = OneTimePeriod.of(this.term_fall_first_quarter)
-                .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
+                .setDateTimeRange(DateTimeRange.of(LocalDateTime.MIN, LocalDateTime.MAX))
                 .addNotes("Test 1", "Test 2", "Test 3");
         RepeatingPeriod p2 = RepeatingPeriod.of(this.term_fall_first_quarter)
-                .setTime(DayOfWeek.MONDAY, LocalTime.MIN, LocalTime.MAX)
+                .setDayTimeRange(DayTimeRange.of(DayOfWeek.MONDAY, LocalTime.MIN, LocalTime.MAX))
                 .addNotes("Test 1", "Test 2", "Test 3").addSupervisors("A Test", "B Test");
         RepeatingPeriod p3 = RepeatingPeriod.of(this.term_fall_first_quarter)
-                .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX)
+                .setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX))
                 .addNotes("Test 1", "Test 2", "Test 3").addSupervisors("A Test");
 
         s1.addPeriod(p1).addPeriod(p2).addPeriod(p3);
@@ -589,15 +594,15 @@ public class SectionTests {
         s1.setWaiting(100);
         s1.setMaximumWaiting(100);
 
-        // Add one-time and unique periods.
+        // Add one-dayTimeRange and unique periods.
         OneTimePeriod p1 = OneTimePeriod.of(this.term_fall_first_quarter)
-                .setDateTimes(LocalDateTime.MIN, LocalDateTime.MAX)
+                .setDateTimeRange(DateTimeRange.of(LocalDateTime.MIN, LocalDateTime.MAX))
                 .addNotes("Test 1", "Test 2", "Test 3");
         RepeatingPeriod p2 = RepeatingPeriod.of(this.term_fall_first_quarter)
-                .setTime(DayOfWeek.MONDAY, LocalTime.MIN, LocalTime.MAX)
+                .setDayTimeRange(DayTimeRange.of(DayOfWeek.MONDAY, LocalTime.MIN, LocalTime.MAX))
                 .addNotes("Test 1", "Test 2", "Test 3").addSupervisors("A Test", "B Test");
         RepeatingPeriod p3 = RepeatingPeriod.of(this.term_fall_first_quarter)
-                .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX)
+                .setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX))
                 .addNotes("Test 1", "Test 2", "Test 3").addSupervisors("A Test");
 
         String expected = s1.getSectionId() +
@@ -693,7 +698,7 @@ public class SectionTests {
         s2.setMaximumWaiting(1);
         assertEquals(s1, s2);
 
-        // Modify one-time periods
+        // Modify one-dayTimeRange periods
         OneTimePeriod p1 = OneTimePeriod.of(this.term_fall_first_quarter);
         s1.addPeriod(p1);
         assertNotEquals(s1, s2);
@@ -702,7 +707,7 @@ public class SectionTests {
 
         // Modify repeating periods
         RepeatingPeriod rp1 = RepeatingPeriod.of(this.term_fall)
-                .setTime(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX);
+                .setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX));
         s1.addPeriod(rp1);
         assertNotEquals(s1, s2);
         s2.addPeriod(rp1);

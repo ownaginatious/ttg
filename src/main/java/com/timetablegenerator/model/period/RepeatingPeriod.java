@@ -7,24 +7,21 @@ import com.timetablegenerator.delta.StructureDelta;
 import com.timetablegenerator.model.Term;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import javax.annotation.Nonnull;
-import java.time.DayOfWeek;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @EqualsAndHashCode(callSuper = true)
+@Accessors(chain = true)
 public class RepeatingPeriod extends Period implements Comparable<RepeatingPeriod>, Diffable<RepeatingPeriod> {
 
-    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm");
-
-    private DayOfWeek dayOfWeek;
-    private LocalTime startTime;
-    private LocalTime endTime;
+    @Setter @NonNull private DayTimeRange dayTimeRange;
+    @Setter @NonNull private DateRange activeDateRange;
 
     private RepeatingPeriod(Term term) {
         super(term);
@@ -34,35 +31,17 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
         return new RepeatingPeriod(term);
     }
 
-    public RepeatingPeriod setTime(@NonNull DayOfWeek dow, @NonNull LocalTime startTime, @NonNull LocalTime endTime) {
-
-        if (endTime.isBefore(startTime)) { // Catch unconverted AM/PM crossings.
-            throw new IllegalStateException("The start time \"" + startTime
-                    + "\" is after the end time '" + endTime + "'");
-        }
-
-        this.dayOfWeek = dow;
-        this.startTime = startTime;
-        this.endTime = endTime;
-
-        return this;
+    public Optional<DayTimeRange> getDayTimeRange(){
+        return Optional.ofNullable(this.dayTimeRange);
     }
 
-    public Optional<DayOfWeek> getDayOfWeek() {
-        return this.dayOfWeek == null ? Optional.empty() : Optional.of(this.dayOfWeek);
-    }
-
-    public Optional<LocalTime> getStartTime() {
-        return this.startTime == null ? Optional.empty() : Optional.of(this.startTime);
-    }
-
-    public Optional<LocalTime> getEndTime() {
-        return this.endTime == null ? Optional.empty() : Optional.of(this.endTime);
+    public Optional<DateRange> getActiveDateRange(){
+        return Optional.ofNullable(this.activeDateRange);
     }
 
     @Override
     public boolean isScheduled() {
-        return this.dayOfWeek != null;
+        return this.dayTimeRange != null;
     }
 
     @Override
@@ -70,20 +49,14 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
 
         StringBuilder sb = new StringBuilder();
 
-        if (this.dayOfWeek == null) {
-            sb.append("TBA");
-        } else {
-            sb.append(this.dayOfWeek.toString());
+        if (this.activeDateRange != null) {
+            sb.append('[').append(this.activeDateRange).append(']');
         }
 
-        sb.append(' ');
-
-        if (this.startTime != null && this.endTime != null) {
-            sb.append(this.startTime.format(TIME_FORMAT))
-                    .append(" -> ")
-                    .append(this.endTime.format(TIME_FORMAT));
+        if (this.dayTimeRange == null) {
+            sb.append("TBA TBA -> TBA");
         } else {
-            sb.append("TBA -> TBA");
+            sb.append(this.dayTimeRange.toString());
         }
 
         sb.append(" [Term: ").append(this.getTerm()).append(']');
@@ -124,18 +97,13 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
         if (!this.getTerm().equals(that.getTerm())) {
             return this.getTerm().compareTo(that.getTerm());
         }
-        if (this.dayOfWeek == null && that.dayOfWeek != null) {
-            return -1;
-        } else if (this.dayOfWeek != null && that.dayOfWeek == null) {
-            return 1;
-        } else if (this.dayOfWeek == null) {
-            return this.equals(that) ? 0 : -1;
-        } else if (this.dayOfWeek != that.dayOfWeek) {
-            return this.dayOfWeek.compareTo(that.dayOfWeek);
-        } else if (!this.startTime.equals(that.startTime)) {
-            return this.startTime.compareTo(that.startTime);
-        } else if (!this.endTime.equals(that.endTime)) {
-            return this.endTime.compareTo(that.endTime);
+        else if (!Objects.equals(this.dayTimeRange, that.dayTimeRange)) {
+            if (this.dayTimeRange == null) {
+                return -1;
+            } else if (that.dayTimeRange == null){
+                return 1;
+            }
+            return this.dayTimeRange.compareTo(that.dayTimeRange);
         }
         return this.equals(that) ? 0 : -1;
     }
@@ -180,20 +148,16 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
     public String getDeltaId() {
         String id = this.getTerm().getYear() + "/" +
                 this.getTerm().getTermDefinition().getCode();
-        if (this.dayOfWeek != null) {
-            return id + "/"
-                    + this.dayOfWeek.name() + "/"
-                    + this.startTime.format(TIME_FORMAT) + "/"
-                    + this.endTime.format(TIME_FORMAT);
+        if (this.dayTimeRange != null) {
+            return id + "/" + this.dayTimeRange.getDayOfWeek().name() + "/" + this.dayTimeRange;
         } else {
-            return id + "/TBA/TBA/TBA";
+            return id + "/TBA";
         }
     }
 
     public StructureDelta findDifferences(RepeatingPeriod that) {
 
-        if (this.getTerm() != that.getTerm() || !Objects.equals(this.startTime, that.startTime)
-                || !Objects.equals(this.endTime, that.endTime)) {
+        if (this.getTerm() != that.getTerm() || !Objects.equals(this.dayTimeRange, that.dayTimeRange)) {
             throw new IllegalArgumentException(
                     String.format("Cannot compare temporally unequal repeating periods: (%s) and (%s)",
                             this.getDeltaId(), that.getDeltaId()));
