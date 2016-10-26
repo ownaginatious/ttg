@@ -27,6 +27,22 @@ You can install `docker-compose` via several different methods as listed [here](
 
 Once you have the above tools installed, you are ready to initialize your development environment. Follow the steps listed below.
 
+**NOTE:**
+
+If you are planning to connect to repositories over SSH, The Timetable Generator git server is **not** hosted on the standard SSH port (22).
+
+You will need to add an entry like this to your `~/.ssh/config` file:
+
+```
+Host ttg-git
+  HostName git.timetablegenerator.io
+  User git
+  Port 2050
+  IdentityFile "path/to/my/private/key"
+```
+
+And instead of cloning via `git@git.timetablegenerator.io:ttg/...`, use `ttg-git:ttg/...`
+
 1. Clone the [ttg-web](https://git.timetablegenerator.io/ttg/ttg-web) repository to your local machine. Cloning into a folder called something like `~/git/` is usually a good idea.
 2. Clone the [ttg-saved-schedule](https://git.timetablegenerator.io/ttg/ttg-saved-schedules) repository to your local machine **in the same parent directory as `ttg-web`**. This repository contains the server necessary for supporting the ability to save and retrieve schedules. This will functionality will eventually be overtaken by `ttg_backend`.
 3. Open a terminal and change the current directory to your local `ttg-web` repository.
