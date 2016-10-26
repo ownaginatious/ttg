@@ -60,7 +60,7 @@ It is strongly advised to **not** push your changes directly to `master` as the 
 
 When you want to make changes, you should instead use the following procedure:
 - Make an issue (optional)
-- Make a new branch off of master and do your work there.
+- Create a fork of the repository and do your work there (may change to branching model later).
 - Submit a pull-request to merge your branch into master.
 - Notify someone to have them review your work and eventually merge.
 
