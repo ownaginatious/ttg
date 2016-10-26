@@ -91,3 +91,5 @@ docs/_build/
 # PyBuilder
 target/
 
+# Development environment data
+dev_data/

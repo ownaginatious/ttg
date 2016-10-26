@@ -5,8 +5,9 @@ services:
     image: node:6
     volumes:
       - ./ttg_frontend:/code
+      - ./dev_data/node_modules:/code/node_modules
     ports:
-      - "8000:8000"
+      - "7447:8000"
     links:
       - ttg-web-backend
       - ttg-saved-schedules
@@ -21,7 +22,7 @@ services:
   ttg-web-backend:
     image: python:3
     volumes:
-      - ./data/legacy_data:/legacy_data
+      - ./dev_data/legacy_data:/legacy_data
       - ./ttg_backend:/code
     environment:
       - "SECRET_KEY=DEV_SECRET"
@@ -58,4 +59,4 @@ services:
   ttg-mongodb:
     image: mongo:3
     volumes:
-      - ./data/mongodb:/data/db
+      - ./dev_data/mongodb:/data/db
