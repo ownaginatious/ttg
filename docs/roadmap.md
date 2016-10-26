@@ -6,7 +6,7 @@ The objective of this document is to establish development goals to promote more
 
 ## Current implementation
 
-**This section will be updated periodically to try and reflect the current state of the system as accurately as possible**
+**This section will be updated periodically to try to reflect the current state of the system as accurately as possible**
 
 This diagram represents the current state of the system.
 
