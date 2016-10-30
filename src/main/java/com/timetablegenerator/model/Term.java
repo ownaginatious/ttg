@@ -1,5 +1,6 @@
 package com.timetablegenerator.model;
 
+import com.timetablegenerator.model.range.DateRange;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -8,10 +9,7 @@ import lombok.experimental.Accessors;
 
 import javax.annotation.Nonnull;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @EqualsAndHashCode
 @Accessors(chain = true)
@@ -20,10 +18,8 @@ public class Term implements Comparable<Term> {
     @Getter private final TermDefinition termDefinition;
     @Getter private final int year;
     @Setter private String key;
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private LocalDate examStartDate;
-    private LocalDate examEndDate;
+    @Setter @NonNull private DateRange dateRange;
+    @Setter @NonNull private DateRange examDateRange;
 
     private Map<String, Term> prebuiltTerms = new HashMap<>();
 
@@ -38,42 +34,12 @@ public class Term implements Comparable<Term> {
         }
     }
 
-    public Term setDates(@NonNull LocalDate start, @NonNull LocalDate end) {
-        if (start.isAfter(end)) {
-            throw new IllegalArgumentException(
-                    String.format("start (%s) is after end (%s)", start, end)
-            );
-        }
-        this.startDate = start;
-        this.endDate = end;
-        return this;
+    public Optional<DateRange> getDateRange() {
+        return Optional.ofNullable(this.dateRange);
     }
 
-    public Term setExamDates(@NonNull LocalDate start, @NonNull LocalDate end) {
-        if (start.isAfter(end)) {
-            throw new IllegalArgumentException(
-                    String.format("start (%s) is after end (%s)", start, end)
-            );
-        }
-        this.examStartDate = start;
-        this.examEndDate = end;
-        return this;
-    }
-
-    public Optional<LocalDate> getStartDate() {
-        return Optional.ofNullable(this.startDate);
-    }
-
-    public Optional<LocalDate> getEndDate() {
-        return Optional.ofNullable(this.endDate);
-    }
-
-    public Optional<LocalDate> getExamStartDate() {
-        return Optional.ofNullable(this.examStartDate);
-    }
-
-    public Optional<LocalDate> getExamEndDate() {
-        return Optional.ofNullable(this.examEndDate);
+    public Optional<DateRange> getExamDateRange() {
+        return Optional.ofNullable(this.examDateRange);
     }
 
     public Optional<String> getKey() {

@@ -7,8 +7,8 @@ import com.timetablegenerator.delta.StructureDelta;
 import com.timetablegenerator.model.*;
 import static org.junit.Assert.*;
 
-import com.timetablegenerator.model.period.DateTimeRange;
-import com.timetablegenerator.model.period.DayTimeRange;
+import com.timetablegenerator.model.range.DateTimeRange;
+import com.timetablegenerator.model.range.DayTimeRange;
 import com.timetablegenerator.model.period.OneTimePeriod;
 import com.timetablegenerator.model.period.RepeatingPeriod;
 import com.timetablegenerator.tests.api.TestUtils;

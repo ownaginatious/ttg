@@ -8,6 +8,8 @@ import com.timetablegenerator.model.Section;
 import com.timetablegenerator.model.Term;
 import com.timetablegenerator.model.TermDefinition;
 import com.timetablegenerator.model.period.*;
+import com.timetablegenerator.model.range.DateTimeRange;
+import com.timetablegenerator.model.range.DayTimeRange;
 import com.timetablegenerator.tests.api.TestUtils;
 import org.junit.*;
 

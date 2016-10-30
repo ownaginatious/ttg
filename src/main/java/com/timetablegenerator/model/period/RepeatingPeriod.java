@@ -5,6 +5,8 @@ import com.timetablegenerator.delta.Diffable;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureDelta;
 import com.timetablegenerator.model.Term;
+import com.timetablegenerator.model.range.DateRange;
+import com.timetablegenerator.model.range.DayTimeRange;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Setter;

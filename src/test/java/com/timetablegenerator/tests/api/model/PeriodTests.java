@@ -6,6 +6,8 @@ import com.timetablegenerator.delta.StructureDelta;
 import com.timetablegenerator.model.Term;
 import com.timetablegenerator.model.TermDefinition;
 import com.timetablegenerator.model.period.*;
+import com.timetablegenerator.model.range.DateTimeRange;
+import com.timetablegenerator.model.range.DayTimeRange;
 import com.timetablegenerator.tests.api.TestUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -77,7 +79,7 @@ public class PeriodTests {
         }
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void setDayTimeRangeStartAfterEnd() {
         DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MAX, LocalTime.MIN);
     }
@@ -91,11 +93,6 @@ public class PeriodTests {
         assertEquals(LocalDateTime.MIN, actualDateTimeRange.getStartDateTime());
         assertEquals(LocalDateTime.MAX, actualDateTimeRange.getEndDateTime());
         assertTrue(otp1.isScheduled());
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void setDateTimeStartAfterEnd() {
-        DateTimeRange.of(LocalDateTime.MAX, LocalDateTime.MIN);
     }
 
     @Test

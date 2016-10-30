@@ -2,6 +2,7 @@ package com.timetablegenerator.tests.api.model;
 
 import com.timetablegenerator.model.Term;
 import com.timetablegenerator.model.TermDefinition;
+import com.timetablegenerator.model.range.DateRange;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -63,30 +64,21 @@ public class TermTests {
 
     @Test
     public void dates() {
-        assertFalse(this.t.getStartDate().isPresent());
-        assertFalse(this.t.getEndDate().isPresent());
-        this.t.setDates(LocalDate.MIN, LocalDate.MAX);
-        assertEquals(LocalDate.MIN, this.t.getStartDate().orElse(null));
-        assertEquals(LocalDate.MAX, this.t.getEndDate().orElse(null));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void badDates() {
-        this.t.setDates(LocalDate.MAX, LocalDate.MIN);
+        assertFalse(this.t.getDateRange().isPresent());
+        this.t.setDateRange(DateRange.of(LocalDate.MIN, LocalDate.MAX));
+        DateRange expected = this.t.getDateRange().orElse(null);
+        assertEquals(LocalDate.MIN, expected.getStartDate());
+        assertEquals(LocalDate.MAX, expected.getEndDate());
     }
 
     @Test
     public void examDates() {
-        assertFalse(this.t.getExamStartDate().isPresent());
-        assertFalse(this.t.getExamEndDate().isPresent());
-        this.t.setExamDates(LocalDate.MIN, LocalDate.MAX);
-        assertEquals(LocalDate.MIN, this.t.getExamStartDate().orElse(null));
-        assertEquals(LocalDate.MAX, this.t.getExamEndDate().orElse(null));
-    }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void badExamDates() {
-        this.t.setExamDates(LocalDate.MAX, LocalDate.MIN);
+        assertFalse(this.t.getExamDateRange().isPresent());
+        this.t.setExamDateRange(DateRange.of(LocalDate.MIN, LocalDate.MAX));
+        DateRange expected = this.t.getExamDateRange().orElse(null);
+        assertEquals(LocalDate.MIN, expected.getStartDate());
+        assertEquals(LocalDate.MAX, expected.getEndDate());
     }
 
     @Test

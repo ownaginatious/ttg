@@ -4,6 +4,8 @@ import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureDelta;
 import com.timetablegenerator.model.*;
 import com.timetablegenerator.model.period.*;
+import com.timetablegenerator.model.range.DateTimeRange;
+import com.timetablegenerator.model.range.DayTimeRange;
 import org.junit.Before;
 import org.junit.Test;
 
