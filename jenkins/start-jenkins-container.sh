@@ -14,8 +14,8 @@ fi
 [ -z "${JENKINS_SLAVE_PORT:-}" ] && JENKINS_SLAVE_PORT=50000
 
 case "${1:-}" in
-    slave) master=false ;;
-    master) master=true ;;
+    slave) master=false; slave=true ;;
+    master) master=true; slave=false ;;
     *) >&2 printf " -> \"${1:-}\" is not a valid mode [valid modes: slave, master]\n"; exit 1
 esac
 
@@ -25,7 +25,7 @@ then
     exit 1
 fi
 
-if [ -z "${3:-}" ]
+if [ -z "${3:-}" ] && "${slave}"
 then
     >&2 printf " -> Missing SSH dir argument (arg 3)\n"
     exit 1
@@ -71,20 +71,28 @@ docker pull "${image}"
 
 # Non-x86 containers have to build their own images in chroots, so they should be
 # given privileged access to do so.
-if [ ! -z "${arch:-}" ]
+if [ ! -z "${arch:-}" ] && "${slave}"
 then
     printf " -> Container will be started with special system privileges [--privileged]"
     super_container="--privileged"
 fi
 
 # Communication with this docker server will be integrated into the Jenkins container
-docker run -d -v /var/run/docker.sock:/var/run/docker.sock \
-              -v "$2":/var/jenkins_home ${ports} \
-              -v "$3":/ssh_keys:ro ${ports} \
-              -e "JENKINS_SLAVE_SECRET=${4:-}" \
-              -e "JENKINS_SLAVE_ID=$(hostname)" \
-              --name "${container}" "${super_container:-}" \
-              "${image}" > /dev/null
+if "${slave}"
+then
+    docker run -d -v /var/run/docker.sock:/var/run/docker.sock \
+                  -v "$2":/var/jenkins_home ${ports} \
+                  -v "$3":/ssh_keys:ro ${ports} \
+                  -e "JENKINS_SLAVE_SECRET=${4:-}" \
+                  -e "JENKINS_SLAVE_ID=$(hostname)" \
+                  --name "${container}" "${super_container:-}" \
+                  "${image}" > /dev/null
+else
+    docker run -d -v /var/run/docker.sock:/var/run/docker.sock \
+                  -v "$2":/var/jenkins_home ${ports} \
+                  --name "${container}" \
+                  "${image}" > /dev/null
+fi
 
 # Hack to get docker to run as the root user. Permission
 # is denied to the jenkins user on /var/run/docker.sock
