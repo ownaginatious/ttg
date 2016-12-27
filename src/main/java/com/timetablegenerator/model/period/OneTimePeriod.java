@@ -85,7 +85,7 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
 
     @Override
     public int compareTo(@Nonnull OneTimePeriod that) {
-        if (!this.getTerm().equals(that.getTerm())) {
+        if (!this.getTerm().temporallyEquals(that.getTerm())) {
             return this.getTerm().compareTo(that.getTerm());
         } else if (!Objects.equals(this.dateTimeRange, that.dateTimeRange)) {
             if (this.dateTimeRange == null) {
@@ -100,8 +100,7 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
 
     @Override
     public String getDeltaId() {
-        String id = this.getTerm().getYear() + "/" +
-                this.getTerm().getTermDefinition().getCode();
+        String id = this.getTerm().getUniqueId();
         if (this.dateTimeRange != null) {
             return id + "/" + this.dateTimeRange;
         } else {
@@ -149,7 +148,7 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
 
         if (this.getTerm() != that.getTerm() || !Objects.equals(this.dateTimeRange, that.dateTimeRange)) {
             throw new IllegalArgumentException(
-                    String.format("Cannot compare temporally unequal one-dayTimeRange periods: (%s) and (%s)",
+                    String.format("Cannot compare temporally unequal one-time periods: (%s) and (%s)",
                             this.getDeltaId(), that.getDeltaId()));
         }
 

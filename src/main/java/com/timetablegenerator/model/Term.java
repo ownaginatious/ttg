@@ -8,7 +8,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import javax.annotation.Nonnull;
-import java.time.LocalDate;
 import java.util.*;
 
 @EqualsAndHashCode
@@ -52,6 +51,10 @@ public class Term implements Comparable<Term> {
         return this.prebuiltTerms.get(code);
     }
 
+    public String getUniqueId(){
+        return this.year + "/" + this.termDefinition.getCode();
+    }
+
     @Override
     public String toString() {
         if (this.key != null) {
@@ -59,6 +62,16 @@ public class Term implements Comparable<Term> {
         } else {
             return String.format("%s %d", this.termDefinition.toString(), this.year);
         }
+    }
+
+    /**
+     * Check whether two terms identify the same point in time
+     * (same definition + year) without regard to their other contents.
+     * @param that The term to compare to.
+     * @return {@code true} if temporally equal, otherwise {@code false}.
+     */
+    public boolean temporallyEquals(Term that) {
+        return this.getUniqueId().equals(that.getUniqueId());
     }
 
     @Override

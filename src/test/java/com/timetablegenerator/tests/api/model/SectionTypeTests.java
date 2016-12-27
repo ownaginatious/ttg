@@ -147,7 +147,7 @@ public class SectionTypeTests {
 
         Section sb1 = Section.of("d");
         Section sb2 = Section.of("c")
-                .addNotes("Note").setAlternating(true).setCancelled(false);
+                .addNotes("Note").setSerialNumber("testing").setCancelled(false);
 
         SectionType st1 = SectionType.of(school, "A")
                 .addSection(sa1).addSection(sa2);
@@ -160,7 +160,7 @@ public class SectionTypeTests {
                     .addRemoved(PropertyType.SECTION, sa1)
                     .addSubstructureChange(StructureDelta.of(PropertyType.SECTION, sa2)
                                 .addAdded(PropertyType.NOTE, "Note")
-                                .addAdded(PropertyType.IS_ALTERNATING, true)
+                                .addAdded(PropertyType.SERIAL_NUMBER, "testing")
                                 .addValueIfChanged(PropertyType.IS_CANCELLED, true, false)),
                 st1.findDifferences(st2));
     }

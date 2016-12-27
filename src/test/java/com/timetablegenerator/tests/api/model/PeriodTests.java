@@ -8,6 +8,7 @@ import com.timetablegenerator.model.TermDefinition;
 import com.timetablegenerator.model.period.*;
 import com.timetablegenerator.model.range.DateTimeRange;
 import com.timetablegenerator.model.range.DayTimeRange;
+import com.timetablegenerator.serializer.model.period.RepeatingPeriodSerializer;
 import com.timetablegenerator.tests.api.TestUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +16,7 @@ import org.junit.Test;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -74,7 +76,7 @@ public class PeriodTests {
             DayTimeRange actualDtr = rp1.getDayTimeRange().orElse(null);
             assertEquals(dow, actualDtr.getDayOfWeek());
             assertEquals(LocalTime.MIN, actualDtr.getStartTime());
-            assertEquals(LocalTime.MAX, actualDtr.getEndTime());
+            assertEquals(LocalTime.MAX.truncatedTo(ChronoUnit.MINUTES), actualDtr.getEndTime());
             assertTrue(rp1.isScheduled());
         }
     }
@@ -91,7 +93,7 @@ public class PeriodTests {
         otp1.setDateTimeRange(dateTimeRange);
         DateTimeRange actualDateTimeRange = otp1.getDateTimeRange().orElse(null);
         assertEquals(LocalDateTime.MIN, actualDateTimeRange.getStartDateTime());
-        assertEquals(LocalDateTime.MAX, actualDateTimeRange.getEndDateTime());
+        assertEquals(LocalDateTime.MAX.truncatedTo(ChronoUnit.MINUTES), actualDateTimeRange.getEndDateTime());
         assertTrue(otp1.isScheduled());
     }
 

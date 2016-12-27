@@ -23,7 +23,7 @@ public enum PropertyType {
     NUM_WAITING(Integer.class), MAX_WAITING(Integer.class), IS_FULL(Boolean.class),
     NUM_ENROLLED(Integer.class), MAX_ENROLLED(Integer.class),
     IS_CANCELLED(Boolean.class), IS_ONLINE(Boolean.class),
-    IS_ALTERNATING(Boolean.class), SUPERVISOR(String.class);
+    SUPERVISOR(String.class);
 
     private final Class<? extends Comparable> expectedType;
 

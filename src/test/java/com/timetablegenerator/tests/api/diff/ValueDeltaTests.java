@@ -22,9 +22,9 @@ public class ValueDeltaTests {
         assertEquals(1.234, vad.getNewValue());
         assertEquals(PropertyType.CREDITS, vad.getPropertyType());
 
-        vad = AdditionDelta.of(PropertyType.IS_ALTERNATING, true);
+        vad = AdditionDelta.of(PropertyType.IS_CANCELLED, true);
         assertEquals(true, vad.getNewValue());
-        assertEquals(PropertyType.IS_ALTERNATING, vad.getPropertyType());
+        assertEquals(PropertyType.IS_CANCELLED, vad.getPropertyType());
     }
 
     @Test
@@ -61,9 +61,9 @@ public class ValueDeltaTests {
         assertEquals(1.234, vrd.getOldValue());
         assertEquals(PropertyType.CREDITS, vrd.getPropertyType());
 
-        vrd = RemovalDelta.of(PropertyType.IS_ALTERNATING, true);
+        vrd = RemovalDelta.of(PropertyType.IS_CANCELLED, true);
         assertEquals(true, vrd.getOldValue());
-        assertEquals(PropertyType.IS_ALTERNATING, vrd.getPropertyType());
+        assertEquals(PropertyType.IS_CANCELLED, vrd.getPropertyType());
     }
 
     @Test
@@ -102,8 +102,8 @@ public class ValueDeltaTests {
         assertEquals(1.25, vcd.getOldValue());
         assertEquals(3.43, vcd.getNewValue());
 
-        vcd = ReplaceDelta.of(PropertyType.IS_ALTERNATING, false, true);
-        assertEquals(PropertyType.IS_ALTERNATING, vcd.getPropertyType());
+        vcd = ReplaceDelta.of(PropertyType.IS_CANCELLED, false, true);
+        assertEquals(PropertyType.IS_CANCELLED, vcd.getPropertyType());
         assertEquals(false, vcd.getOldValue());
         assertEquals(true, vcd.getNewValue());
     }

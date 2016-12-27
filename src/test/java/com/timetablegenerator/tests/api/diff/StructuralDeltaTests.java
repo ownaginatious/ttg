@@ -106,26 +106,26 @@ public class StructuralDeltaTests {
     public void booleanPropertyChanges() {
 
         this.scd.hasValueChanges();
-        this.scd.addValueIfChanged(PropertyType.IS_ALTERNATING, false, true);
+        this.scd.addValueIfChanged(PropertyType.IS_CANCELLED, false, true);
         assertEquals(1, this.scd.getValueChanges().size());
         assertEquals(ReplaceDelta.class, this.scd.getValueChanges().stream()
                 .findFirst().orElse(null).getClass());
 
         this.setUp();
         this.scd.hasValueChanges();
-        this.scd.addValueIfChanged(PropertyType.IS_ALTERNATING, 1.0, 1.0);
+        this.scd.addValueIfChanged(PropertyType.IS_CANCELLED, 1.0, 1.0);
         assertEquals(0, this.scd.getValueChanges().size());
 
         this.setUp();
         this.scd.hasValueChanges();
-        this.scd.addValueIfChanged(PropertyType.IS_ALTERNATING, null, false);
+        this.scd.addValueIfChanged(PropertyType.IS_CANCELLED, null, false);
         assertEquals(1, this.scd.getValueChanges().size());
         assertEquals(AdditionDelta.class, this.scd.getValueChanges().stream()
                 .findFirst().orElse(null).getClass());
 
         this.setUp();
         this.scd.hasValueChanges();
-        this.scd.addValueIfChanged(PropertyType.IS_ALTERNATING, true, null);
+        this.scd.addValueIfChanged(PropertyType.IS_CANCELLED, true, null);
         assertEquals(1, this.scd.getValueChanges().size());
         assertEquals(RemovalDelta.class, this.scd.getValueChanges().stream()
                 .findFirst().orElse(null).getClass());
@@ -168,7 +168,7 @@ public class StructuralDeltaTests {
     @Test
     public void structureAddedProperties() {
         this.scd.addAdded(PropertyType.CAMPUS, "Hello");
-        this.scd.addAdded(PropertyType.IS_ALTERNATING, true);
+        this.scd.addAdded(PropertyType.IS_CANCELLED, true);
         this.scd.addAdded(PropertyType.CREDITS, 1.234);
         this.scd.addAdded(PropertyType.REPEATING_PERIOD, this.rp1);
 
@@ -179,7 +179,7 @@ public class StructuralDeltaTests {
         assertEquals("Hello", delta.getNewValue());
 
         delta = (AdditionDelta) this.scd.getValueChanges().stream()
-                    .filter(x -> x.getPropertyType() == PropertyType.IS_ALTERNATING)
+                    .filter(x -> x.getPropertyType() == PropertyType.IS_CANCELLED)
                     .findFirst().orElse(null);
         assertEquals(true, delta.getNewValue());
 
@@ -198,7 +198,7 @@ public class StructuralDeltaTests {
     @Test
     public void structureRemovedProperties() {
         this.scd.addRemoved(PropertyType.CAMPUS, "Hello");
-        this.scd.addRemoved(PropertyType.IS_ALTERNATING, true);
+        this.scd.addRemoved(PropertyType.IS_CANCELLED, true);
         this.scd.addRemoved(PropertyType.CREDITS, 1.234);
         this.scd.addRemoved(PropertyType.REPEATING_PERIOD, this.rp1);
 
@@ -209,7 +209,7 @@ public class StructuralDeltaTests {
         assertEquals("Hello", delta.getOldValue());
 
         delta = (RemovalDelta) this.scd.getValueChanges().stream()
-                .filter(x -> x.getPropertyType() == PropertyType.IS_ALTERNATING)
+                .filter(x -> x.getPropertyType() == PropertyType.IS_CANCELLED)
                 .findFirst().orElse(null);
         assertEquals(true, delta.getOldValue());
 

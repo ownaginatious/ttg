@@ -259,22 +259,19 @@ public class SectionTests {
     }
 
     @Test
-    public void alternating() {
-        assertFalse(s1.isAlternating().isPresent());
-        s1.setAlternating(true);
-        assertTrue(s1.isAlternating().isPresent());
-        assertTrue(s1.isAlternating().orElse(false));
-        s1.setAlternating(false);
-        assertTrue(s1.isAlternating().isPresent());
-        assertFalse(s1.isAlternating().orElse(true));
-    }
-
-    @Test
     public void serialNumber() {
         String serial = TestUtils.getRandomString(10);
         assertFalse(s1.getSerialNumber().isPresent());
         s1.setSerialNumber(serial);
         assertEquals(serial, s1.getSerialNumber().orElse(""));
+    }
+
+    @Test
+    public void groupId() {
+        String groupId = TestUtils.getRandomString(10);
+        assertFalse(s1.getGroupId().isPresent());
+        s1.setGroupId(groupId);
+        assertEquals(groupId, s1.getGroupId().orElse(""));
     }
 
     @Test
@@ -358,16 +355,6 @@ public class SectionTests {
 
         expected.addValueIfChanged(PropertyType.IS_ONLINE, false, true);
         invertExpected.addValueIfChanged(PropertyType.IS_ONLINE, true, false);
-
-        assertEquals(expected, s1.findDifferences(s2));
-        assertEquals(invertExpected, s2.findDifferences(s1));
-
-        // Alternating change.
-        s2.setAlternating(true);
-        s1.setAlternating(false);
-
-        expected.addValueIfChanged(PropertyType.IS_ALTERNATING, false, true);
-        invertExpected.addValueIfChanged(PropertyType.IS_ALTERNATING, true, false);
 
         assertEquals(expected, s1.findDifferences(s2));
         assertEquals(invertExpected, s2.findDifferences(s1));
@@ -487,18 +474,6 @@ public class SectionTests {
     }
 
     @Test
-    public void sectionAlternating() {
-        String header = s1.getSectionId() + " {Test Serial} [CANCELLED] [ONLINE]";
-        s1.setSerialNumber("Test Serial");
-        s1.setCancelled(true);
-        s1.setOnline(true);
-        s1.setAlternating(true);
-        assertEquals(header + " [ALTERNATES]", s1.toString());
-        s1.setAlternating(false);
-        assertEquals(header, s1.toString());
-    }
-
-    @Test
     public void sectionFullString() {
         String header = s1.getSectionId() + " {Test Serial} [CANCELLED]";
         s1.setSerialNumber("Test Serial");
@@ -511,12 +486,11 @@ public class SectionTests {
 
     @Test
     public void sectionEnrollmentString() {
-        String header = s1.getSectionId() + " {Test Serial} [CANCELLED] [ONLINE] [ALTERNATES]";
+        String header = s1.getSectionId() + " {Test Serial} [CANCELLED] [ONLINE]";
         s1.setSerialNumber("Test Serial");
         s1.setCancelled(true);
         s1.setEnrollment(3);
         s1.setOnline(true);
-        s1.setAlternating(true);
         assertEquals(header + " [enrolled: 3/?]", s1.toString());
         s1.setMaximumEnrollment(4);
         assertEquals(header + " [AVAILABLE] [enrolled: 3/4]", s1.toString());
@@ -527,11 +501,10 @@ public class SectionTests {
     @Test
     public void sectionWaitingString() {
         String header = s1.getSectionId()
-                + " {Test Serial} [CANCELLED] [ONLINE] [ALTERNATES] [enrolled: 3/?]";
+                + " {Test Serial} [CANCELLED] [ONLINE] [enrolled: 3/?]";
         s1.setSerialNumber("Test Serial");
         s1.setCancelled(true);
         s1.setOnline(true);
-        s1.setAlternating(true);
         s1.setWaiting(50);
         s1.setEnrollment(3);
         assertEquals(header + " [waiting: 50/?]", s1.toString());
@@ -544,11 +517,10 @@ public class SectionTests {
     @Test
     public void sectionPeriodsString() {
         String header = s1.getSectionId()
-                + " {Test Serial} [CANCELLED] [ONLINE] [ALTERNATES] [enrolled: 3/?] [waiting: 100/100]";
+                + " {Test Serial} [CANCELLED] [ONLINE] [enrolled: 3/?] [waiting: 100/100]";
         s1.setSerialNumber("Test Serial");
         s1.setCancelled(true);
         s1.setOnline(true);
-        s1.setAlternating(true);
         s1.setEnrollment(3);
         s1.setWaiting(100);
         s1.setMaximumWaiting(100);
@@ -591,7 +563,6 @@ public class SectionTests {
         s1.setSerialNumber("Test Serial");
         s1.setCancelled(true);
         s1.setOnline(true);
-        s1.setAlternating(true);
         s1.setEnrollment(3);
         s1.setWaiting(100);
         s1.setMaximumWaiting(100);
@@ -608,7 +579,7 @@ public class SectionTests {
                 .addNotes("Test 1", "Test 2", "Test 3").addSupervisors("A Test");
 
         String expected = s1.getSectionId() +
-                " {Test Serial} [CANCELLED] [ONLINE] [ALTERNATES] [enrolled: 3/?] [waiting: 100/100]\n\n"
+                " {Test Serial} [CANCELLED] [ONLINE] [enrolled: 3/?] [waiting: 100/100]\n\n"
                 + I + "Notes:\n\n"
                 + I + I + "This is my note\n"
                 + I + I + "This is my note\n"
@@ -652,14 +623,6 @@ public class SectionTests {
         s1.setOnline(false);
         assertNotEquals(s1, s2);
         s2.setOnline(false);
-        assertEquals(s1, s2);
-
-        // Toggle alternating
-        s1.setAlternating(true);
-        assertNotEquals(s1, s2);
-        s1.setAlternating(false);
-        assertNotEquals(s1, s2);
-        s2.setAlternating(false);
         assertEquals(s1, s2);
 
         // Toggle waiting list

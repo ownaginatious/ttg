@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
 @Accessors(chain = true)
 public class RepeatingPeriod extends Period implements Comparable<RepeatingPeriod>, Diffable<RepeatingPeriod> {
 
-    @Setter @NonNull private DayTimeRange dayTimeRange;
-    @Setter @NonNull private DateRange activeDateRange;
+    @NonNull @Setter private DayTimeRange dayTimeRange;
+    @NonNull @Setter private DateRange activeDateRange;
 
     private RepeatingPeriod(Term term) {
         super(term);
@@ -47,56 +47,9 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
     }
 
     @Override
-    public String toString() {
-
-        StringBuilder sb = new StringBuilder();
-
-        if (this.activeDateRange != null) {
-            sb.append('[').append(this.activeDateRange).append(']');
-        }
-
-        if (this.dayTimeRange == null) {
-            sb.append("TBA TBA -> TBA");
-        } else {
-            sb.append(this.dayTimeRange.toString());
-        }
-
-        sb.append(" [Term: ").append(this.getTerm()).append(']');
-
-        if (this.getCampus().isPresent() || this.getRoom().isPresent()) {
-
-            sb.append(" (");
-
-            this.getCampus().ifPresent(x -> sb.append("campus: ").append(x));
-            this.getRoom().ifPresent(x -> sb.append(this.getCampus().isPresent() ? ", " : "")
-                    .append("room: ").append(x));
-
-            sb.append(")");
-        }
-
-        this.isOnline().ifPresent(x -> sb.append(x ? " (" : " (not ").append("online)"));
-
-        if (!this.getSupervisors().isEmpty()) {
-            sb.append(" [Instructors: ").append(this.getSupervisors().stream()
-                    .map(x -> "'" + x + "'")
-                    .collect(Collectors.joining(", "))).append(']');
-        }
-
-        Collection<String> notes = this.getNotes();
-
-        if (!notes.isEmpty()) {
-            sb.append("\n\n").append(I).append("Notes:\n");
-            notes.forEach(x -> sb.append('\n')
-                    .append(StringUtilities.indent(2, x)));
-        }
-
-        return sb.toString();
-    }
-
-    @Override
     public int compareTo(@Nonnull RepeatingPeriod that) {
 
-        if (!this.getTerm().equals(that.getTerm())) {
+        if (!this.getTerm().temporallyEquals(that.getTerm())) {
             return this.getTerm().compareTo(that.getTerm());
         }
         else if (!Objects.equals(this.dayTimeRange, that.dayTimeRange)) {
@@ -147,11 +100,16 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
     }
 
     @Override
+    public RepeatingPeriod setOnline(Boolean online) {
+        super.setOnline(online);
+        return this;
+    }
+
+    @Override
     public String getDeltaId() {
-        String id = this.getTerm().getYear() + "/" +
-                this.getTerm().getTermDefinition().getCode();
+        String id = this.getTerm().getUniqueId();
         if (this.dayTimeRange != null) {
-            return id + "/" + this.dayTimeRange.getDayOfWeek().name() + "/" + this.dayTimeRange;
+            return id + "/" + this.dayTimeRange;
         } else {
             return id + "/TBA";
         }
@@ -169,5 +127,52 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
         this.savePeriodDifferences(delta, that);
 
         return delta;
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+
+        if (this.activeDateRange != null) {
+            sb.append('[').append(this.activeDateRange).append(']');
+        }
+
+        if (this.dayTimeRange == null) {
+            sb.append("TBA TBA -> TBA");
+        } else {
+            sb.append(this.dayTimeRange.toString());
+        }
+
+        sb.append(" [Term: ").append(this.getTerm()).append(']');
+
+        if (this.getCampus().isPresent() || this.getRoom().isPresent()) {
+
+            sb.append(" (");
+
+            this.getCampus().ifPresent(x -> sb.append("campus: ").append(x));
+            this.getRoom().ifPresent(x -> sb.append(this.getCampus().isPresent() ? ", " : "")
+                    .append("room: ").append(x));
+
+            sb.append(")");
+        }
+
+        this.isOnline().ifPresent(x -> sb.append(x ? " (" : " (not ").append("online)"));
+
+        if (!this.getSupervisors().isEmpty()) {
+            sb.append(" [Instructors: ").append(this.getSupervisors().stream()
+                    .map(x -> "'" + x + "'")
+                    .collect(Collectors.joining(", "))).append(']');
+        }
+
+        Collection<String> notes = this.getNotes();
+
+        if (!notes.isEmpty()) {
+            sb.append("\n\n").append(I).append("Notes:\n");
+            notes.forEach(x -> sb.append('\n')
+                    .append(StringUtilities.indent(2, x)));
+        }
+
+        return sb.toString();
     }
 }

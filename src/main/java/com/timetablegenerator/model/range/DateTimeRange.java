@@ -2,20 +2,15 @@ package com.timetablegenerator.model.range;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.timetablegenerator.serializer.jackson.LocalDateTimeSerializer;
 import lombok.*;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 @EqualsAndHashCode
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -24,35 +19,16 @@ public class DateTimeRange implements Comparable<DateTimeRange> {
     private static final String START = "startDateTime";
     private static final String END = "endDateTime";
 
-    private static final DateTimeFormatter DATETIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+    private static final DateTimeFormatter DATETIME_FORMAT = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm");
 
-    @SuppressWarnings("WeakerAccess")
-    public static class LocalDateTimeSerializer extends JsonSerializer<LocalDateTime> {
-
-        @Override
-        public void serialize(LocalDateTime localDateTime, JsonGenerator jsonGenerator,
-                              SerializerProvider serializerProvider) throws IOException {
-            jsonGenerator.writeString(localDateTime.toString());
-        }
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public static class LocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
-
-        @Override
-        public LocalDateTime deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-            return LocalDateTime.parse(p.getText(), DATETIME_FORMAT);
-        }
-    }
-
-    @JsonSerialize(using = DateTimeRange.LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = DateTimeRange.LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.Serializer.class)
+    @JsonDeserialize(using = LocalDateTimeSerializer.Deserializer.class)
     @JsonProperty(START)
     @Getter
     private final LocalDateTime startDateTime;
 
-    @JsonSerialize(using = DateTimeRange.LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = DateTimeRange.LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.Serializer.class)
+    @JsonDeserialize(using = LocalDateTimeSerializer.Deserializer.class)
     @JsonProperty(END)
     @Getter
     private final LocalDateTime endDateTime;
@@ -66,7 +42,8 @@ public class DateTimeRange implements Comparable<DateTimeRange> {
                         + "' is after the end '" + endDateTime + "'");
             }
         }
-        return new DateTimeRange(startDateTime, endDateTime);
+        return new DateTimeRange(startDateTime.truncatedTo(ChronoUnit.MINUTES),
+                endDateTime.truncatedTo(ChronoUnit.MINUTES));
     }
 
     @Override

@@ -128,11 +128,7 @@ public class Course implements Diffable<Course> {
     }
 
     public Course addSection(String sectionTypeId, Section s) {
-        SectionType st = sectionTypes.get(sectionTypeId);
-        if (st == null) {
-            st = SectionType.of(this.school, sectionTypeId);
-            sectionTypes.put(sectionTypeId, st);
-        }
+        SectionType st = sectionTypes.computeIfAbsent(sectionTypeId, x -> SectionType.of(this.school, x));
         st.addSection(s);
         return this;
     }

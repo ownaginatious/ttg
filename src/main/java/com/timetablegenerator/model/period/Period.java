@@ -1,9 +1,11 @@
 package com.timetablegenerator.model.period;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.timetablegenerator.Settings;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureDelta;
 import com.timetablegenerator.model.Term;
+import com.timetablegenerator.model.range.DateRange;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -14,18 +16,24 @@ import java.util.*;
 
 @Accessors(chain = true)
 @EqualsAndHashCode()
-abstract class Period {
+public abstract class Period {
 
     protected static final String I = Settings.getIndent();
 
     @Getter private final Term term;
+
     private final Set<String> supervisors = new TreeSet<>();
-    @Setter private String room;
-    @Setter private String campus;
+
+    @NonNull @Setter
+    private String campus = null;
+
+    @NonNull @Setter
+    private String room = null;
 
     private final List<String> notes = new ArrayList<>();
 
-    @Setter private Boolean online;
+    @NonNull @Setter
+    private Boolean online;
 
     Period(@NonNull Term term) {
         this.term = term;
@@ -36,7 +44,6 @@ abstract class Period {
     }
 
     public Period addSupervisors(String... supervisors){
-
         Collections.addAll(this.supervisors, supervisors);
         return this;
     }
@@ -60,6 +67,7 @@ abstract class Period {
         return this;
     }
 
+    @JsonProperty("supervisors")
     public List<String> getNotes(){
         return Collections.unmodifiableList(this.notes);
     }

@@ -21,7 +21,8 @@ public class Section implements Diffable<Section> {
 
     private static final String I = Settings.getIndent();
 
-    @Setter private String serialNumber;
+    @NonNull @Setter private String serialNumber = null;
+    @NonNull @Setter private String groupId = null;
     @NonNull @Getter private final String sectionId;
 
     private Boolean waitingList;
@@ -41,10 +42,13 @@ public class Section implements Diffable<Section> {
 
     @NonNull @Setter private Boolean cancelled = null;
     @NonNull @Setter private Boolean online = null;
-    @NonNull @Setter private Boolean alternating = null;
 
     public Optional<String> getSerialNumber() {
         return Optional.ofNullable(this.serialNumber);
+    }
+
+    public Optional<String> getGroupId() {
+        return Optional.ofNullable(this.groupId);
     }
 
     public Section addNotes(@NonNull Collection<String> notes) {
@@ -67,10 +71,6 @@ public class Section implements Diffable<Section> {
 
     public Optional<Boolean> isCancelled() {
         return Optional.ofNullable(this.cancelled);
-    }
-
-    public Optional<Boolean> isAlternating() {
-        return Optional.ofNullable(this.alternating);
     }
 
     public Section setWaitingList(boolean waitingList) {
@@ -210,7 +210,6 @@ public class Section implements Diffable<Section> {
         this.getSerialNumber().ifPresent(x -> sb.append(" {").append(this.serialNumber).append('}'));
         this.isCancelled().ifPresent(x -> sb.append(x ? " [CANCELLED]" : ""));
         this.isOnline().ifPresent(x -> sb.append(x ? " [ONLINE]" : ""));
-        this.isAlternating().ifPresent(x -> sb.append(x ? " [ALTERNATES]" : ""));
         this.isFull().ifPresent(x -> sb.append(x ? " [FULL]" : " [AVAILABLE]"));
 
         if (this.getEnrollment().isPresent() || this.getMaxEnrollment().isPresent()) {
@@ -282,7 +281,6 @@ public class Section implements Diffable<Section> {
         delta.addValueIfChanged(PropertyType.IS_CANCELLED, this.cancelled, that.cancelled);
 
         delta.addValueIfChanged(PropertyType.IS_ONLINE, this.online, that.online);
-        delta.addValueIfChanged(PropertyType.IS_ALTERNATING, this.alternating, that.alternating);
 
         // Add added notes.
         that.notes.stream()
@@ -298,7 +296,7 @@ public class Section implements Diffable<Section> {
         this.oneTimePeriods.stream()
                 .filter(x -> that.oneTimePeriods.stream()
                         .noneMatch(
-                                y -> x.getTerm().equals(y.getTerm()) &&
+                                y -> x.getTerm().temporallyEquals(y.getTerm()) &&
                                         Objects.equals(x.getDateTimeRange(), y.getDateTimeRange())
                         )
                 )
@@ -308,7 +306,7 @@ public class Section implements Diffable<Section> {
         that.oneTimePeriods.stream()
                 .filter(x -> this.oneTimePeriods.stream()
                         .noneMatch(
-                                y -> x.getTerm().equals(y.getTerm()) &&
+                                y -> x.getTerm().temporallyEquals(y.getTerm()) &&
                                         Objects.equals(x.getDateTimeRange(), y.getDateTimeRange())
                         )
                 ).forEach(x -> delta.addAdded(PropertyType.ONE_TIME_PERIOD, x));
@@ -316,7 +314,7 @@ public class Section implements Diffable<Section> {
         // Find changed one-time periods.
         for (OneTimePeriod thisOtp : this.oneTimePeriods) {
             for (OneTimePeriod thatOtp : that.oneTimePeriods) {
-                boolean cond = thisOtp.getTerm().equals(thatOtp.getTerm()) &&
+                boolean cond = thisOtp.getTerm().temporallyEquals(thatOtp.getTerm()) &&
                         thisOtp.getDateTimeRange().equals(thatOtp.getDateTimeRange());
                 if (cond) {
                     if (!thisOtp.equals(thatOtp))
@@ -330,7 +328,7 @@ public class Section implements Diffable<Section> {
         this.repeatingPeriods.stream()
                 .filter(x -> that.repeatingPeriods.stream()
                         .noneMatch(
-                                y -> x.getTerm().equals(y.getTerm()) &&
+                                y -> x.getTerm().temporallyEquals(y.getTerm()) &&
                                         x.getDayTimeRange().equals(y.getDayTimeRange())
                         )
                 ).forEach(x -> delta.addRemoved(PropertyType.REPEATING_PERIOD, x));
@@ -339,7 +337,7 @@ public class Section implements Diffable<Section> {
         that.repeatingPeriods.stream()
                 .filter(x -> this.repeatingPeriods.stream()
                         .noneMatch(
-                                y -> x.getTerm().equals(y.getTerm()) &&
+                                y -> x.getTerm().temporallyEquals(y.getTerm()) &&
                                         x.getDayTimeRange().equals(y.getDayTimeRange())
                         )
                 ).forEach(x -> delta.addAdded(PropertyType.REPEATING_PERIOD, x));
@@ -347,7 +345,7 @@ public class Section implements Diffable<Section> {
         // Find changed repeating periods.
         for (RepeatingPeriod thisRp : this.repeatingPeriods)
             for (RepeatingPeriod thatRp : that.repeatingPeriods) {
-                boolean cond = thisRp.getTerm().equals(thatRp.getTerm()) &&
+                boolean cond = thisRp.getTerm().temporallyEquals(thatRp.getTerm()) &&
                         thisRp.getDayTimeRange().equals(thatRp.getDayTimeRange());
                 if (cond) {
                     if (!thisRp.equals(thatRp))

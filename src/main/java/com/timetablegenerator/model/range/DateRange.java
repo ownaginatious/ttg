@@ -2,18 +2,12 @@ package com.timetablegenerator.model.range;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.timetablegenerator.serializer.jackson.LocalDateSerializer;
 import lombok.*;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -24,26 +18,7 @@ public class DateRange implements Comparable<DateRange> {
     private static final String START = "startDate";
     private static final String END = "endDate";
 
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-    @SuppressWarnings("WeakerAccess")
-    public static class LocalDateSerializer extends JsonSerializer<LocalDate> {
-
-        @Override
-        public void serialize(LocalDate localDate, JsonGenerator jsonGenerator,
-                              SerializerProvider serializerProvider) throws IOException {
-            jsonGenerator.writeString(localDate.toString());
-        }
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public static class LocalDateDeserializer extends JsonDeserializer<LocalDate> {
-
-        @Override
-        public LocalDate deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-            return LocalDate.parse(p.getText(), DATE_FORMAT);
-        }
-    }
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("uuuu-MM-dd");
 
     private final LocalDate startDate;
     private final LocalDate endDate;
@@ -60,15 +35,15 @@ public class DateRange implements Comparable<DateRange> {
         return new DateRange(startDate, endDate);
     }
 
-    @JsonSerialize(using = DateRange.LocalDateSerializer.class)
-    @JsonDeserialize(using = DateRange.LocalDateDeserializer.class)
+    @JsonSerialize(using = LocalDateSerializer.Serializer.class)
+    @JsonDeserialize(using = LocalDateSerializer.Deserializer.class)
     @JsonProperty(START)
     public LocalDate getStartDate(){
         return this.startDate;
     }
 
-    @JsonSerialize(using = DateRange.LocalDateSerializer.class)
-    @JsonDeserialize(using = DateRange.LocalDateDeserializer.class)
+    @JsonSerialize(using = LocalDateSerializer.Serializer.class)
+    @JsonDeserialize(using = LocalDateSerializer.Deserializer.class)
     @JsonProperty(END)
     public LocalDate getEndDate(){
         return this.endDate;
