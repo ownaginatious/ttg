@@ -146,7 +146,7 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
 
     public StructureDelta findDifferences(OneTimePeriod that) {
 
-        if (this.getTerm() != that.getTerm() || !Objects.equals(this.dateTimeRange, that.dateTimeRange)) {
+        if (!this.getTerm().temporallyEquals(that.getTerm()) || !Objects.equals(this.dateTimeRange, that.dateTimeRange)) {
             throw new IllegalArgumentException(
                     String.format("Cannot compare temporally unequal one-time periods: (%s) and (%s)",
                             this.getDeltaId(), that.getDeltaId()));
@@ -156,5 +156,10 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
         this.savePeriodDifferences(delta, that);
 
         return delta;
+    }
+
+    public boolean temporallyEquals(OneTimePeriod that) {
+        return this.getTerm().temporallyEquals(that.getTerm()) &&
+                this.dateTimeRange.equals(that.dateTimeRange);
     }
 }

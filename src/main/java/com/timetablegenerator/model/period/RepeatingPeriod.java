@@ -117,7 +117,7 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
 
     public StructureDelta findDifferences(RepeatingPeriod that) {
 
-        if (this.getTerm() != that.getTerm() || !Objects.equals(this.dayTimeRange, that.dayTimeRange)) {
+        if (!this.getTerm().temporallyEquals(that.getTerm()) || !Objects.equals(this.dayTimeRange, that.dayTimeRange)) {
             throw new IllegalArgumentException(
                     String.format("Cannot compare temporally unequal repeating periods: (%s) and (%s)",
                             this.getDeltaId(), that.getDeltaId()));
@@ -127,6 +127,11 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
         this.savePeriodDifferences(delta, that);
 
         return delta;
+    }
+
+    public boolean temporallyEquals(RepeatingPeriod that) {
+        return this.getTerm().temporallyEquals(that.getTerm()) &&
+                this.dayTimeRange.equals(that.dayTimeRange);
     }
 
     @Override

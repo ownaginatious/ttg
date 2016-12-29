@@ -67,7 +67,6 @@ public abstract class Period {
         return this;
     }
 
-    @JsonProperty("supervisors")
     public List<String> getNotes(){
         return Collections.unmodifiableList(this.notes);
     }

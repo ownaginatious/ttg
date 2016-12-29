@@ -294,29 +294,18 @@ public class Section implements Diffable<Section> {
 
         // Find removed one-time periods.
         this.oneTimePeriods.stream()
-                .filter(x -> that.oneTimePeriods.stream()
-                        .noneMatch(
-                                y -> x.getTerm().temporallyEquals(y.getTerm()) &&
-                                        Objects.equals(x.getDateTimeRange(), y.getDateTimeRange())
-                        )
-                )
+                .filter(x -> that.oneTimePeriods.stream().noneMatch(x::temporallyEquals))
                 .forEach(x -> delta.addRemoved(PropertyType.ONE_TIME_PERIOD, x));
 
         // Find added one-time periods.
         that.oneTimePeriods.stream()
-                .filter(x -> this.oneTimePeriods.stream()
-                        .noneMatch(
-                                y -> x.getTerm().temporallyEquals(y.getTerm()) &&
-                                        Objects.equals(x.getDateTimeRange(), y.getDateTimeRange())
-                        )
+                .filter(x -> this.oneTimePeriods.stream().noneMatch(x::temporallyEquals)
                 ).forEach(x -> delta.addAdded(PropertyType.ONE_TIME_PERIOD, x));
 
         // Find changed one-time periods.
         for (OneTimePeriod thisOtp : this.oneTimePeriods) {
             for (OneTimePeriod thatOtp : that.oneTimePeriods) {
-                boolean cond = thisOtp.getTerm().temporallyEquals(thatOtp.getTerm()) &&
-                        thisOtp.getDateTimeRange().equals(thatOtp.getDateTimeRange());
-                if (cond) {
+                if (thisOtp.temporallyEquals(thatOtp)) {
                     if (!thisOtp.equals(thatOtp))
                         delta.addSubstructureChange(thisOtp.findDifferences(thatOtp));
                     break;
@@ -326,28 +315,18 @@ public class Section implements Diffable<Section> {
 
         // Find removed repeating periods.
         this.repeatingPeriods.stream()
-                .filter(x -> that.repeatingPeriods.stream()
-                        .noneMatch(
-                                y -> x.getTerm().temporallyEquals(y.getTerm()) &&
-                                        x.getDayTimeRange().equals(y.getDayTimeRange())
-                        )
-                ).forEach(x -> delta.addRemoved(PropertyType.REPEATING_PERIOD, x));
+                .filter(x -> that.repeatingPeriods.stream().noneMatch(x::temporallyEquals)).
+                forEach(x -> delta.addRemoved(PropertyType.REPEATING_PERIOD, x));
 
         // Find added repeating periods.
         that.repeatingPeriods.stream()
-                .filter(x -> this.repeatingPeriods.stream()
-                        .noneMatch(
-                                y -> x.getTerm().temporallyEquals(y.getTerm()) &&
-                                        x.getDayTimeRange().equals(y.getDayTimeRange())
-                        )
-                ).forEach(x -> delta.addAdded(PropertyType.REPEATING_PERIOD, x));
+                .filter(x -> this.repeatingPeriods.stream().noneMatch(x::temporallyEquals))
+                .forEach(x -> delta.addAdded(PropertyType.REPEATING_PERIOD, x));
 
         // Find changed repeating periods.
         for (RepeatingPeriod thisRp : this.repeatingPeriods)
             for (RepeatingPeriod thatRp : that.repeatingPeriods) {
-                boolean cond = thisRp.getTerm().temporallyEquals(thatRp.getTerm()) &&
-                        thisRp.getDayTimeRange().equals(thatRp.getDayTimeRange());
-                if (cond) {
+                if (thisRp.temporallyEquals(thatRp)) {
                     if (!thisRp.equals(thatRp))
                         delta.addSubstructureChange(thisRp.findDifferences(thatRp));
                     break;
