@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.timetablegenerator.model.period.Period;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -30,16 +31,8 @@ class PeriodSerializer {
         period.addSupervisors(this.supervisors);
         period.addNotes(this.notes);
 
-        if (this.campus != null) {
-            period.setCampus(this.campus);
-        }
-
-        if (this.room != null) {
-            period.setCampus(this.room);
-        }
-
-        if (this.online != null) {
-            period.setOnline(this.online);
-        }
+        Optional.ofNullable(this.campus).ifPresent(period::setCampus);
+        Optional.ofNullable(this.room).ifPresent(period::setRoom);
+        Optional.ofNullable(this.online).ifPresent(period::setOnline);
     }
 }

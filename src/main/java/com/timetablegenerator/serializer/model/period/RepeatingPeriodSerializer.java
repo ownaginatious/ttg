@@ -1,16 +1,14 @@
 package com.timetablegenerator.serializer.model.period;
 
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.timetablegenerator.model.School;
-import com.timetablegenerator.model.Term;
 import com.timetablegenerator.model.period.RepeatingPeriod;
 import com.timetablegenerator.model.range.DateRange;
 import com.timetablegenerator.model.range.DayTimeRange;
 import com.timetablegenerator.serializer.model.Serializer;
+import com.timetablegenerator.serializer.model.SerializerContext;
 
-import java.util.Map;
+import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RepeatingPeriodSerializer extends PeriodSerializer implements Serializer<RepeatingPeriod> {
@@ -20,25 +18,23 @@ public class RepeatingPeriodSerializer extends PeriodSerializer implements Seria
     @JsonProperty("activeDates") private DateRange activeDateRange = null;
 
     @Override
-    public void fromInstance(RepeatingPeriod instance){
+    public Serializer<RepeatingPeriod> fromInstance(RepeatingPeriod instance){
         super.fromInstance(instance);
         this.termId = instance.getTerm().getUniqueId();
         this.dayTimeRange = instance.getDayTimeRange().orElse(null);
         this.activeDateRange = instance.getActiveDateRange().orElse(null);
+        return this;
     }
 
     @Override
-    public RepeatingPeriod toInstance(School school, Map<String, Term> terms){
+    public RepeatingPeriod toInstance(SerializerContext context){
 
-        RepeatingPeriod instance = RepeatingPeriod.of(terms.get(this.termId));
+        RepeatingPeriod instance = RepeatingPeriod.of(context.getTerm(this.termId));
         super.populateInstance(instance);
 
-        if (this.dayTimeRange != null){
-            instance.setDayTimeRange(this.dayTimeRange);
-        }
-        if (this.activeDateRange != null){
-            instance.setActiveDateRange(this.activeDateRange);
-        }
+        Optional.ofNullable(this.dayTimeRange).ifPresent(instance::setDayTimeRange);
+        Optional.ofNullable(this.activeDateRange).ifPresent(instance::setActiveDateRange);
+
         return instance;
     }
 }

@@ -2,13 +2,12 @@ package com.timetablegenerator.serializer.model.period;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.timetablegenerator.model.School;
-import com.timetablegenerator.model.Term;
 import com.timetablegenerator.model.period.OneTimePeriod;
 import com.timetablegenerator.model.range.DateTimeRange;
 import com.timetablegenerator.serializer.model.Serializer;
+import com.timetablegenerator.serializer.model.SerializerContext;
 
-import java.util.Map;
+import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class OneTimePeriodSerializer extends PeriodSerializer implements Serializer<OneTimePeriod> {
@@ -16,22 +15,24 @@ public class OneTimePeriodSerializer extends PeriodSerializer implements Seriali
     @JsonProperty("term") private String termId = null;
     @JsonProperty("times") private DateTimeRange dateTimeRange = null;
 
+
     @Override
-    public void fromInstance(OneTimePeriod instance){
+    public Serializer<OneTimePeriod> fromInstance(OneTimePeriod instance){
         super.fromInstance(instance);
         this.termId = instance.getTerm().getUniqueId();
         this.dateTimeRange = instance.getDateTimeRange().orElse(null);
+        return this;
     }
 
-    @Override
-    public OneTimePeriod toInstance(School school, Map<String, Term> terms){
 
-        OneTimePeriod instance = OneTimePeriod.of(terms.get(this.termId));
+    @Override
+    public OneTimePeriod toInstance(SerializerContext context){
+
+        OneTimePeriod instance = OneTimePeriod.of(context.getTerm(this.termId));
         super.populateInstance(instance);
 
-        if (this.dateTimeRange != null){
-            instance.setDateTimeRange(this.dateTimeRange);
-        }
+        Optional.ofNullable(this.dateTimeRange).ifPresent(instance::setDateTimeRange);
+
         return instance;
     }
 }

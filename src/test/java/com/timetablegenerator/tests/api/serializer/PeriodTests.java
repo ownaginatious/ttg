@@ -10,6 +10,7 @@ import com.timetablegenerator.model.period.RepeatingPeriod;
 import com.timetablegenerator.model.range.DateRange;
 import com.timetablegenerator.model.range.DateTimeRange;
 import com.timetablegenerator.model.range.DayTimeRange;
+import com.timetablegenerator.serializer.model.SerializerContext;
 import com.timetablegenerator.serializer.model.period.OneTimePeriodSerializer;
 import com.timetablegenerator.serializer.model.period.RepeatingPeriodSerializer;
 import org.junit.Before;
@@ -20,8 +21,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -33,15 +32,15 @@ public class PeriodTests {
     private OneTimePeriod otp;
 
     private Term term_fall = TermDefinition.builder("fall", "Fall", 1).build().createForYear(2016);
-    private Map<String, Term> terms = new HashMap<>();
-    private School school = School.builder("school_id", "school_name").build();
+    private SerializerContext context;
 
     @Before
     public void setUp(){
         this.objectMapper = new ObjectMapper().configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
         this.rp = RepeatingPeriod.of(this.term_fall);
         this.otp = OneTimePeriod.of(this.term_fall);
-        this.terms.put(this.term_fall.getUniqueId(), this.term_fall);
+        this.context = SerializerContext.of(School.builder("id", "name").build(),
+                new Term[]{this.term_fall});
     }
 
     @Test
@@ -95,7 +94,7 @@ public class PeriodTests {
                 "\"activeDates\":{\"startDate\":\"-999999999-01-01\",\"endDate\":\"+999999999-12-31\"}}";
 
         RepeatingPeriodSerializer serializer = this.objectMapper.readValue(raw, RepeatingPeriodSerializer.class);
-        RepeatingPeriod actual = serializer.toInstance(this.school, this.terms);
+        RepeatingPeriod actual = serializer.toInstance(this.context);
 
         assertEquals(this.rp, actual);
     }
@@ -113,7 +112,7 @@ public class PeriodTests {
                 "\"endDateTime\":\"+999999999-12-31T23:59\"}}";
 
         OneTimePeriodSerializer serializer = this.objectMapper.readValue(raw, OneTimePeriodSerializer.class);
-        OneTimePeriod actual = serializer.toInstance(this.school, this.terms);
+        OneTimePeriod actual = serializer.toInstance(this.context);
 
         assertEquals(this.otp, actual);
     }
