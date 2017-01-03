@@ -11,6 +11,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
 import static org.hamcrest.Matchers.*;
 
 import static org.junit.Assert.*;
@@ -32,7 +34,7 @@ public class SectionTypeTests {
     @Before
     public void setUp() {
         school = School.builder(TestUtils.getRandomString(10),
-                                TestUtils.getRandomString(20))
+                TestUtils.getRandomString(20))
                 .withSection("A", "Section Type A")
                 .withSection("B", "Section Type B")
                 .withSection("C", "Section Type C")
@@ -52,7 +54,7 @@ public class SectionTypeTests {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void duplicateSections(){
+    public void duplicateSections() {
         Section s1 = Section.of("abc");
         Section s2 = Section.of("abc");
         this.st.addSection(s1);
@@ -60,15 +62,15 @@ public class SectionTypeTests {
     }
 
     @Test
-    public void keys(){
+    public void values() {
         Set<String> ids = new HashSet<>(
                 Arrays.asList("abc", "def", "hij", "lmno"));
         ids.forEach(x -> this.st.addSection(Section.of(x)));
-        assertEquals(ids, this.st.getSectionKeys());
+        assertEquals(ids, this.st.getSections().stream().map(Section::getId).collect(Collectors.toSet()));
     }
 
     @Test
-    public void getSection(){
+    public void getSection() {
         Section s1 = Section.of("abc");
         Section s2 = Section.of("def");
 
@@ -80,7 +82,7 @@ public class SectionTypeTests {
     }
 
     @Test
-    public void compare(){
+    public void compare() {
 
         SectionType st1 = SectionType.of(school, "A");
         SectionType st2 = SectionType.of(school, "C");
@@ -105,12 +107,12 @@ public class SectionTypeTests {
     }
 
     @Test
-    public void string(){
+    public void string() {
         Section s1 = Section.of("abc")
                 .addNotes("Note 1", "Note 2")
                 .addPeriod(OneTimePeriod.of(this.term_fall)
-                                        .setCampus("Campus x")
-                                        .setRoom("Room 234"));
+                        .setCampus("Campus x")
+                        .setRoom("Room 234"));
         Section s2 = Section.of("def");
         this.st.addSection(s1).addSection(s2);
         assertEquals(
@@ -122,25 +124,25 @@ public class SectionTypeTests {
     }
 
     @Test
-    public void emptySectionString(){
+    public void emptySectionString() {
         assertEquals(String.format("%s sections:\n\n%s%s",
                 this.st.getName(), I, "NONE LISTED"), this.st.toString());
     }
 
     @Test
-    public void deltaId(){
+    public void deltaId() {
         assertEquals(this.st.getCode(), this.st.getDeltaId());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void deltaUnrelated(){
+    public void deltaUnrelated() {
         SectionType st1 = SectionType.of(school, "A");
         SectionType st2 = SectionType.of(school, "C");
         st1.findDifferences(st2);
     }
 
     @Test
-    public void delta(){
+    public void delta() {
 
         Section sa1 = Section.of("a");
         Section sa2 = Section.of("c").setCancelled(true);
@@ -156,9 +158,9 @@ public class SectionTypeTests {
 
         assertEquals(
                 StructureDelta.of(PropertyType.SECTION_TYPE, st1)
-                    .addAdded(PropertyType.SECTION, sb1)
-                    .addRemoved(PropertyType.SECTION, sa1)
-                    .addSubstructureChange(StructureDelta.of(PropertyType.SECTION, sa2)
+                        .addAdded(PropertyType.SECTION, sb1)
+                        .addRemoved(PropertyType.SECTION, sa1)
+                        .addSubstructureChange(StructureDelta.of(PropertyType.SECTION, sa2)
                                 .addAdded(PropertyType.NOTE, "Note")
                                 .addAdded(PropertyType.SERIAL_NUMBER, "testing")
                                 .addValueIfChanged(PropertyType.IS_CANCELLED, true, false)),

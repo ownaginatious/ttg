@@ -9,12 +9,11 @@ import com.timetablegenerator.serializer.model.SerializerContext;
 
 import java.util.Optional;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class OneTimePeriodSerializer extends PeriodSerializer implements Serializer<OneTimePeriod> {
 
     @JsonProperty("term") private String termId = null;
     @JsonProperty("times") private DateTimeRange dateTimeRange = null;
-
 
     @Override
     public Serializer<OneTimePeriod> fromInstance(OneTimePeriod instance){
@@ -23,7 +22,6 @@ public class OneTimePeriodSerializer extends PeriodSerializer implements Seriali
         this.dateTimeRange = instance.getDateTimeRange().orElse(null);
         return this;
     }
-
 
     @Override
     public OneTimePeriod toInstance(SerializerContext context){

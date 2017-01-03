@@ -23,7 +23,7 @@ public class Section implements Diffable<Section> {
 
     @NonNull @Setter private String serialNumber = null;
     @NonNull @Setter private String groupId = null;
-    @NonNull @Getter private final String sectionId;
+    @NonNull @Getter private final String id;
 
     private Boolean waitingList;
 
@@ -35,8 +35,8 @@ public class Section implements Diffable<Section> {
     private Integer enrollment;
     private Integer maxEnrollment;
 
-    private final Set<RepeatingPeriod> repeatingPeriods = new TreeSet<>();
-    private final Set<OneTimePeriod> oneTimePeriods = new TreeSet<>();
+    private final Map<String, RepeatingPeriod> repeatingPeriods = new HashMap<>();
+    private final Map<String, OneTimePeriod> oneTimePeriods = new HashMap<>();
 
     private final List<String> notes = new ArrayList<>();
 
@@ -79,6 +79,7 @@ public class Section implements Diffable<Section> {
 
         if (!this.waitingList) {
             this.waiting = null;
+            this.maxWaiting = null;
         }
         return this;
     }
@@ -126,10 +127,12 @@ public class Section implements Diffable<Section> {
         if (!this.full) {
             this.enrollment = null;
         } else {
-            if (this.maxEnrollment != null)
+            if (this.maxEnrollment != null) {
                 this.enrollment = this.maxEnrollment;
-            if (this.maxEnrollment == null && this.enrollment != null)
+            }
+            if (this.maxEnrollment == null && this.enrollment != null) {
                 this.maxEnrollment = this.enrollment;
+            }
         }
 
         return this;
@@ -183,21 +186,27 @@ public class Section implements Diffable<Section> {
     }
 
     public Section addPeriod(OneTimePeriod period){
-        this.oneTimePeriods.add(period);
+        if (this.oneTimePeriods.putIfAbsent(period.getUniqueId(), period) != null) {
+            throw new IllegalArgumentException("A one-time period '" + period.getUniqueId()
+                    + "' is already part of this section.");
+        }
         return this;
     }
 
     public Section addPeriod(RepeatingPeriod period){
-        this.repeatingPeriods.add(period);
+        if (this.repeatingPeriods.putIfAbsent(period.getUniqueId(), period) != null) {
+            throw new IllegalArgumentException("A repeating period '" + period.getUniqueId()
+                    + "' is already part of this section.");
+        }
         return this;
     }
 
     public Collection<RepeatingPeriod> getRepeatingPeriods() {
-        return new TreeSet<>(this.repeatingPeriods);
+        return new TreeSet<>(this.repeatingPeriods.values());
     }
 
     public Collection<OneTimePeriod> getOneTimePeriods() {
-        return new TreeSet<>(this.oneTimePeriods);
+        return new TreeSet<>(this.oneTimePeriods.values());
     }
 
     @Override
@@ -205,7 +214,7 @@ public class Section implements Diffable<Section> {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append(this.sectionId);
+        sb.append(this.id);
 
         this.getSerialNumber().ifPresent(x -> sb.append(" {").append(this.serialNumber).append('}'));
         this.isCancelled().ifPresent(x -> sb.append(x ? " [CANCELLED]" : ""));
@@ -236,13 +245,13 @@ public class Section implements Diffable<Section> {
 
         if (!this.repeatingPeriods.isEmpty()) {
             sb.append("\n\n").append(I).append("Repeating periods:");
-            this.repeatingPeriods.forEach(x -> sb.append("\n\n")
+            this.repeatingPeriods.values().stream().sorted().forEach(x -> sb.append("\n\n")
                     .append(StringUtilities.indent(2, x.toString())));
         }
 
         if (!this.oneTimePeriods.isEmpty()) {
             sb.append("\n\n").append(I).append("One time periods:");
-            this.oneTimePeriods.forEach(x -> sb.append("\n\n")
+            this.oneTimePeriods.values().stream().sorted().forEach(x -> sb.append("\n\n")
                     .append(StringUtilities.indent(2, x.toString())));
         }
 
@@ -251,15 +260,15 @@ public class Section implements Diffable<Section> {
 
     @Override
     public String getDeltaId(){
-        return this.getSectionId();
+        return this.getId();
     }
 
     @Override
-    public StructureDelta findDifferences(Section that) {
+    public StructureDelta findDifferences(@NonNull Section that) {
 
-        if (!this.sectionId.equals(that.sectionId)) {
-            throw new IllegalArgumentException("Sections are not related: \"" + this.sectionId
-                    + "\" and \"" + that.sectionId + "\"");
+        if (!this.id.equals(that.id)) {
+            throw new IllegalArgumentException("Sections are not related: \"" + this.id
+                    + "\" and \"" + that.id + "\"");
         }
 
         final StructureDelta delta = StructureDelta.of(PropertyType.SECTION, this);
@@ -293,53 +302,56 @@ public class Section implements Diffable<Section> {
                 .forEach(x -> delta.addRemoved(PropertyType.NOTE, x));
 
         // Find removed one-time periods.
-        this.oneTimePeriods.stream()
-                .filter(x -> that.oneTimePeriods.stream().noneMatch(x::temporallyEquals))
-                .forEach(x -> delta.addRemoved(PropertyType.ONE_TIME_PERIOD, x));
+        this.oneTimePeriods.entrySet().stream()
+                .filter(x -> !that.oneTimePeriods.containsKey(x.getKey()))
+                .forEach(x -> delta.addRemoved(PropertyType.ONE_TIME_PERIOD, x.getValue()));
 
         // Find added one-time periods.
-        that.oneTimePeriods.stream()
-                .filter(x -> this.oneTimePeriods.stream().noneMatch(x::temporallyEquals)
-                ).forEach(x -> delta.addAdded(PropertyType.ONE_TIME_PERIOD, x));
+        that.oneTimePeriods.entrySet().stream()
+                .filter(x -> !this.oneTimePeriods.containsKey(x.getKey()))
+                .forEach(x -> delta.addAdded(PropertyType.ONE_TIME_PERIOD, x.getValue()));
 
         // Find changed one-time periods.
-        for (OneTimePeriod thisOtp : this.oneTimePeriods) {
-            for (OneTimePeriod thatOtp : that.oneTimePeriods) {
-                if (thisOtp.temporallyEquals(thatOtp)) {
-                    if (!thisOtp.equals(thatOtp))
-                        delta.addSubstructureChange(thisOtp.findDifferences(thatOtp));
-                    break;
-                }
+        Set<String> samePeriods = new HashSet<>(this.oneTimePeriods.keySet());
+        samePeriods.retainAll(that.oneTimePeriods.keySet());
+
+        for (String key : samePeriods) {
+            OneTimePeriod thisOtp = this.oneTimePeriods.get(key);
+            OneTimePeriod thatOtp = that.oneTimePeriods.get(key);
+            if (!thisOtp.equals(thatOtp)) {
+                delta.addSubstructureChange(thisOtp.findDifferences(thatOtp));
             }
         }
 
         // Find removed repeating periods.
-        this.repeatingPeriods.stream()
-                .filter(x -> that.repeatingPeriods.stream().noneMatch(x::temporallyEquals)).
-                forEach(x -> delta.addRemoved(PropertyType.REPEATING_PERIOD, x));
+        this.repeatingPeriods.entrySet().stream()
+                .filter(x -> !that.repeatingPeriods.containsKey(x.getKey()))
+                .forEach(x -> delta.addRemoved(PropertyType.REPEATING_PERIOD, x.getValue()));
 
         // Find added repeating periods.
-        that.repeatingPeriods.stream()
-                .filter(x -> this.repeatingPeriods.stream().noneMatch(x::temporallyEquals))
-                .forEach(x -> delta.addAdded(PropertyType.REPEATING_PERIOD, x));
+        that.repeatingPeriods.entrySet().stream()
+                .filter(x -> !this.repeatingPeriods.containsKey(x.getKey()))
+                .forEach(x -> delta.addAdded(PropertyType.REPEATING_PERIOD, x.getValue()));
 
         // Find changed repeating periods.
-        for (RepeatingPeriod thisRp : this.repeatingPeriods)
-            for (RepeatingPeriod thatRp : that.repeatingPeriods) {
-                if (thisRp.temporallyEquals(thatRp)) {
-                    if (!thisRp.equals(thatRp))
-                        delta.addSubstructureChange(thisRp.findDifferences(thatRp));
-                    break;
-                }
+        samePeriods = new HashSet<>(this.repeatingPeriods.keySet());
+        samePeriods.retainAll(that.repeatingPeriods.keySet());
+
+        for (String key : samePeriods) {
+            RepeatingPeriod thisRp = this.repeatingPeriods.get(key);
+            RepeatingPeriod thatRp = that.repeatingPeriods.get(key);
+            if (!thisRp.equals(thatRp)) {
+                delta.addSubstructureChange(thisRp.findDifferences(thatRp));
             }
+        }
 
         return delta;
     }
 
     @Override
     public int compareTo(@Nonnull Section that) {
-        if (!this.sectionId.equals(that.sectionId)){
-            return this.sectionId.compareTo(that.sectionId);
+        if (!this.id.equals(that.id)){
+            return this.id.compareTo(that.id);
         }
         // Some standard classes will use this instead of .equals() so ensure non-zero if not equal.
         return this.equals(that) ? 0 : -1;

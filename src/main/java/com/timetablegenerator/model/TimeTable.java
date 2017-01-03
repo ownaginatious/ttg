@@ -78,7 +78,7 @@ public class TimeTable implements Diffable<TimeTable> {
     }
 
     @Override
-    public StructureDelta findDifferences(TimeTable that) {
+    public StructureDelta findDifferences(@NonNull TimeTable that) {
 
         if (!this.term.equals(that.term)) {
             throw new IllegalArgumentException("Timetables are not from the same term: \""

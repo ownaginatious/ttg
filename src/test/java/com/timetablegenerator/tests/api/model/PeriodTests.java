@@ -391,20 +391,20 @@ public class PeriodTests {
     @Test
     public void oneTimePeriodString(){
 
-        assertEquals("TBA [Term: Fall (fall) 2016]", otp1.toString());
+        assertEquals("TBA -> TBA [Term: Fall (fall) 2016]", otp1.toString());
 
         // With a campus.
         otp1.setCampus("Test Campus");
-        assertEquals("TBA [Term: Fall (fall) 2016] (campus: Test Campus)", otp1.toString());
+        assertEquals("TBA -> TBA [Term: Fall (fall) 2016] (campus: Test Campus)", otp1.toString());
 
         // With a room.
         setUp();
         otp1.setRoom("Test Room");
-        assertEquals("TBA [Term: Fall (fall) 2016] (room: Test Room)", otp1.toString());
+        assertEquals("TBA -> TBA [Term: Fall (fall) 2016] (room: Test Room)", otp1.toString());
 
         // With a campus and room.
         otp1.setCampus("Test Campus");
-        assertEquals("TBA [Term: Fall (fall) 2016] " +
+        assertEquals("TBA -> TBA [Term: Fall (fall) 2016] " +
                 "(campus: Test Campus, room: Test Room)", otp1.toString());
 
         // With a day, start dayTimeRange, end dayTimeRange, and day of week.

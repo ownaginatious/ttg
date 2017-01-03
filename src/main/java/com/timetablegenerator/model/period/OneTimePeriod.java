@@ -48,7 +48,7 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
         if (this.dateTimeRange != null) {
             sb.append(this.dateTimeRange);
         } else {
-            sb.append("TBA");
+            sb.append("TBA -> TBA");
         }
 
         sb.append(" [Term: ").append(this.getTerm()).append(']');
@@ -99,13 +99,18 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
     }
 
     @Override
-    public String getDeltaId() {
+    public String getUniqueId() {
         String id = this.getTerm().getUniqueId();
         if (this.dateTimeRange != null) {
             return id + "/" + this.dateTimeRange;
         } else {
             return id + "/TBA";
         }
+    }
+
+    @Override
+    public String getDeltaId() {
+        return this.getUniqueId();
     }
 
     @Override
@@ -156,10 +161,5 @@ public class OneTimePeriod extends Period implements Comparable<OneTimePeriod>, 
         this.savePeriodDifferences(delta, that);
 
         return delta;
-    }
-
-    public boolean temporallyEquals(OneTimePeriod that) {
-        return this.getTerm().temporallyEquals(that.getTerm()) &&
-                this.dateTimeRange.equals(that.dateTimeRange);
     }
 }

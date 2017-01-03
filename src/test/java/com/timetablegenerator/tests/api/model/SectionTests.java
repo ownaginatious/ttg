@@ -52,7 +52,7 @@ public class SectionTests {
         String sectionName = "some_section";
 
         Section section = Section.of(sectionName);
-        assertEquals(section.getSectionId(), sectionName);
+        assertEquals(section.getId(), sectionName);
     }
 
     @Test
@@ -285,12 +285,23 @@ public class SectionTests {
                 .setDateTimeRange(DateTimeRange.of(LocalDateTime.MIN, LocalDateTime.MAX));
 
         s1.addPeriod(p1);
-        s1.addPeriod(p1);
         s1.addPeriod(p2);
         s1.addPeriod(p3);
 
         assertEquals(new TreeSet<>(Collections.singletonList(p3)), s1.getOneTimePeriods());
         assertEquals(new TreeSet<>(Arrays.asList(p1, p2)), s1.getRepeatingPeriods());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void rejectDuplicateRepeatingPeriod() {
+        RepeatingPeriod rp = RepeatingPeriod.of(this.term_fall_first_quarter);
+        this.s1.addPeriod(rp).addPeriod(rp);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void rejectDuplicateOneTimePeriod() {
+        OneTimePeriod otp = OneTimePeriod.of(this.term_fall_first_quarter);
+        this.s1.addPeriod(otp).addPeriod(otp);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -443,18 +454,18 @@ public class SectionTests {
 
     @Test
     public void emptySectionString() {
-        assertEquals(s1.getSectionId(), s1.toString());
+        assertEquals(s1.getId(), s1.toString());
     }
 
     @Test
     public void sectionWithSerialString() {
         s1.setSerialNumber("Test Serial");
-        assertEquals(s1.getSectionId() + " {Test Serial}", s1.toString());
+        assertEquals(s1.getId() + " {Test Serial}", s1.toString());
     }
 
     @Test
     public void sectionCancelledString() {
-        String header = s1.getSectionId() + " {Test Serial}";
+        String header = s1.getId() + " {Test Serial}";
         s1.setSerialNumber("Test Serial");
         s1.setCancelled(true);
         assertEquals(header + " [CANCELLED]", s1.toString());
@@ -464,7 +475,7 @@ public class SectionTests {
 
     @Test
     public void sectionOnlineString() {
-        String header = s1.getSectionId() + " {Test Serial} [CANCELLED]";
+        String header = s1.getId() + " {Test Serial} [CANCELLED]";
         s1.setSerialNumber("Test Serial");
         s1.setCancelled(true);
         s1.setOnline(true);
@@ -475,7 +486,7 @@ public class SectionTests {
 
     @Test
     public void sectionFullString() {
-        String header = s1.getSectionId() + " {Test Serial} [CANCELLED]";
+        String header = s1.getId() + " {Test Serial} [CANCELLED]";
         s1.setSerialNumber("Test Serial");
         s1.setCancelled(true);
         s1.setFull(true);
@@ -486,7 +497,7 @@ public class SectionTests {
 
     @Test
     public void sectionEnrollmentString() {
-        String header = s1.getSectionId() + " {Test Serial} [CANCELLED] [ONLINE]";
+        String header = s1.getId() + " {Test Serial} [CANCELLED] [ONLINE]";
         s1.setSerialNumber("Test Serial");
         s1.setCancelled(true);
         s1.setEnrollment(3);
@@ -500,7 +511,7 @@ public class SectionTests {
 
     @Test
     public void sectionWaitingString() {
-        String header = s1.getSectionId()
+        String header = s1.getId()
                 + " {Test Serial} [CANCELLED] [ONLINE] [enrolled: 3/?]";
         s1.setSerialNumber("Test Serial");
         s1.setCancelled(true);
@@ -516,7 +527,7 @@ public class SectionTests {
 
     @Test
     public void sectionPeriodsString() {
-        String header = s1.getSectionId()
+        String header = s1.getId()
                 + " {Test Serial} [CANCELLED] [ONLINE] [enrolled: 3/?] [waiting: 100/100]";
         s1.setSerialNumber("Test Serial");
         s1.setCancelled(true);
@@ -578,7 +589,7 @@ public class SectionTests {
                 .setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX))
                 .addNotes("Test 1", "Test 2", "Test 3").addSupervisors("A Test");
 
-        String expected = s1.getSectionId() +
+        String expected = s1.getId() +
                 " {Test Serial} [CANCELLED] [ONLINE] [enrolled: 3/?] [waiting: 100/100]\n\n"
                 + I + "Notes:\n\n"
                 + I + I + "This is my note\n"

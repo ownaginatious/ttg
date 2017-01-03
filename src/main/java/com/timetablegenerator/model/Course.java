@@ -127,9 +127,14 @@ public class Course implements Diffable<Course> {
         return this.sectionTypes.containsKey(type) ? Optional.of(this.sectionTypes.get(type)) : Optional.empty();
     }
 
-    public Course addSection(String sectionTypeId, Section s) {
+    public Course addSection(@NonNull String sectionTypeId, @NonNull Section s) {
         SectionType st = sectionTypes.computeIfAbsent(sectionTypeId, x -> SectionType.of(this.school, x));
         st.addSection(s);
+        return this;
+    }
+
+    public Course addSections(@NonNull SectionType sectionType) {
+        sectionType.getSections().forEach(x -> this.addSection(sectionType.getCode(), x));
         return this;
     }
 
@@ -205,7 +210,7 @@ public class Course implements Diffable<Course> {
     }
 
     @Override
-    public StructureDelta findDifferences(Course that) {
+    public StructureDelta findDifferences(@NonNull Course that) {
 
         if (!this.getUniqueId().equals(that.getUniqueId()) || !Objects.equals(this.school, that.school)) {
             throw new IllegalArgumentException("Courses are not related: \"" + this.getUniqueId()

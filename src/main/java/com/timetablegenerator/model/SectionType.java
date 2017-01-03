@@ -21,20 +21,23 @@ public class SectionType implements Diffable<SectionType> {
 
     private final Map<String, Section> sections = new TreeMap<>();
 
-    private SectionType(@NonNull School school, @NonNull String type) {
+    private SectionType(@NonNull School school, @NonNull String code) {
         this.school = school;
-        this.code = type;
+        this.code = code;
         this.name = school.getSectionTypeName(this.code);
     }
 
-    public static SectionType of(@NonNull School school, @NonNull String type){
+    public static SectionType of(@NonNull School school, @NonNull String code){
         // Force check to ensure the code exists.
-        school.getSectionTypeName(type);
-        return new SectionType(school, type);
+        school.getSectionTypeName(code);
+        return new SectionType(school, code);
     }
 
-    public Set<String> getSectionKeys(){
-        return this.sections.keySet();
+    public Collection<Section> getSections(){
+        // TreeMap<>.values apparently doesn't have .equals(...) implemented,
+        // which can lead to false negatives when doing equality checks.
+        // Therefore, we wrap it in an array list to materialize the collection.
+        return new ArrayList<>(this.sections.values());
     }
 
     public Optional<Section> getSection(String sectionId) {
@@ -43,9 +46,9 @@ public class SectionType implements Diffable<SectionType> {
     }
 
     public SectionType addSection(@NonNull Section s) {
-        if (this.sections.putIfAbsent(s.getSectionId(), s) != null) {
+        if (this.sections.putIfAbsent(s.getId(), s) != null) {
             throw new IllegalStateException("Attempted to add the section of code \""
-                    + this.code + "\" with ID \"" + s.getSectionId() + "\" twice");
+                    + this.code + "\" with ID \"" + s.getId() + "\" twice");
         }
         return this;
     }
@@ -83,7 +86,7 @@ public class SectionType implements Diffable<SectionType> {
     }
 
     @Override
-    public StructureDelta findDifferences(SectionType that) {
+    public StructureDelta findDifferences(@NonNull SectionType that) {
 
         if (!this.code.equals(that.code)) {
             throw new IllegalArgumentException("Section types are not related: \"" + this.code

@@ -79,6 +79,8 @@ public abstract class Period {
         return Optional.ofNullable(this.campus);
     }
 
+    public abstract String getUniqueId();
+
     public abstract boolean isScheduled();
 
     void savePeriodDifferences(StructureDelta delta, Period that) {

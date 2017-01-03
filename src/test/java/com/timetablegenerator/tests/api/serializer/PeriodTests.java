@@ -2,6 +2,7 @@ package com.timetablegenerator.tests.api.serializer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.timetablegenerator.model.Department;
 import com.timetablegenerator.model.School;
 import com.timetablegenerator.model.Term;
 import com.timetablegenerator.model.TermDefinition;
@@ -35,12 +36,12 @@ public class PeriodTests {
     private SerializerContext context;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         this.objectMapper = new ObjectMapper().configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
         this.rp = RepeatingPeriod.of(this.term_fall);
         this.otp = OneTimePeriod.of(this.term_fall);
         this.context = SerializerContext.of(School.builder("id", "name").build(),
-                new Term[]{this.term_fall});
+                new Term[]{this.term_fall}, new Department[]{});
     }
 
     @Test
@@ -70,7 +71,7 @@ public class PeriodTests {
         OneTimePeriodSerializer serializer = new OneTimePeriodSerializer();
         serializer.fromInstance(this.otp);
 
-        String expected = "{\"supervisors\":[],\"notes\":[\"Note 1\",\"Note 2\"],\"campus\":\"Test Campus\"," +
+        String expected = "{\"notes\":[\"Note 1\",\"Note 2\"],\"campus\":\"Test Campus\"," +
                 "\"term\":\"2016/fall\"," +
                 "\"times\":{\"startDateTime\":\"-999999999-01-01T00:00\"," +
                 "\"endDateTime\":\"+999999999-12-31T23:59\"}}";

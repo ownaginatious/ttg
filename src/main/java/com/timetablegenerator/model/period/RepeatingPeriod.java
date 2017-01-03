@@ -106,13 +106,18 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
     }
 
     @Override
-    public String getDeltaId() {
+    public String getUniqueId() {
         String id = this.getTerm().getUniqueId();
         if (this.dayTimeRange != null) {
             return id + "/" + this.dayTimeRange;
         } else {
             return id + "/TBA";
         }
+    }
+
+    @Override
+    public String getDeltaId() {
+        return this.getUniqueId();
     }
 
     public StructureDelta findDifferences(RepeatingPeriod that) {
@@ -127,11 +132,6 @@ public class RepeatingPeriod extends Period implements Comparable<RepeatingPerio
         this.savePeriodDifferences(delta, that);
 
         return delta;
-    }
-
-    public boolean temporallyEquals(RepeatingPeriod that) {
-        return this.getTerm().temporallyEquals(that.getTerm()) &&
-                this.dayTimeRange.equals(that.dayTimeRange);
     }
 
     @Override

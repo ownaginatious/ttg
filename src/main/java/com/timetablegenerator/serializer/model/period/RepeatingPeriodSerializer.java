@@ -10,7 +10,7 @@ import com.timetablegenerator.serializer.model.SerializerContext;
 
 import java.util.Optional;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class RepeatingPeriodSerializer extends PeriodSerializer implements Serializer<RepeatingPeriod> {
 
     @JsonProperty("term") private String termId = null;
