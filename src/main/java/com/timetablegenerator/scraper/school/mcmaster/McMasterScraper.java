@@ -440,6 +440,9 @@ public class McMasterScraper extends Scraper {
                                     throw new IllegalArgumentException("Unknown term type \"" + termString + "\"");
                             }
 
+                            // Temporary fix for data entry error.
+                            currentSectionTitle = currentSectionTitle.replace("C05`-LEC(11218)", "C05-LEC(11218)");
+
                             Matcher m = SECTION_CODE_PATTERN.matcher(currentSectionTitle);
 
                             String currentSectionType;

@@ -15,12 +15,7 @@ import org.jsoup.nodes.Element;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -46,9 +41,10 @@ public class UniversityOfOttawaScraper extends Scraper {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final Pattern COURSE_CODE_PATTERN =
-            Pattern.compile("^(?<code>[A-Z]+\\s?[0-9]+\\s?[A-Z]*) (?<section>(?<variant>[A-Z]*)[0-9]*)( " +
-                    "\\((?<smonth>[A-Z][a-z]+) (?<sday>[0-9]+) - (?<emonth>[A-Z][a-z]+) (?<eday>[0-9]+)\\))?");
+    //TODO: Activate after refactor
+//    private static final Pattern COURSE_DATES_PATTERN =
+//            Pattern.compile("\\((?<smonth>[A-Z][a-z]+) (?<sday>[0-9]+) - (?<emonth>[A-Z][a-z]+) (?<eday>[0-9]+)\\)");
+
     private static final Pattern DAY_TIME_PATTERN =
             Pattern.compile("^(?<day>[A-Z][a-z]+) " +
                     "(?<shour>[0-9]{1,2}):(?<sminute>[0-9]{2}) - (?<ehour>[0-9]{1,2}):(?<eminute>[0-9]{2})$");
@@ -137,6 +133,20 @@ public class UniversityOfOttawaScraper extends Scraper {
         return tt;
     }
 
+    private String[] parseCourseCodes(String courseCodeString) {
+
+        courseCodeString = courseCodeString.trim();
+
+        String courseName = courseCodeString.substring(0, courseCodeString.lastIndexOf(" "));
+        String variant = null;
+        String section = courseCodeString.substring(courseCodeString.lastIndexOf(" ") + 1);
+
+        if (section.matches("^[A-Z]+[0-9]+")) {
+            variant = section.split("[0-9]+")[0];
+        }
+        return new String[]{courseName, variant, section};
+    }
+
     private void parseCourseData(Term term, Department department, Map<String, String> courseNameMap,
                                  Map<String, Course> courseMap, Element courseElement) {
 
@@ -149,14 +159,13 @@ public class UniversityOfOttawaScraper extends Scraper {
 
             String courseCodeString = rowIterator.next().select(".Section").text();
 
-            Matcher m = COURSE_CODE_PATTERN.matcher(courseCodeString);
+            // Remove the course date range information.
+            courseCodeString = courseCodeString.split("\\(")[0];
+            String[] courseCodes = this.parseCourseCodes(courseCodeString);
 
-            if (!m.find())
-                throw new IllegalArgumentException("Cannot parse course code from \"" + courseCodeString + "\"");
-
-            String courseCode = m.group("code");
-            String courseVariant = m.group("variant");
-            String sectionCode = m.group("section");
+            String courseCode = courseCodes[0];
+            String courseVariant = courseCodes[1];
+            String sectionCode = courseCodes[2];
 
             String courseName = courseNameMap.get(courseCode);
 
@@ -206,7 +215,7 @@ public class UniversityOfOttawaScraper extends Scraper {
 
                 if (!dayTimeString.equals(UNAVAILABLE)) {
 
-                    m = DAY_TIME_PATTERN.matcher(dayTimeString);
+                    Matcher m = DAY_TIME_PATTERN.matcher(dayTimeString);
 
                     if (!m.find())
                         throw new IllegalArgumentException("Cannot parse day time from \"" + dayTimeString + "\"");
