@@ -91,37 +91,14 @@ public class UniversityOfOttawaScraper extends Scraper {
                     .setFormParameter("ctl00$MainContentPlaceHolder$Basic_Button", "Search")
             ).run();
 
-            boolean hasMore;
+            // Parse the course data referenced by this page.
+            Element schedulingElements = Jsoup.parse(rr.nextGet(PRINT_ROOT).run().getResponseString());
 
-            Element responseElement;
-
-            Map<String, String> courseNameMap = new HashMap<>();
+            Map<String, String> courseNameMap = this.getCourseNames(rr);
             Map<String, Course> discoveredCourses = new HashMap<>();
 
-            while (true) {
-
-                responseElement = Jsoup.parse(rr.getResponseString());
-
-                hasMore = responseElement.select("a").stream().anyMatch(x -> x.text().equalsIgnoreCase("Next"));
-
-                responseElement.select("table.result-table > tbody > tr:not(.results-header)")
-                        .forEach(x -> courseNameMap.put(x.select(".CourseCode").text(), x.select(".CourseTitle").text()));
-
-                // Parse the course data referenced by this page.
-                Element schedulingElements = Jsoup.parse(rr.nextGet(PRINT_ROOT).run().getResponseString());
-
-                for (Element schedulingElement : schedulingElements.select("#main-content div.schedule")) {
-                    parseCourseData(term, d, courseNameMap, discoveredCourses, schedulingElement);
-                }
-
-                if (!hasMore) {
-                    break;
-                }
-
-                LOGGER.debug(" >> Getting more data for department " + d.getCode() + "...");
-
-                rr = addState(responseElement, rr.nextPost(RESULTS_ROOT)
-                        .setFormParameter("__EVENTTARGET", "ctl00$MainContentPlaceHolder$ctl05")).run();
+            for (Element schedulingElement : schedulingElements.select("#main-content div.schedule")) {
+                parseCourseData(term, d, courseNameMap, discoveredCourses, schedulingElement);
             }
 
             LOGGER.debug(" >> No more data for department " + d.getCode() + "!");
@@ -131,6 +108,35 @@ public class UniversityOfOttawaScraper extends Scraper {
         }
 
         return tt;
+    }
+
+    private Map<String, String> getCourseNames(RestResponse context) throws IOException {
+
+        LOGGER.debug("Retrieving course names for department...");
+
+        boolean hasMore;
+
+        Element responseElement;
+
+        Map<String, String> courseNameMap = new HashMap<>();
+
+        while (true) {
+
+            responseElement = Jsoup.parse(context.getResponseString());
+
+            hasMore = responseElement.select("a").stream().anyMatch(x -> x.text().equalsIgnoreCase("Next"));
+
+            responseElement.select("table.result-table > tbody > tr:not(.results-header)")
+                    .forEach(x -> courseNameMap.put(x.select(".CourseCode").text(), x.select(".CourseTitle").text()));
+
+            if (!hasMore) {
+                break;
+            }
+
+            context = addState(responseElement, context.nextPost(RESULTS_ROOT)
+                    .setFormParameter("__EVENTTARGET", "ctl00$MainContentPlaceHolder$ctl05")).run();
+        }
+        return courseNameMap;
     }
 
     private String[] parseCourseCodes(String courseCodeString) {
