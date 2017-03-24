@@ -139,20 +139,28 @@ public class WesternScraper extends Scraper {
 
         Collection<Course> courses = new ArrayList<>();
 
+        String nextCaption = null, nextDescription = null;
+
         // Iterate through the course listings.
-        d.select(".table-striped").forEach(e -> courses.add(parseCourseData(e, department)));
+        for(Element e: d.select(".table-striped,h4,p.font-md")) {
+            switch(e.tag().getName().toLowerCase()){
+                case "h4": nextCaption = e.text(); break;
+                case "p": nextDescription = e.ownText(); break;
+                case "table": {
+                    Course c = parseCourseData(nextCaption, nextDescription, e, department);
+                    courses.add(c);
+                } break;
+            }
+        }
+
         return courses;
     }
 
-    private Course parseCourseData(Element courseElement, Department department) {
+    private Course parseCourseData(String caption, String description, Element courseElement, Department department) {
 
         final Course c;
 
-        String caption;
-
-        if (!department.getCode().equals("EDUC")) {
-           caption = courseElement.select("caption").text();
-        } else {
+        if (department.getCode().equals("EDUC")) {
             // EDUC courses are strangely formatted and required special handling.
             caption = "EDUC ";
             Set<String> codes = courseElement.select("table.table-striped > tbody > tr > td:first-child")
@@ -180,7 +188,9 @@ public class WesternScraper extends Scraper {
         String termId = courseMatch.group("term");
 
         if (termId.length() == 0 || FULL_YEAR_TERM.contains(termId)) {
-            c = new Course(getSchool(), TermClassifier.FULL_SCHOOL_YEAR, department, courseCode, courseName, 1.00);
+            c = new Course(getSchool(), TermClassifier.FULL_SCHOOL_YEAR, department,
+                    courseCode, courseName, 1.00);
+            c.setDescription(description);
         } else {
 
             TermClassifier courseTerm;
