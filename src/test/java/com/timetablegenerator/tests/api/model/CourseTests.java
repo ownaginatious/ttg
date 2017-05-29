@@ -4,6 +4,7 @@ import com.timetablegenerator.Settings;
 import com.timetablegenerator.StringUtilities;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureDelta;
+import com.timetablegenerator.exceptions.TermScopeException;
 import com.timetablegenerator.model.*;
 import static org.junit.Assert.*;
 
@@ -32,9 +33,12 @@ public class CourseTests {
     }
 
     private School school;
-    private Term term = TermDefinition.builder("fall", "Fall", 1).build().createForYear(2016);
-    private Term term_fq = TermDefinition.builder("fall_fq", "Fall First Quarter", 1).build().createForYear(2016);
-    private Term term_sq = TermDefinition.builder("fall_sq", "Fall Second Quarter", 1).build().createForYear(2016);
+    private Term term = TermDefinition.builder("fall", "Fall", 1)
+                .withSubterm(TermDefinition.builder("fall_fq", "Fall First Quarter", 1).build())
+                .withSubterm(TermDefinition.builder("fall_sq", "Fall Second Quarter", 1).build())
+                .build().createForYear(2016);
+    private Term term_fq = term.getSubterm("fall_fq");
+    private Term term_sq = term.getSubterm("fall_sq");
     private Department department =
             Department.of(TestUtils.getRandomString(5),
                     TestUtils.getRandomString(20));
@@ -236,9 +240,9 @@ public class CourseTests {
     @Test
     public void sectionTypes() {
         Course c = getRandomCourse();
-        Section s1 = Section.of("A01");
-        Section s2 = Section.of("B01");
-        Section s3 = Section.of("B02");
+        Section s1 = Section.of(this.term, "A01");
+        Section s2 = Section.of(this.term, "B01");
+        Section s3 = Section.of(this.term, "B02");
 
         c.addSection("A", s1);
         assertEquals(new HashSet<>(Collections.singleton("A")), c.getSectionTypes());
@@ -247,11 +251,18 @@ public class CourseTests {
         c.addSection("B", s3);
         assertEquals(new HashSet<>(Arrays.asList("A", "B")), c.getSectionTypes());
 
-        SectionType st = SectionType.of(school, "B");
+        SectionType st = SectionType.of(school, this.term, "B");
         st.addSection(s3);
         st.addSection(s2);
 
         assertEquals(st, c.getSectionType("B").orElse(null));
+    }
+
+    @Test(expected = TermScopeException.class)
+    public void outOfScopeSection() {
+        Section s1 = Section.of(this.term, "A01");
+        Course c = Course.of(this.school, this.term_fq, this.department, "code", "name");
+        c.addSection("A", s1);
     }
 
     @Test
@@ -365,13 +376,13 @@ public class CourseTests {
         Course c2 = Course.of(this.school, this.term, this.department,
                 courseCode, courseName).setCredits(2.0);
 
-        Section s0 = Section.of("A1");
-        Section s1 = Section.of("A2");
-        Section s2 = Section.of("A3");
+        Section s0 = Section.of(this.term, "A1");
+        Section s1 = Section.of(this.term, "A2");
+        Section s2 = Section.of(this.term, "A3");
 
-        Section s3 = Section.of("B1");
-        Section s4 = Section.of("B2");
-        Section s5 = Section.of("B3");
+        Section s3 = Section.of(this.term, "B1");
+        Section s4 = Section.of(this.term, "B2");
+        Section s5 = Section.of(this.term, "B3");
 
         c1.addSection("A", s0).addSection("A", s1);
         c2.addSection("A", s0).addSection("A", s2)
@@ -404,17 +415,17 @@ public class CourseTests {
                 .addPrerequisite(c5).addCrossListing(c3)
                 .addCorequesite(c4).addCorequesite(c6);
 
-        Section s1 = Section.of("A01")
+        Section s1 = Section.of(this.term, "A01")
                 .addPeriod(OneTimePeriod.of(this.term_fq)
                         .setDateTimeRange(DateTimeRange.of(LocalDateTime.MIN, LocalDateTime.MAX))
                         .setCampus("Campus B").setRoom("987")
                         .addNotes("Some note", "Some note 2"));
-        Section s2 = Section.of("A02")
+        Section s2 = Section.of(this.term, "A02")
                 .addPeriod(RepeatingPeriod.of(this.term_sq)
                         .setDayTimeRange(DayTimeRange.of(DayOfWeek.FRIDAY, LocalTime.MIN, LocalTime.MAX))
                         .setCampus("Campus B").setRoom("997"));
         c.addSection("A", s1).addSection("A", s2);
-        Section s3 = Section.of("B01")
+        Section s3 = Section.of(this.term, "B01")
                 .addPeriod(RepeatingPeriod.of(this.term_fq)
                         .setDayTimeRange(DayTimeRange.of(DayOfWeek.THURSDAY, LocalTime.MIN, LocalTime.MAX))
                         .setCampus("Campus A").setRoom("123"));

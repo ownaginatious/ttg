@@ -1,11 +1,9 @@
 package com.timetablegenerator.model.period;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.timetablegenerator.Settings;
 import com.timetablegenerator.delta.PropertyType;
 import com.timetablegenerator.delta.StructureDelta;
 import com.timetablegenerator.model.Term;
-import com.timetablegenerator.model.range.DateRange;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;

@@ -265,10 +265,10 @@ public class StructuralDeltaTests {
     @Test(expected = IllegalArgumentException.class)
     public void ambiguousSubstructureDiff() {
         this.scd.addSubstructureChange(
-                StructureDelta.of(PropertyType.SECTION, Section.of("ID")).addRemoved(PropertyType.NOTE, "B")
+                StructureDelta.of(PropertyType.SECTION, Section.of(this.term, "ID")).addRemoved(PropertyType.NOTE, "B")
         );
         this.scd.addSubstructureChange(
-                StructureDelta.of(PropertyType.SECTION, Section.of("ID")).addRemoved(PropertyType.NOTE, "A")
+                StructureDelta.of(PropertyType.SECTION, Section.of(this.term, "ID")).addRemoved(PropertyType.NOTE, "A")
         );
     }
 
@@ -281,16 +281,16 @@ public class StructuralDeltaTests {
         this.scd.addValueIfChanged(PropertyType.NOTE, null, "My Note 2");
         this.scd.addValueIfChanged(PropertyType.CREDITS, 2.32, 4.343);
         this.scd.addSubstructureChange(
-                StructureDelta.of(PropertyType.SECTION, Section.of("ID3"))
+                StructureDelta.of(PropertyType.SECTION, Section.of(this.term, "ID3"))
                     .addRemoved(PropertyType.NOTE, "2. This is quite the note!")
                     .addRemoved(PropertyType.NOTE, "1. This is a second note!")
         );
         this.scd.addSubstructureChange(
-                StructureDelta.of(PropertyType.SECTION, Section.of("ID1"))
+                StructureDelta.of(PropertyType.SECTION, Section.of(this.term, "ID1"))
                         .addRemoved(PropertyType.NUM_ENROLLED, 43)
         );
         this.scd.addSubstructureChange(
-                StructureDelta.of(PropertyType.SECTION, Section.of("ID2"))
+                StructureDelta.of(PropertyType.SECTION, Section.of(this.term, "ID2"))
                         .addRemoved(PropertyType.NOTE, "Hello")
         );
 
@@ -334,7 +334,7 @@ public class StructuralDeltaTests {
     @Test
     public void structureDeltaCompare() {
 
-        StructureDelta scd1 = StructureDelta.of(PropertyType.SECTION, Section.of("ABC"));
+        StructureDelta scd1 = StructureDelta.of(PropertyType.SECTION, Section.of(this.term, "ABC"));
         StructureDelta scd2 = StructureDelta.of(PropertyType.REPEATING_PERIOD, this.rp1);
 
         assertThat(scd1.compareTo(scd2), lessThan(0));

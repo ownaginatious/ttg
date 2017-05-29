@@ -36,8 +36,9 @@ public class SectionTypeTests {
     @Test
     public void serializeSectionType() throws IOException {
 
-        Section section = Section.of("test_id");
-        SectionType sectionType = SectionType.of(this.context.getSchool(), "section_code").addSection(section);
+        Section section = Section.of(this.term_fall, "test_id");
+        SectionType sectionType = SectionType.of(
+                this.context.getSchool(), this.term_fall, "section_code").addSection(section);
 
         SectionTypeSerializer serializer = new SectionTypeSerializer();
         serializer.fromInstance(sectionType);
@@ -47,9 +48,11 @@ public class SectionTypeTests {
                 "  \"name\" : \"Section name\",\n" +
                 "  \"sections\" : {\n" +
                 "    \"test_id\" : {\n" +
-                "      \"id\" : \"test_id\"\n" +
+                "      \"id\" : \"test_id\",\n" +
+                "      \"term\" : \"2016/fall\"\n" +
                 "    }\n" +
-                "  }\n" +
+                "  },\n" +
+                "  \"term\" : \"2016/fall\"\n" +
                 "}";
         String actual = this.objectMapper.writeValueAsString(serializer);
 
@@ -59,17 +62,20 @@ public class SectionTypeTests {
     @Test
     public void deserializeSectionType() throws IOException {
 
-        Section section = Section.of("test_id");
-        SectionType expected = SectionType.of(this.context.getSchool(), "section_code").addSection(section);
+        Section section = Section.of(this.term_fall, "test_id");
+        SectionType expected = SectionType.of(
+                this.context.getSchool(), this.term_fall, "section_code").addSection(section);
 
         String raw = "{\n" +
                 "  \"code\" : \"section_code\",\n" +
                 "  \"name\" : \"Section name\",\n" +
                 "  \"sections\" : {\n" +
                 "    \"test_id\" : {\n" +
+                "      \"term\" : \"2016/fall\",\n" +
                 "      \"id\" : \"test_id\"\n" +
                 "    }\n" +
-                "  }\n" +
+                "  },\n" +
+                "  \"term\" : \"2016/fall\"\n" +
                 "}";
 
         SectionTypeSerializer serializer = this.objectMapper.readValue(raw, SectionTypeSerializer.class);
@@ -86,9 +92,11 @@ public class SectionTypeTests {
                 "  \"name\" : \"Section name\",\n" +
                 "  \"sections\" : {\n" +
                 "    \"test_id\" : {\n" +
-                "      \"id\" : \"different_id\"\n" +
+                "      \"id\" : \"different_id\",\n" +
+                "      \"term\" : \"2016/fall\"\n" +
                 "    }\n" +
-                "  }\n" +
+                "  },\n" +
+                "  \"term\" : \"2016/fall\"\n" +
                 "}";
 
         this.objectMapper.readValue(raw, SectionTypeSerializer.class).toInstance(this.context);

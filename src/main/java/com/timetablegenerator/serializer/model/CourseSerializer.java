@@ -79,13 +79,17 @@ public class CourseSerializer implements Serializer<Course> {
             Map<String, SectionType> sectionTypes = this.sectionTypes.entrySet().stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, x -> x.getValue().toInstance(context)));
 
-            // Validate the section type mapping.
+            // Validate the section type mapping and term. The Course model does not allow for SectionType
+            // instances to be added directly, so the term and code should always be valid. However, when
+            // deserializing, we do not know where this data is coming from and should check the term validity
+            // anyway to pick up on any discreet bugs that may have occurred outside the system.
             for (Map.Entry<String, SectionType> entry : sectionTypes.entrySet()) {
                 if (!entry.getKey().equals(entry.getValue().getCode())) {
                     throw new IllegalStateException(
                             "Serialized course has an invalid section type code -> section type: " +
                                     entry.getKey() + " to " + entry.getValue().getCode());
                 }
+                entry.getValue().getTerm().assertFallsWithin(term);
             }
 
             sectionTypes.values().forEach(course::addSections);

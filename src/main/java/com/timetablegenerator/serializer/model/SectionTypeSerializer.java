@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.timetablegenerator.model.Section;
 import com.timetablegenerator.model.SectionType;
+import com.timetablegenerator.model.Term;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SectionTypeSerializer implements Serializer<SectionType> {
 
+    @JsonProperty("term") private String termId = null;
     @JsonProperty("code") private String code = null;
 
     @SuppressWarnings({"FieldCanBeLocal", "unused"})
@@ -24,6 +26,7 @@ public class SectionTypeSerializer implements Serializer<SectionType> {
     @Override
     public Serializer<SectionType> fromInstance(SectionType instance) {
 
+        this.termId = instance.getTerm().getUniqueId();
         this.code = instance.getCode();
         this.name = instance.getName();
 
@@ -39,7 +42,8 @@ public class SectionTypeSerializer implements Serializer<SectionType> {
     @Override
     public SectionType toInstance(SerializerContext context) {
 
-        SectionType sectionType = SectionType.of(context.getSchool(), this.code);
+        Term term = context.getTerm(termId);
+        SectionType sectionType = SectionType.of(context.getSchool(), term, this.code);
 
         if (this.sections != null) {
 

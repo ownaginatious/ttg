@@ -16,21 +16,22 @@ public class SectionType implements Diffable<SectionType> {
     private static final String I = Settings.getIndent();
 
     @NonNull @Getter private final School school;
+    @NonNull @Getter private final Term term;
     @NonNull @Getter private final String code;
     @NonNull @Getter private final String name;
 
     private final Map<String, Section> sections = new TreeMap<>();
 
-    private SectionType(@NonNull School school, @NonNull String code) {
+    private SectionType(@NonNull School school, @NonNull Term term, @NonNull String code, @NonNull String name) {
         this.school = school;
+        this.term = term;
         this.code = code;
-        this.name = school.getSectionTypeName(this.code);
+        this.name = name;
     }
 
-    public static SectionType of(@NonNull School school, @NonNull String code){
-        // Force check to ensure the code exists.
-        school.getSectionTypeName(code);
-        return new SectionType(school, code);
+    public static SectionType of(@NonNull School school, @NonNull Term term, @NonNull String code){
+        String name = school.getSectionTypeName(code);
+        return new SectionType(school, term, code, name);
     }
 
     public Collection<Section> getSections(){
@@ -46,6 +47,7 @@ public class SectionType implements Diffable<SectionType> {
     }
 
     public SectionType addSection(@NonNull Section s) {
+        s.getTerm().assertFallsWithin(this.term);
         if (this.sections.putIfAbsent(s.getId(), s) != null) {
             throw new IllegalStateException("Attempted to add the section of code \""
                     + this.code + "\" with ID \"" + s.getId() + "\" twice");
@@ -91,6 +93,10 @@ public class SectionType implements Diffable<SectionType> {
         if (!this.code.equals(that.code)) {
             throw new IllegalArgumentException("Section types are not related: \"" + this.code
                     + "\" and \"" + that.code + "\"");
+        }
+        if (!this.term.temporallyEquals(that.term)) {
+            throw new IllegalArgumentException("Section types are in unrelated terms: \"" +
+                    this.term.getUniqueId() + "\" and \"" + that.term.getUniqueId() + "\"");
         }
 
         final StructureDelta delta = StructureDelta.of(PropertyType.SECTION_TYPE, this);

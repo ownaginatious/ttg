@@ -23,6 +23,7 @@ public class Section implements Diffable<Section> {
 
     @NonNull @Setter private String serialNumber = null;
     @NonNull @Setter private String groupId = null;
+    @NonNull @Getter private final Term term;
     @NonNull @Getter private final String id;
 
     private Boolean waitingList;
@@ -186,6 +187,7 @@ public class Section implements Diffable<Section> {
     }
 
     public Section addPeriod(OneTimePeriod period){
+        period.getTerm().assertFallsWithin(this.term);
         if (this.oneTimePeriods.putIfAbsent(period.getUniqueId(), period) != null) {
             throw new IllegalArgumentException("A one-time period '" + period.getUniqueId()
                     + "' is already part of this section.");
@@ -194,6 +196,7 @@ public class Section implements Diffable<Section> {
     }
 
     public Section addPeriod(RepeatingPeriod period){
+        period.getTerm().assertFallsWithin(this.term);
         if (this.repeatingPeriods.putIfAbsent(period.getUniqueId(), period) != null) {
             throw new IllegalArgumentException("A repeating period '" + period.getUniqueId()
                     + "' is already part of this section.");

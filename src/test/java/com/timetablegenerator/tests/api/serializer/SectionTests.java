@@ -1,5 +1,6 @@
 package com.timetablegenerator.tests.api.serializer;
 
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.timetablegenerator.model.*;
@@ -26,7 +27,10 @@ public class SectionTests {
 
     @Before
     public void setUp() {
-        this.objectMapper = new ObjectMapper().configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+        this.objectMapper = new ObjectMapper()
+                .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
+                .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
+                .configure(SerializationFeature.INDENT_OUTPUT, true);
         this.rp = RepeatingPeriod.of(this.term_fall);
         this.otp = OneTimePeriod.of(this.term_fall);
         this.context = SerializerContext.of(School.builder("id", "name").build(),
@@ -36,7 +40,7 @@ public class SectionTests {
     @Test
     public void serializeSection() throws IOException {
 
-        Section section = Section.of("test_id").addNotes("note_1", "note_2")
+        Section section = Section.of(this.term_fall, "test_id").addNotes("note_1", "note_2")
                 .setEnrollment(40).setMaximumEnrollment(40)
                 .setWaiting(5)
                 .setCancelled(false)
@@ -47,9 +51,24 @@ public class SectionTests {
         SectionSerializer serializer = new SectionSerializer();
         serializer.fromInstance(section);
 
-        String expected = "{\"id\":\"test_id\",\"waitingList\":true,\"waitingNum\":5,\"full\":true,\"enrolled\":40," +
-                "\"maxEnrollment\":40,\"online\":false,\"cancelled\":false,\"notes\":[\"note_1\",\"note_2\"]," +
-                "\"repeatingPeriods\":[{\"term\":\"2016/fall\"}],\"oneTimePeriods\":[{\"term\":\"2016/fall\"}]}";
+        String expected = "{\n" +
+                "  \"cancelled\" : false,\n" +
+                "  \"enrolled\" : 40,\n" +
+                "  \"full\" : true,\n" +
+                "  \"id\" : \"test_id\",\n" +
+                "  \"maxEnrollment\" : 40,\n" +
+                "  \"notes\" : [ \"note_1\", \"note_2\" ],\n" +
+                "  \"oneTimePeriods\" : [ {\n" +
+                "    \"term\" : \"2016/fall\"\n" +
+                "  } ],\n" +
+                "  \"online\" : false,\n" +
+                "  \"repeatingPeriods\" : [ {\n" +
+                "    \"term\" : \"2016/fall\"\n" +
+                "  } ],\n" +
+                "  \"term\" : \"2016/fall\",\n" +
+                "  \"waitingList\" : true,\n" +
+                "  \"waitingNum\" : 5\n" +
+                "}";
         String actual = this.objectMapper.writeValueAsString(serializer);
 
         assertEquals(expected, actual);
@@ -58,7 +77,7 @@ public class SectionTests {
     @Test
     public void deserializeSection() throws IOException {
 
-        Section expected = Section.of("test_id").addNotes("note_1", "note_2")
+        Section expected = Section.of(this.term_fall, "test_id").addNotes("note_1", "note_2")
                 .setEnrollment(40).setMaximumEnrollment(40)
                 .setWaiting(5)
                 .setCancelled(false)
@@ -66,9 +85,24 @@ public class SectionTests {
                 .addPeriod(this.otp)
                 .addPeriod(this.rp);
 
-        String raw = "{\"id\":\"test_id\",\"waitingList\":true,\"waitingNum\":5,\"full\":true,\"enrolled\":40," +
-                "\"maxEnrollment\":40,\"online\":false,\"cancelled\":false,\"notes\":[\"note_1\",\"note_2\"]," +
-                "\"repeatingPeriods\":[{\"term\":\"2016/fall\"}],\"oneTimePeriods\":[{\"term\":\"2016/fall\"}]}";
+        String raw = "{\n" +
+                "  \"cancelled\" : false,\n" +
+                "  \"enrolled\" : 40,\n" +
+                "  \"full\" : true,\n" +
+                "  \"id\" : \"test_id\",\n" +
+                "  \"maxEnrollment\" : 40,\n" +
+                "  \"notes\" : [ \"note_1\", \"note_2\" ],\n" +
+                "  \"oneTimePeriods\" : [ {\n" +
+                "    \"term\" : \"2016/fall\"\n" +
+                "  } ],\n" +
+                "  \"online\" : false,\n" +
+                "  \"repeatingPeriods\" : [ {\n" +
+                "    \"term\" : \"2016/fall\"\n" +
+                "  } ],\n" +
+                "  \"term\" : \"2016/fall\",\n" +
+                "  \"waitingList\" : true,\n" +
+                "  \"waitingNum\" : 5\n" +
+                "}";
 
         SectionSerializer serializer = this.objectMapper.readValue(raw, SectionSerializer.class);
         Section actual = serializer.toInstance(this.context);

@@ -3,6 +3,7 @@ package com.timetablegenerator.tests.api.serializer;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.timetablegenerator.exceptions.TermScopeException;
 import com.timetablegenerator.model.*;
 import com.timetablegenerator.model.period.RepeatingPeriod;
 import com.timetablegenerator.serializer.model.CourseSerializer;
@@ -21,7 +22,10 @@ public class CourseTests {
 
     private ObjectMapper objectMapper;
 
-    private Term term_fall = TermDefinition.builder("fall", "Fall", 1).build().createForYear(2016);
+    private Term term_fall = TermDefinition.builder("fall", "Fall", 1)
+            .withSubterm(TermDefinition.builder("fall_fq", "Fall First Quarted", 2).build())
+            .build().createForYear(2016);
+    private Term term_fall_fq = term_fall.getSubterm("fall_fq");
     private Department department = Department.of("TEST", "Test Department");
     private SerializerContext context;
 
@@ -35,7 +39,7 @@ public class CourseTests {
         this.context = SerializerContext.of(School.builder("id", "name")
                         .withSection("test_section_type", "Test Type")
                         .withSection("test_section_type_2", "Test Type 2").build(),
-                new Term[]{this.term_fall}, new Department[]{this.department});
+                new Term[]{this.term_fall, this.term_fall_fq}, new Department[]{this.department});
     }
 
     @Test
@@ -44,7 +48,7 @@ public class CourseTests {
         Course course = Course.of(
                 this.context.getSchool(), this.term_fall, this.department, "course_code", "Course name")
                 .addSection("test_section_type",
-                        Section.of("test_section").addPeriod(RepeatingPeriod.of(this.term_fall))
+                        Section.of(this.term_fall, "test_section").addPeriod(RepeatingPeriod.of(this.term_fall))
                 ).setDescription("test course is test").setCredits(3.14);
 
         CourseSerializer serializer = new CourseSerializer();
@@ -65,9 +69,11 @@ public class CourseTests {
                 "          \"id\" : \"test_section\",\n" +
                 "          \"repeatingPeriods\" : [ {\n" +
                 "            \"term\" : \"2016/fall\"\n" +
-                "          } ]\n" +
+                "          } ],\n" +
+                "          \"term\" : \"2016/fall\"\n" +
                 "        }\n" +
-                "      }\n" +
+                "      },\n" +
+                "      \"term\" : \"2016/fall\"\n" +
                 "    }\n" +
                 "  },\n" +
                 "  \"term\" : \"2016/fall\"\n" +
@@ -84,7 +90,7 @@ public class CourseTests {
         Course expected = Course.of(
                 this.context.getSchool(), this.term_fall, this.department, "course_code", "Course name")
                 .addSection("test_section_type",
-                        Section.of("test_section").addPeriod(RepeatingPeriod.of(this.term_fall))
+                        Section.of(this.term_fall, "test_section").addPeriod(RepeatingPeriod.of(this.term_fall))
                 ).setCredits(5.5).addNotes("note_1", "note_2");
 
         String raw = "{\n" +
@@ -103,9 +109,11 @@ public class CourseTests {
                 "          \"id\" : \"test_section\",\n" +
                 "          \"repeatingPeriods\" : [ {\n" +
                 "            \"term\" : \"2016/fall\"\n" +
-                "          } ]\n" +
+                "          } ],\n" +
+                "          \"term\" : \"2016/fall\"\n" +
                 "        }\n" +
-                "      }\n" +
+                "      },\n" +
+                "      \"term\" : \"2016/fall\"\n" +
                 "    }\n" +
                 "  }\n" +
                 "}";
@@ -187,9 +195,42 @@ public class CourseTests {
                 "          \"id\" : \"test_section\",\n" +
                 "          \"repeatingPeriods\" : [ {\n" +
                 "            \"term\" : \"2016/fall\"\n" +
-                "          } ]\n" +
+                "          } ],\n" +
+                "          \"term\" : \"2016/fall\"\n" +
                 "        }\n" +
-                "      }\n" +
+                "      },\n" +
+                "      \"term\" : \"2016/fall\"\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+
+        this.objectMapper.readValue(raw, CourseSerializer.class).toInstance(this.context);
+    }
+
+    @Test(expected = TermScopeException.class)
+    public void outOfScopeSectionType() throws IOException {
+
+        String raw = "{\n" +
+                "  \"term\" : \"2016/fall_fq\",\n" +
+                "  \"department\" : \"TEST\",\n" +
+                "  \"code\" : \"course_code\",\n" +
+                "  \"credits\" : 5.5,\n" +
+                "  \"name\" : \"Course name\",\n" +
+                "  \"notes\" : [\"note_1\", \"note_2\"],\n" +
+                "  \"sectionTypes\" : {\n" +
+                "    \"test_section_type\" : {\n" +
+                "      \"code\" : \"test_section_type\",\n" +
+                "      \"name\" : \"Test Type\",\n" +
+                "      \"sections\" : {\n" +
+                "        \"test_section\" : {\n" +
+                "          \"id\" : \"test_section\",\n" +
+                "          \"repeatingPeriods\" : [ {\n" +
+                "            \"term\" : \"2016/fall\"\n" +
+                "          } ],\n" +
+                "          \"term\" : \"2016/fall\"\n" +
+                "        }\n" +
+                "      },\n" +
+                "      \"term\" : \"2016/fall\"\n" +
                 "    }\n" +
                 "  }\n" +
                 "}";

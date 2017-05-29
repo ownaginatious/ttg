@@ -1,5 +1,6 @@
 package com.timetablegenerator.model;
 
+import com.timetablegenerator.exceptions.TermScopeException;
 import com.timetablegenerator.model.range.DateRange;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -72,6 +73,30 @@ public class Term implements Comparable<Term> {
      */
     public boolean temporallyEquals(Term that) {
         return this.getUniqueId().equals(that.getUniqueId());
+    }
+
+    /**
+     * Checks whether a term falls within another's scope of time.
+     *
+     * @param superTerm The term to check if this one falls within the time of.
+     * @return {@code true} if the term is a equal or a subset of the super time, {@code false} otherwise.
+     */
+    public boolean fallsWithin(Term superTerm) {
+        if (this.temporallyEquals(superTerm)){
+            return true;
+        }
+        try {
+            Term equivalentSubterm = superTerm.getSubterm(this.termDefinition.getCode());
+            return equivalentSubterm.temporallyEquals(this);
+        } catch(IllegalArgumentException iae) {
+            return false;
+        }
+    }
+
+    public void assertFallsWithin(Term superTerm) {
+        if (!this.fallsWithin(superTerm)){
+            throw new TermScopeException(this, superTerm);
+        }
     }
 
     @Override

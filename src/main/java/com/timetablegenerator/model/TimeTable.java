@@ -34,7 +34,8 @@ public class TimeTable implements Diffable<TimeTable> {
         return new TimeTable(school, term, parseTime);
     }
 
-    public TimeTable addCourse(Course c) {
+    public TimeTable addCourse(@NonNull Course c) {
+        c.getTerm().assertFallsWithin(this.term);
         String id = c.getUniqueId();
         if (this.courses.putIfAbsent(id, c) != null) {
             throw new IllegalStateException("Attempted to insert multiple courses with the ID \"" + id + "\".");

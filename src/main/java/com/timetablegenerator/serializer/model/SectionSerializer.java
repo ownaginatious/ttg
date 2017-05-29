@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.timetablegenerator.model.Section;
+import com.timetablegenerator.model.Term;
 import com.timetablegenerator.model.period.OneTimePeriod;
 import com.timetablegenerator.model.period.RepeatingPeriod;
 import com.timetablegenerator.serializer.model.period.OneTimePeriodSerializer;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class SectionSerializer implements Serializer<Section> {
 
+    @JsonProperty("term") private String termId = null;
     @JsonProperty("id") private String sectionId = null;
     @JsonProperty("serial") private String serial = null;
     @JsonProperty("groupId") private String groupId = null;
@@ -44,6 +46,7 @@ public class SectionSerializer implements Serializer<Section> {
     @Override
     public Serializer<Section> fromInstance(Section instance) {
 
+        this.termId = instance.getTerm().getUniqueId();
         this.sectionId = instance.getId();
         this.serial = instance.getSerialNumber().orElse(null);
         this.groupId = instance.getGroupId().orElse(null);
@@ -75,7 +78,8 @@ public class SectionSerializer implements Serializer<Section> {
     @Override
     public Section toInstance(SerializerContext context) {
 
-        Section instance = Section.of(this.sectionId);
+        Term term = context.getTerm(this.termId);
+        Section instance = Section.of(term, this.sectionId);
 
         Optional.ofNullable(this.serial).ifPresent(instance::setSerialNumber);
         Optional.ofNullable(this.groupId).ifPresent(instance::setGroupId);

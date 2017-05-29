@@ -29,6 +29,9 @@ public class SerializerContext {
     }
 
     public Term getTerm(String termId) {
+        if (!this.termMap.containsKey(termId)) {
+            throw new IllegalArgumentException("No such term \"" + termId + "\" in serializer context");
+        }
         return this.termMap.get(termId);
     }
 

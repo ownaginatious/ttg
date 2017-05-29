@@ -128,7 +128,7 @@ public class Course implements Diffable<Course> {
     }
 
     public Course addSection(@NonNull String sectionTypeId, @NonNull Section s) {
-        SectionType st = sectionTypes.computeIfAbsent(sectionTypeId, x -> SectionType.of(this.school, x));
+        SectionType st = sectionTypes.computeIfAbsent(sectionTypeId, x -> SectionType.of(this.school, this.term, x));
         st.addSection(s);
         return this;
     }

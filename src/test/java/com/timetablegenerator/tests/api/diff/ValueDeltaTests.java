@@ -3,6 +3,8 @@ package com.timetablegenerator.tests.api.diff;
 import com.timetablegenerator.Settings;
 import com.timetablegenerator.delta.*;
 import com.timetablegenerator.model.Section;
+import com.timetablegenerator.model.Term;
+import com.timetablegenerator.model.TermDefinition;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -199,7 +201,8 @@ public class ValueDeltaTests {
         assertThat(c1.compareTo(r1), greaterThan(0));
         assertThat(r1.compareTo(c1), lessThan(0));
 
-        StructureDelta sd = StructureDelta.of(PropertyType.SECTION, Section.of("ABC"));
+        Term t = TermDefinition.builder("123", "Term 123", 1).build().createForYear(2017);
+        StructureDelta sd = StructureDelta.of(PropertyType.SECTION, Section.of(t, "ABC"));
 
         assertThat(a1.compareTo(sd), lessThan(0));
         assertThat(sd.compareTo(a1), greaterThan(0));

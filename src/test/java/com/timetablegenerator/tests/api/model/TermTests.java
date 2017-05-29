@@ -14,6 +14,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TermTests {
 
@@ -164,6 +165,20 @@ public class TermTests {
         terms = Arrays.asList(t4, t1, t2, t3, t4);
         Collections.sort(terms);
         assertEquals(Arrays.asList(t4, t4, t2, t3, t1), terms);
+    }
+
+    @Test
+    public void fallsWithin() {
+        Term t1 = this.t.getSubterm("SEM1Q2");
+        Term t2 = this.t.getSubterm("SEM1Q1");
+        Term t3 = this.t.getSubterm("SEM1");
+
+        assertTrue(t1.fallsWithin(t3));
+        assertFalse(t3.fallsWithin(t1));
+        assertFalse(t1.fallsWithin(t2));
+        assertFalse(t2.fallsWithin(t1));
+        assertTrue(t2.fallsWithin(t3));
+        assertFalse(t3.fallsWithin(t2));
     }
 
     @Test
