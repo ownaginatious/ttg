@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
                 @SectionMapping(name = "Tutorial", code = "TUT")
         },
         legacy = @LegacyConfig(
-                year = 2016, term = TermClassifier.FULL_SCHOOL_YEAR,
+                year = 2017, term = TermClassifier.FULL_SCHOOL_YEAR,
                 mapping = {
                         @LegacyMapping(from = "LEC", to = CORE),
                         @LegacyMapping(from = "PRA", to = LAB),
