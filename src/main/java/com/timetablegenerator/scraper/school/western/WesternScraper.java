@@ -65,8 +65,9 @@ public class WesternScraper extends Scraper {
 
     // Credit signifiers.
     private static final String QUARTER_CREDITS = "QRST";
+    private static final String THREE_QUARTER_CREDITS = "K";
     private static final String HALF_CREDITS = "ABFGYZ";
-    private static final String FULL_CREDITS = "EWX";
+    private static final String FULL_CREDITS = "EWXHJ";
 
     // Time fromName year signifiers.
     private static final String FIRST_TERM = "AFW";
@@ -77,7 +78,7 @@ public class WesternScraper extends Scraper {
     private static final String SECOND_TERM_FIRST_QUARTER = "S";
     private static final String SECOND_TERM_SECOND_QUARTER = "T";
 
-    private static final String FULL_YEAR_TERM = "EU";
+    private static final String FULL_YEAR_TERM = "EUHJK";
 
     private static final String UNSCHEDULED_TERM = "YZ";
 
@@ -220,6 +221,8 @@ public class WesternScraper extends Scraper {
                 credits = 0.25;
             else if (HALF_CREDITS.contains(termId))
                 credits = 0.50;
+            else if (THREE_QUARTER_CREDITS.contains(termId))
+                credits = 0.75;
             else if (FULL_CREDITS.contains(termId))
                 credits = 1.00;
             else
@@ -409,6 +412,9 @@ public class WesternScraper extends Scraper {
         int i = 0;
 
         for (Department department : departments) {
+
+            if (!department.getCode().equals("EDUC"))
+                continue;
 
             LOGGER.info("Retrieving data under \"" + department.getName()
                     + "\" (" + department.getCode() + ") [" + ++i + " of " + departments.size() + "]...");
