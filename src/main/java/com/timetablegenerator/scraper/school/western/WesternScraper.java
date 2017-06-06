@@ -413,9 +413,6 @@ public class WesternScraper extends Scraper {
 
         for (Department department : departments) {
 
-            if (!department.getCode().equals("EDUC"))
-                continue;
-
             LOGGER.info("Retrieving data under \"" + department.getName()
                     + "\" (" + department.getCode() + ") [" + ++i + " of " + departments.size() + "]...");
 
