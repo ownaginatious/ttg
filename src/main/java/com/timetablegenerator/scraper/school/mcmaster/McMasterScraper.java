@@ -465,6 +465,7 @@ public class McMasterScraper extends Scraper {
                                         break;
 
                                     case "LAB":
+                                    case "STO":
 
                                         currentSectionType = "L";
                                         break;
