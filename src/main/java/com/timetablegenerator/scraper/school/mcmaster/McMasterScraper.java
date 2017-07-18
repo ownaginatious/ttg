@@ -231,16 +231,15 @@ public class McMasterScraper extends Scraper {
                             .setFormParameter("ICFind", "")
                             .setFormParameter("ICAddCount", "")
                             .setFormParameter("ICAPPCLSDATA", "")
-                            .setFormParameter("DERIVED_SSTSNAV_SSTS_MAIN_GOTO$155$", "9999")
-                            .setFormParameter("CLASS_SRCH_WRK2_INSTITUTION$41$", "MCMST")
+                            .setFormParameter("DERIVED_SSTSNAV_SSTS_MAIN_GOTO$16$", "9999")
+                            .setFormParameter("CLASS_SRCH_WRK2_INSTITUTION$31$", "MCMST")
                             .setFormParameter("MCM_DERIVED_CE_ACAD_CAREER", "UGRD")
-                            .setFormParameter("CLASS_SRCH_WRK2_STRM$45$", term.getKey())
-                            .setFormParameter("SSR_CLSRCH_WRK_SUBJECT$75$$0", department.getCode())
+                            .setFormParameter("CLASS_SRCH_WRK2_STRM$35$", term.getKey())
+                            .setFormParameter("SSR_CLSRCH_WRK_SUBJECT$7$$0", department.getCode())
                             .setFormParameter("SSR_CLSRCH_WRK_SSR_EXACT_MATCH1$1", "E")
                             .setFormParameter("SSR_CLSRCH_WRK_CATALOG_NBR$1", "")
                             .setFormParameter("SSR_CLSRCH_WRK_SSR_OPEN_ONLY$chk$3", "N")
-                            .setFormParameter("SSR_CLSRCH_WRK_CLASS_NBR$4", "")
-                            .setFormParameter("DERIVED_SSTSNAV_SSTS_MAIN_GOTO$183$", "9999");
+                            .setFormParameter("SSR_CLSRCH_WRK_CLASS_NBR$4", "");
 
             rr = req.run();
 
@@ -255,7 +254,7 @@ public class McMasterScraper extends Scraper {
 
             Element resultsData = Jsoup.parse(rr.getResponseString().replace("<![CDATA[", "").replace("]]>", ""));
 
-            if (resultsData.getElementById("ACE_$ICField229$0") != null) {
+            if (resultsData.getElementById("ACE_$ICField102$0") != null) {
 
                 LOGGER.info("Pulling course data...");
 
@@ -270,8 +269,9 @@ public class McMasterScraper extends Scraper {
                         .setFormParameter("DERIVED_SSTSNAV_SSTS_MAIN_GOTO$5$", "9999")
                         .setFormParameter("DERIVED_SSTSNAV_SSTS_MAIN_GOTO$207$", "9999").run();
 
-            } else
+            } else {
                 LOGGER.info("No courses listed under this department.");
+            }
         }
     }
 
@@ -361,7 +361,7 @@ public class McMasterScraper extends Scraper {
                 continue;
             }
 
-            for (Element e : departmentSchedule.getElementById("ACE_$ICField237$" + i)
+            for (Element e : departmentSchedule.getElementById("ACE_$ICField106$" + i)
                     .select("tr, span.PSEDITBOX_DISPONLY, span.PSHYPERLINK > a")) {
 
                 String id = e.attr("id");
@@ -439,9 +439,6 @@ public class McMasterScraper extends Scraper {
                                 default:
                                     throw new IllegalArgumentException("Unknown term type \"" + termString + "\"");
                             }
-
-                            // Temporary fix for data entry error.
-                            currentSectionTitle = currentSectionTitle.replace("C05`-LEC(11218)", "C05-LEC(11218)");
 
                             Matcher m = SECTION_CODE_PATTERN.matcher(currentSectionTitle);
 
@@ -657,9 +654,8 @@ public class McMasterScraper extends Scraper {
         RestResponse rr = this.performAuthentication();
 
         Set<Term> probableTerms = new TreeSet<>();
-
         for (Element e : Jsoup.parse(rr.getResponseString())
-                .getElementById("CLASS_SRCH_WRK2_STRM$45$").select("option")) {
+                .getElementById("CLASS_SRCH_WRK2_STRM$35$").select("option")) {
 
             String key = e.attr("value");
             String text = ParsingTools.sanitize(e.ownText());
