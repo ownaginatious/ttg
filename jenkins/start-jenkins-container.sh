@@ -85,8 +85,7 @@ then
                   -v "$3":/ssh_keys:ro ${ports} \
                   -e "JENKINS_SLAVE_SECRET=${4:-}" \
                   -e "JENKINS_SLAVE_ID=$(hostname)" \
-                  --name "${container}" "${super_container:-}" \
-                  "${image}" > /dev/null
+                  --name "${container}" ${super_container:-} "${image}" > /dev/null
 else
     docker run -d -v /var/run/docker.sock:/var/run/docker.sock \
                   -v "$2":/var/jenkins_home ${ports} \
