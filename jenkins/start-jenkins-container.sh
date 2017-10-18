@@ -85,6 +85,8 @@ then
                   -v "$3":/ssh_keys:ro ${ports} \
                   -e "JENKINS_SLAVE_SECRET=${4:-}" \
                   -e "JENKINS_SLAVE_ID=$(hostname)" \
+                  --log-driver json-file \
+                  --log-opt max-size=1m \
                   --name "${container}" ${super_container:-} "${image}" > /dev/null
 else
     docker run -d -v /var/run/docker.sock:/var/run/docker.sock \
