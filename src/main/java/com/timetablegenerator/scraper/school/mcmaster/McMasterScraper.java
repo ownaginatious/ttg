@@ -64,8 +64,8 @@ public class McMasterScraper extends Scraper {
         RestResponse rr = RestRequest.get("https://epprd.mcmaster.ca/psp/prepprd/EMPLOYEE/EMPL/").run()
                 .nextPost("https://epprd.mcmaster.ca/psp/prepprd/EMPLOYEE/EMPL/")
                 .allowInvalidCertificates(true)
-                .setFormParameter("userid", "dixond2")
-                .setFormParameter("pwd", "Hv6eVW2NKzMgUydESdgn")
+                .setFormParameter("userid", System.getenv("MCMASTER_USERNAME"))
+                .setFormParameter("pwd", System.getenv("MCMASTER_PASSWORD"))
                 .setFormParameter("Submit", "Sign+In")
                 .setQueryParameter("cmd", "login").run();
 
@@ -231,7 +231,6 @@ public class McMasterScraper extends Scraper {
                             .setFormParameter("ICFind", "")
                             .setFormParameter("ICAddCount", "")
                             .setFormParameter("ICAPPCLSDATA", "")
-                            .setFormParameter("DERIVED_SSTSNAV_SSTS_MAIN_GOTO$16$", "9999")
                             .setFormParameter("CLASS_SRCH_WRK2_INSTITUTION$31$", "MCMST")
                             .setFormParameter("MCM_DERIVED_CE_ACAD_CAREER", "UGRD")
                             .setFormParameter("CLASS_SRCH_WRK2_STRM$35$", term.getKey())
@@ -239,7 +238,9 @@ public class McMasterScraper extends Scraper {
                             .setFormParameter("SSR_CLSRCH_WRK_SSR_EXACT_MATCH1$1", "E")
                             .setFormParameter("SSR_CLSRCH_WRK_CATALOG_NBR$1", "")
                             .setFormParameter("SSR_CLSRCH_WRK_SSR_OPEN_ONLY$chk$3", "N")
-                            .setFormParameter("SSR_CLSRCH_WRK_CLASS_NBR$4", "");
+                            .setFormParameter("SSR_CLSRCH_WRK_CLASS_NBR$4", "")
+                            .setFormParameter("DERIVED_SSTSNAV_SSTS_MAIN_GOTO$7$", "9999")
+                            .setFormParameter("DERIVED_SSTSNAV_SSTS_MAIN_GOTO$8$", "9999");
 
             rr = req.run();
 
@@ -266,59 +267,13 @@ public class McMasterScraper extends Scraper {
                 // Go back to the search page.
                 rr = rr.nextPost("https://csprd.mcmaster.ca/psc/prcsprd/EMPLOYEE/HRMS_LS/c/SA_LEARNER_SERVICES.CLASS_SEARCH.GBL")
                         .setFormParameter("ICAction", "CLASS_SRCH_WRK2_SSR_PB_NEW_SEARCH")
-                        .setFormParameter("DERIVED_SSTSNAV_SSTS_MAIN_GOTO$5$", "9999")
-                        .setFormParameter("DERIVED_SSTSNAV_SSTS_MAIN_GOTO$207$", "9999").run();
+                        .setFormParameter("DERIVED_SSTSNAV_SSTS_MAIN_GOTO$7$", "9999")
+                        .setFormParameter("DERIVED_SSTSNAV_SSTS_MAIN_GOTO$8$", "9999").run();
 
             } else {
                 LOGGER.info("No courses listed under this department.");
             }
         }
-    }
-
-    public Collection<Course> retrieveDepartment(Term term, Department department) throws IOException {
-
-        LOGGER.info("Retrieving courses for McMaster University department \"" + department.getCode()
-                + "\" and term: " + term.toString() + "...");
-
-        // Retrieve all course content.
-        RestResponse rr = this.performAuthentication();
-
-        LOGGER.info("Initiating search...");
-
-        RestRequest req =
-                rr.nextPost("https://csprd.mcmaster.ca/psc/prcsprd/EMPLOYEE/"
-                        + "HRMS_LS/c/SA_LEARNER_SERVICES.CLASS_SEARCH.GBL")
-                        .setFormParameter("ICAction", "CLASS_SRCH_WRK2_SSR_PB_CLASS_SRCH")
-                        .setFormParameter("DERIVED_SSTSNAV_SSTS_MAIN_GOTO$155$", "9999")
-                        .setFormParameter("CLASS_SRCH_WRK2_INSTITUTION$41$", "MCMST")
-                        .setFormParameter("MCM_DERIVED_CE_ACAD_CAREER", "UGRD")
-                        .setFormParameter("CLASS_SRCH_WRK2_STRM$45$", term.getKey())
-                        .setFormParameter("SSR_CLSRCH_WRK_SUBJECT$75$$0", department.getCode())
-                        .setFormParameter("SSR_CLSRCH_WRK_SSR_EXACT_MATCH1$1", "E")
-                        .setFormParameter("SSR_CLSRCH_WRK_SSR_OPEN_ONLY$chk$3", "N")
-                        .setFormParameter("DERIVED_SSTSNAV_SSTS_MAIN_GOTO$183$", "9999");
-
-        rr = req.run();
-
-        // Handle the situation where a warning message about search returning a lot fromName results comes up.
-        if (rr.getResponseString().contains(SEARCH_BLOCKING_METHOD)) {
-
-            LOGGER.info("Navigating through the large result set screen...");
-
-            rr = rr.nextPost("https://csprd.mcmaster.ca/psc/prcsprd/EMPLOYEE/HRMS_LS/c/SA_LEARNER_SERVICES.CLASS_SEARCH.GBL")
-                    .setFormParameter("ICAction", "#ICSave").run();
-        }
-
-        Element resultsData = Jsoup.parse(rr.getResponseString().replace("<![CDATA[", "").replace("]]>", ""));
-
-        if (resultsData.getElementById("ACE_$ICField229$0") != null) {
-
-            LOGGER.info("Pulling course data...");
-
-            return parseCourses(term, department, resultsData);
-        }
-
-        return new ArrayList<>(0);
     }
 
     private Collection<Course> parseCourses(Term containingTerm, Department department, Element departmentSchedule) {
@@ -449,6 +404,7 @@ public class McMasterScraper extends Scraper {
                                 switch (m.group("type")) {
 
                                     case "LEC":
+                                    case "FLD":
                                     case "SEM":
                                     case "WRK":
                                     case "COP":
