@@ -13,6 +13,20 @@
         },
         "name": "University of Toronto Scarborough Campus 2017/2018"
     },
+    "utsc_summer": {
+        "show_term": false,
+        "school_unit_names": {
+            "tutorial": "Tutorial",
+            "core": "Lecture",
+            "lab": "Practical"
+        },
+        "school_unit_prefixes": {
+            "tutorial": "TUT",
+            "core": "LEC",
+            "lab": "PRA"
+        },
+        "name": "University of Toronto Scarborough Campus Summer 2018"
+    },
     "western": {
         "show_term": false,
         "school_unit_names": {
