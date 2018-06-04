@@ -11,7 +11,7 @@
             "core": "LEC",
             "lab": "PRA"
         },
-        "name": "University of Toronto Scarborough Campus 2017/2018"
+        "name": "University of Toronto Scarborough Campus 2018/2019"
     },
     "utsc_summer": {
         "show_term": false,
@@ -39,7 +39,7 @@
             "core": "LEC",
             "lab": "LAB"
         },
-        "name": "University of Western Ontario 2017/2018"
+        "name": "University of Western Ontario 2018/2019"
     },
     "mcmaster": {
         "show_term": true,
