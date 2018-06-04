@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
                 @SectionMapping(code = "EXM", name = "Exam")
         },
         legacy = @LegacyConfig(
-                year = 2017, term = TermClassifier.FULL_SCHOOL_YEAR,
+                year = 2018, term = TermClassifier.FULL_SCHOOL_YEAR,
                 mapping = {
                         @LegacyMapping(from = "LEC", to = CORE),
                         @LegacyMapping(from = "LAB", to = LAB),
