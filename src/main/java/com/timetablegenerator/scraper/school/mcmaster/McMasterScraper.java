@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
                 @SectionMapping(name = "Tutorial", code = "T")
         },
         legacy = @LegacyConfig(
-                year = 2017, term = TermClassifier.FULL_SCHOOL_YEAR,
+                year = 2018, term = TermClassifier.FULL_SCHOOL_YEAR,
                 mapping = {
                         @LegacyMapping(from = "C", to = CORE),
                         @LegacyMapping(from = "L", to = LAB),
@@ -650,10 +650,10 @@ public class McMasterScraper extends Scraper {
 
         mergedTerms.forEach(probableTerms::remove);
 
-        // Remove all 2016/2017 terms, since apparently McMaster is too dumb to do so themselves...
+        // Remove all 2017/2018 terms, since apparently McMaster is too dumb to do so themselves...
         return new TreeSet<>(probableTerms.stream()
-                .filter(t -> t.getYear() > 2016)
-                .filter(t -> !(t.getTermId() == TermClassifier.SPRING && t.getYear() == 2017))
+                .filter(t -> t.getYear() > 2017)
+                .filter(t -> !(t.getTermId() == TermClassifier.SPRING && t.getYear() == 2018))
                 .collect(Collectors.toSet()));
     }
 }
