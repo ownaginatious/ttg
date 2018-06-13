@@ -410,6 +410,7 @@ public class McMasterScraper extends Scraper {
                                     case "COP":
                                     case "IND":
                                     case "PRJ":
+                                    case "PLC":
                                     case "EXC":
                                     case "PRA":
                                     case "THE":
