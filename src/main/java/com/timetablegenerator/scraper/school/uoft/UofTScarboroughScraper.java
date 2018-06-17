@@ -81,10 +81,7 @@ public class UofTScarboroughScraper extends Scraper {
 
         LOGGER.info("Extracting departments...");
 
-        Collection<Department> departments = this.getDepartments().stream()
-                .filter(x -> !x.getCode().equals("EEG"))
-                .filter(x -> !x.getCode().equals("COP"))
-                .filter(x -> !x.getCode().equals("MGT")).collect(Collectors.toList());
+        Collection<Department> departments = this.getDepartments();
 
         // Iterate over the departments.
         for (Department department : departments) {
