@@ -295,6 +295,7 @@ public class McMasterScraper extends Scraper {
 
             String currentSectionTitle = null;
             Boolean currentSectionFull = null;
+            Boolean currentSectionWaitList = null;
 
             final Map<TermClassifier, Course> currentCourseMultiplexer = new EnumMap<>(TermClassifier.class);
 
@@ -342,11 +343,13 @@ public class McMasterScraper extends Scraper {
                                     String statusText = ParsingTools.sanitize(subdiv.select("img").first().attr("alt"));
 
                                     switch (statusText) {
-
                                         case "Closed":
                                             currentSectionFull = true;
                                             break;
-
+                                        case "Wait List":
+                                            currentSectionFull = true;
+                                            currentSectionWaitList = true;
+                                            break;
                                         case "Open":
                                             currentSectionFull = false;
                                             break;
@@ -439,7 +442,7 @@ public class McMasterScraper extends Scraper {
                                         + currentSectionTitle + "\"");
 
                             currentSection = Section.fromName(m.group("name")).setSerialNumber(m.group("serial"))
-                                    .setFull(currentSectionFull);
+                                    .setFull(currentSectionFull).setWaitingList(currentSectionWaitList);
 
                             currentSectionTitle = null;
                             currentSectionFull = null;
