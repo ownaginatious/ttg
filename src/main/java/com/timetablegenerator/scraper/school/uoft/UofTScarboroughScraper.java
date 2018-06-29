@@ -49,7 +49,7 @@ public class UofTScarboroughScraper extends Scraper {
     private static final Pattern COURSE_CODE_DEP_MATCHER =
             Pattern.compile("(?<code>(?<department>[A-Z]{3})[A-Z0-9]{3,4}(?<credits>[HY])[0-9]?(?<term>[FSY])) -\\s?(?<name>.*)");
 
-    private static final String ROOT_URL = "http://www.utsc.utoronto.ca/~registrar/";
+    private static final String ROOT_URL = "https://www.utsc.utoronto.ca/~registrar/";
     private static final String TIMETABLE_URL = ROOT_URL + "scheduling/timetable";
 
     private Collection<Department> getDepartments() throws IOException {
