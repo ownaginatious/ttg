@@ -53,7 +53,7 @@ public class WesternScraper extends Scraper {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final String ORIGIN = "http://studentservices.uwo.ca";
+    private final String ORIGIN = "https://studentservices.uwo.ca";
     private final String TIMETABLE_ROOT = ORIGIN + "/secure/timetables/mastertt/ttindex.cfm";
     private final String EDUC_TIMETABLE_ROOT = ORIGIN + "/secure/timetables/eductt/ttindex.cfm";
 
