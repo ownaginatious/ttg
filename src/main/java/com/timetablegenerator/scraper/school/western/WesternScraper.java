@@ -123,7 +123,7 @@ public class WesternScraper extends Scraper {
 
             d = Jsoup.parse(request.run().getResponseString());
 
-            if (d.select("textarea[name=recaptcha_challenge_field]").size() > 0)
+            if (d.select(".g-recaptcha").size() > 0)
                 LOGGER.warn(" >>> CAPTCHA detected, pausing for cool-down... [" + i + "s]");
             else
                 break;
@@ -432,11 +432,28 @@ public class WesternScraper extends Scraper {
     public Set<Term> findAvailableTerms() throws IOException {
 
         RestResponse resp = RestRequest.get(TIMETABLE_ROOT).run();
+        Document d = Jsoup.parse(resp.getResponseString());
 
-        Element e = Jsoup.parse(resp.getResponseString()).select("small.resizeSmall").first();
+        // retry in case of captcha
 
-        if (e == null)
+        int i = 0;
+        while (d.select(".g-recaptcha").size() > 0) {
+            int pause = COOL_DOWN_PAUSE + 5 * i++;
+            LOGGER.warn(" >>> CAPTCHA detected, pausing for cool-down... [" + pause + "s]");
+            try {
+                Thread.sleep(1000 * pause);
+            } catch (InterruptedException ie) {
+                System.out.println("Interrupted prematurely?");
+            }
+            resp = RestRequest.get(TIMETABLE_ROOT).run();
+            d = Jsoup.parse(resp.getResponseString());
+        }
+
+        Element e = d.select("small.resizeSmall").first();
+
+        if (e == null) {
             throw new IllegalArgumentException("Cannot locate header string. Perhaps the web page layout has changed?");
+        }
 
         String value = ParsingTools.sanitize(e.ownText());
 
