@@ -49,8 +49,8 @@ public class UofTScarboroughScraper extends Scraper {
     private static final Pattern COURSE_CODE_DEP_MATCHER =
             Pattern.compile("(?<code>(?<department>[A-Z]{3})[A-Z0-9]{3,4}(?<credits>[HY])[0-9]?(?<term>[FSY])) -\\s?(?<name>.*)");
 
-    private static final String ROOT_URL = "https://www.utsc.utoronto.ca/~registrar/";
-    private static final String TIMETABLE_URL = ROOT_URL + "scheduling/timetable";
+    private static final String ROOT_URL = "https://www.utsc.utoronto.ca/";
+    private static final String TIMETABLE_URL = ROOT_URL + "regoffice/timetable/timetable.php";
 
     private Collection<Department> getDepartments() throws IOException {
 
@@ -119,7 +119,6 @@ public class UofTScarboroughScraper extends Scraper {
                 .setFormParameter("course", department.getCode())
                 .setFormParameter("course2", "")
                 .setFormParameter("submit", "Display by Discipline").run();
-
         Document doc = Jsoup.parse(response.getResponseString());
 
         Elements courseTable = doc.getElementById("timetable_section").select("tr");
