@@ -1,15 +1,6 @@
 #! /bin/bash
 set -e -u
 
-# Microcontroller slaves require a different build.
-if [[ "$(uname -m)" =~ ^armv6.*$ ]]
-then
-    arch="-armv6h"
-elif [[ "$(uname -m)" =~ ^armv7.*$ ]]
-then
-    arch="-armv7h"
-fi
-
 [ -z "${JENKINS_PORT:-}" ] && JENKINS_PORT=8080
 [ -z "${JENKINS_SLAVE_PORT:-}" ] && JENKINS_SLAVE_PORT=50000
 
@@ -77,7 +68,7 @@ then
     super_container="--privileged"
 fi
 
-# Communication with this docker server will be integrated into the Jenkins container
+# Communication with the host's docker daemon will be integrated into the Jenkins container
 if "${slave}"
 then
     docker run -d -v /var/run/docker.sock:/var/run/docker.sock \
@@ -103,3 +94,4 @@ docker exec -u root "${container}" /bin/chmod a+s /usr/bin/docker
 printf "done!\n"
 
 docker ps --filter "name=${container}"
+
