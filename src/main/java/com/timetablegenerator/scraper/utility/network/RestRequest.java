@@ -69,7 +69,13 @@ public final class RestRequest {
 
     private HttpClient buildHttpClient(boolean secure) {
 
+        int ten_seconds = 10000;
+        RequestConfig rcb = RequestConfig.custom()
+                .setConnectTimeout(ten_seconds)
+                .setSocketTimeout(ten_seconds).build();
+
         HttpClientBuilder htb = HttpClients.custom();
+        htb.setDefaultRequestConfig(rcb);
 
         if (!secure) {
             try {

@@ -98,7 +98,7 @@ public final class RestResponse {
 
         if (response == null) {
             throw new IOException("Failed to yield a response from the server after "
-                    + (1 + retryCount) + " attempt" + (retryCount > 0 ? "s" : ""));
+                    + attempts + " attempt" + (retryCount > 0 ? "s" : ""));
         }
 
         // Get the HTTP status code.
