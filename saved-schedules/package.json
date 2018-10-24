@@ -1,0 +1,19 @@
+{
+  "name": "user_schedules",
+  "version": "1.0.0",
+  "description": "Temporary fix to store user schedules with MongoDB.",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.13.4",
+    "json-stable-stringify": "^1.0.1",
+    "minimist": "^1.2.0",
+    "mongodb": "^2.1.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Alice Tsai",
+  "license": "ISC"
+}
