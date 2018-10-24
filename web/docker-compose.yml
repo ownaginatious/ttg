@@ -1,0 +1,62 @@
+version: '2'
+services:
+
+  ttg-web-frontend:
+    image: node:6
+    volumes:
+      - ./ttg_frontend:/code
+      - ./dev_data/node_modules:/code/node_modules
+    ports:
+      - "7447:8000"
+    links:
+      - ttg-web-backend
+      - ttg-saved-schedules
+    command: >
+        bash -c "
+        cd /code &&
+        npm install &&
+        ./node_modules/grunt-cli/bin/grunt dev-build &&
+        ./node_modules/grunt-cli/bin/grunt concurrent:serve
+        "
+
+  ttg-web-backend:
+    image: python:3
+    volumes:
+      - ./dev_data/legacy_data:/legacy_data
+      - ./ttg_backend:/code
+    environment:
+      - "SECRET_KEY=DEV_SECRET"
+      - "LEGACY_DIR=/legacy_data"
+      - "LEGACY_POST_KEY=DEV_POST_KEY"
+      - "DJANGO_SETTINGS_MODULE:settings.dev"
+    expose:
+      - "8080"
+    command: >
+        bash -c "
+        cd /code &&
+        pip install -r requirements.txt &&
+        pip install uwsgi &&
+        python ./manage.py runserver 0.0.0.0:8080
+        "
+
+  ttg-saved-schedules:
+    image: node:6
+    volumes:
+      - ../ttg-saved-schedules:/code
+    expose:
+     - "8080"
+    links:
+      - ttg-mongodb
+    command: >
+        bash -c "
+        cd /code &&
+        npm install &&
+        node ./app.js --service ttg --server_port 8080\
+                      --max_size 10000 --db_host ttg-mongodb\
+                      --db_port 27017
+        "
+
+  ttg-mongodb:
+    image: mongo:3
+    volumes:
+      - ./dev_data/mongodb:/data/db

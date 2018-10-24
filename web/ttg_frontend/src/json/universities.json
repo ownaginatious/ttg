@@ -1,0 +1,72 @@
+{
+    "utsc": {
+        "show_term": false,
+        "school_unit_names": {
+            "tutorial": "Tutorial",
+            "core": "Lecture",
+            "lab": "Practical"
+        },
+        "school_unit_prefixes": {
+            "tutorial": "TUT",
+            "core": "LEC",
+            "lab": "PRA"
+        },
+        "name": "University of Toronto Scarborough Campus 2018/2019"
+    },
+    "utsc_summer": {
+        "show_term": false,
+        "school_unit_names": {
+            "tutorial": "Tutorial",
+            "core": "Lecture",
+            "lab": "Practical"
+        },
+        "school_unit_prefixes": {
+            "tutorial": "TUT",
+            "core": "LEC",
+            "lab": "PRA"
+        },
+        "name": "University of Toronto Scarborough Campus Summer 2018"
+    },
+    "western": {
+        "show_term": false,
+        "school_unit_names": {
+            "tutorial": "Tutorial",
+            "core": "Lecture",
+            "lab": "Lab"
+        },
+        "school_unit_prefixes": {
+            "tutorial": "TUT",
+            "core": "LEC",
+            "lab": "LAB"
+        },
+        "name": "University of Western Ontario 2018/2019"
+    },
+    "mcmaster": {
+        "show_term": true,
+        "school_unit_names": {
+            "tutorial": "Tutorial",
+            "core": "Core",
+            "lab": "Lab"
+        },
+        "school_unit_prefixes": {
+            "tutorial": "T",
+            "core": "C",
+            "lab": "L"
+        },
+        "name": "McMaster University 2018/2019"
+    },
+    "mcmaster_summer": {
+        "show_term": true,
+        "school_unit_names": {
+            "tutorial": "Tutorial",
+            "core": "Core",
+            "lab": "Lab"
+        },
+        "school_unit_prefixes": {
+            "tutorial": "T",
+            "core": "C",
+            "lab": "L"
+        },
+        "name": "McMaster University Summer 2018"
+    }
+}

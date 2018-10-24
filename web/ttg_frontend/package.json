@@ -1,0 +1,28 @@
+{
+  "name": "ttg",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Grunt automation for the Timetable Generator front end",
+  "devDependencies": {
+    "grunt": "^0.4.0",
+    "grunt-bower-task": "^0.4.0",
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-htmlmin": "^1.4.0",
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-contrib-nodeunit": "^1.0.0",
+    "grunt-contrib-symlink": "^1.0.0",
+    "grunt-contrib-uglify": "^1.0.0",
+    "grunt-contrib-watch": "1.0.0",
+    "grunt-contrib-connect": "1.0.2",
+    "grunt-connect-proxy": "0.2.0",
+    "grunt-concurrent": "2.3.0",
+    "grunt-wiredep": "^3.0.0",
+    "wiredep": "^4.0.0",
+    "grunt-cli": "^1.2.0",
+    "serve-static": "^1.11.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  }
+}

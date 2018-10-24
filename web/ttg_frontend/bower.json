@@ -1,0 +1,10 @@
+{
+  "name": "ttg",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "jquery": "2.2.3",
+    "bootstrap": "3.3.6",
+    "moment": "2.13.0"
+  }
+}
