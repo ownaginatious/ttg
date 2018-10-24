@@ -1,0 +1,17 @@
+FROM java:8
+ENV EDITED_ON 2016-02-24
+RUN apt-get update && \
+    apt-get install -y apt-transport-https ca-certificates && \
+    apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D && \
+    echo "deb https://apt.dockerproject.org/repo debian-jessie main"  > /etc/apt/sources.list.d/docker.list && \
+    apt-get update && apt-get install -y docker-engine
+
+CMD [ -d '/ssh_keys' ] && (cp -R /ssh_keys /root/.ssh/ && \
+                           chown -R root:root /root/.ssh/ && \
+                           chmod 400 -R /root/.ssh/) || true && \
+    rm -f slave.jar && \
+    wget "https://jenkins.timetablegenerator.io/jnlpJars/slave.jar" && \
+    java -jar ./slave.jar \
+         -jnlpUrl https://jenkins.timetablegenerator.io/computer/${JENKINS_SLAVE_ID}/slave-agent.jnlp \
+         -secret ${JENKINS_SLAVE_SECRET}
+

@@ -1,0 +1,52 @@
+version: '2'
+services:
+
+  ttg-nginx:
+    build: .
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes_from:
+      - ttg-letsencrypt:ro
+    links:
+      - ttg-web-backend
+      - ttg-web-frontend
+      - ttg-saved-schedules
+      - ttg-letsencrypt
+
+  ttg-web-backend:
+    image: docker.timetablegenerator.io/ttg/ttg-web-backend
+    volumes:
+      - "${TTG_LEGACY_DIR}:/data"
+    environment:
+      - "SECRET_KEY=${TTG_WEB_BACKEND_SECRET}"
+      - "LEGACY_DIR=/data"
+      - "LEGACY_POST_KEY=${TTG_LEGACY_POST_KEY}"
+    expose:
+      - "8080"
+
+  ttg-web-frontend:
+    image: docker.timetablegenerator.io/ttg/ttg-web-frontend
+    expose:
+      - "80"
+
+  ttg-saved-schedules:
+    image: docker.timetablegenerator.io/ttg/ttg-saved-schedules
+    expose:
+     - "8080"
+    links:
+      - ttg-mongodb
+
+  ttg-mongodb:
+    image: mongo:3
+    volumes:
+      - "${TTG_MONGO_VOL}:/data/db"
+
+  ttg-letsencrypt:
+    image: quay.io/letsencrypt/letsencrypt:latest
+    expose:
+      - "80"
+      - "443"
+    volumes:
+      - "${TTG_SSL}/lib:/var/lib/letsencrypt"
+      - "${TTG_SSL}/etc:/etc/letsencrypt"
