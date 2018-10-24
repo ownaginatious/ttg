@@ -1,0 +1,21 @@
+apply plugin: 'java'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+version = '2.0'
+
+jar {
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    from(sourceSets.main.output){ include "**" }
+    archiveName = "ttg-api-java.jar"
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile 'junit:junit:4.12'
+    compile 'com.google.code.findbugs:jsr305:3.0.1'
+}
