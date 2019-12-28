@@ -23,13 +23,13 @@ public class Console {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @SuppressWarnings("unused")
-    @Option(name="-jlo", aliases = "-json-mapping-output", required = false,
-            usage = "The directory to output a generated mapping format JSON file.")
+    @Option(name="-jlo", aliases = "-json-legacy-output", required = false,
+            usage = "The path of the legacy (V1) JSON file to write.")
     private String legacyJsonOutput;
 
     @SuppressWarnings("unused")
     @Option(name="-jo", aliases = "-json-output", required = true,
-            usage = "The directory to output the generated JSON file.")
+            usage = "The path of the V2 JSON file to write.")
     private String jsonOutput;
 
     @SuppressWarnings("unused")
@@ -42,7 +42,7 @@ public class Console {
     private boolean help;
 
     private static final String USAGE =
-            "Usage: java -jar <jar name>.jar -s SCHOOL_NAME -jo|--json-output /some/file/path.json";
+            "Usage: java -jar <jar name>.jar -s SCHOOL_NAME -jo|--json-output PATH_TO_JSON_FILE [-jlo|--json-legacy-output PATH_TO_JSON_FILE";
 
     public static void main(String[] args) throws Throwable {
 
