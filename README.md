@@ -13,16 +13,16 @@ This table summarizes what each one represents:
 
 | Component | Description |
 | -----------|------------|
-| [infrastructure](../infrastructure) | Docker-based infrastructure for bringing up services used for the production environment. |
-| [model](../model) | Language specific implementations of the data model that website data is parsed into by the scrapers.|
-| [roadmap](../roadmap) | Old planning documentation describing the current state of the timetable generator and its future development trajectory.|
-| [saved-schedules](../saved-schedules) | Node + mongo based service for saving schedules|
-| [scrapers](../scrapers) | The Java-based framework for scraping course data into JSON. Includes all supported university implementations.|
-| [web](../web) | Web front-end (jQuery + Grunt) and backend (Django) for the website.|
+| [infrastructure](./infrastructure) | Docker-based infrastructure for bringing up services used for the production environment. |
+| [model](./model) | Language specific implementations of the data model that website data is parsed into by the scrapers.|
+| [roadmap](./roadmap) | Old planning documentation describing the current state of the timetable generator and its future development trajectory.|
+| [saved-schedules](./saved-schedules) | Node + mongo based service for saving schedules|
+| [scrapers](./scrapers) | The Java-based framework for scraping course data into JSON. Includes all supported university implementations.|
+| [web](./web) | Web front-end (jQuery + Grunt) and backend (Django) for the website.|
 
 Thorough documentation is provided for getting each of the components running separately (if possible). Please open an issue if you feel anything needs further clarification.
 
-[roadmap](../roadmap) is a good starting point to understanding how this all fits together.
+[roadmap](./roadmap) is a good starting point to understanding how this all fits together.
 
 ## How do I contribute?
 
