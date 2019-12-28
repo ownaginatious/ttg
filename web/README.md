@@ -2,6 +2,8 @@
 
 The front and backend implementations of the Timetable Generator
 
+** NOTE: Any instructions referring to external services are now obsolete as those external services no longer exist.**
+
 ## How do I begin development?
 
 ### Required tools
