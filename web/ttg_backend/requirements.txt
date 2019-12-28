@@ -1,5 +1,5 @@
 django-model-utils==2.4
-django==1.11.23
+django==3.0.1
 djangorestframework-yaml==1.0.3
 djangorestframework==3.9.1
 
