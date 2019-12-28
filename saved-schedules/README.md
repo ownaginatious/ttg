@@ -1,3 +1,7 @@
+# michuservice
+
+A service for storing deduplicated arbitrary JSON under deterministic fingerprints/IDs. This was used for storing saved timetable data in the timetable generator.
+
 ## Steps:
 1. Run npm install
 2. Run mongod
